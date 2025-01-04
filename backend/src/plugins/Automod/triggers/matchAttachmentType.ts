@@ -13,19 +13,20 @@ const baseConfig = z.strictObject({
   filetype_blacklist: z.array(z.string().max(32)).max(255).default([]),
   filetype_whitelist: z.array(z.string().max(32)).max(255).default([]),
 });
-const configWithWhitelist = baseConfig.merge(z.strictObject({
-  whitelist_enabled: z.literal(true),
-  blacklist_enabled: z.literal(false).default(false),
-}));
-const configWithBlacklist = baseConfig.merge(z.strictObject({
-  blacklist_enabled: z.literal(true),
-  whitelist_enabled: z.literal(false).default(false),
-}));
+const configWithWhitelist = baseConfig.merge(
+  z.strictObject({
+    whitelist_enabled: z.literal(true),
+    blacklist_enabled: z.literal(false).default(false),
+  }),
+);
+const configWithBlacklist = baseConfig.merge(
+  z.strictObject({
+    blacklist_enabled: z.literal(true),
+    whitelist_enabled: z.literal(false).default(false),
+  }),
+);
 
-const configSchema = z.union([
-  configWithWhitelist,
-  configWithBlacklist,
-]);
+const configSchema = z.union([configWithWhitelist, configWithBlacklist]);
 
 export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
   configSchema,

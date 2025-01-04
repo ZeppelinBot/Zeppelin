@@ -1,6 +1,6 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { humanizeDuration } from "../../../../humanizeDuration.js";
 import { UnknownUser, asSingleLine, renderUsername } from "../../../../utils.js";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";

@@ -7,9 +7,9 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { logger } from "../../../logger.js";
 import { canActOn } from "../../../pluginUtils.js";
 import { convertDelayStringToMS } from "../../../utils.js";

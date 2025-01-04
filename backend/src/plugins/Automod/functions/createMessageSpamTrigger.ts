@@ -1,6 +1,6 @@
 import z from "zod";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
-import { humanizeDurationShort } from "../../../humanizeDurationShort.js";
+import { humanizeDurationShort } from "../../../humanizeDuration.js";
 import { getBaseUrl } from "../../../pluginUtils.js";
 import { convertDelayStringToMS, sorter, zDelayString } from "../../../utils.js";
 import { RecentActionType } from "../constants.js";

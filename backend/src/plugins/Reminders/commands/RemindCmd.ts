@@ -1,7 +1,7 @@
-import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { registerUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { convertDelayStringToMS, messageLink } from "../../../utils.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 import { remindersCmd } from "../types.js";

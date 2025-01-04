@@ -3,7 +3,7 @@ import { PluginOptions, guildPlugin } from "knub";
 import { GuildCounters } from "../../data/GuildCounters.js";
 import { CounterTrigger, parseCounterConditionString } from "../../data/entities/CounterTrigger.js";
 import { makePublicFn } from "../../pluginUtils.js";
-import { MINUTES, convertDelayStringToMS, values } from "../../utils.js";
+import { MINUTES, convertDelayStringToMS } from "../../utils.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { AddCounterCmd } from "./commands/AddCounterCmd.js";
 import { CountersListCmd } from "./commands/CountersListCmd.js";

@@ -6,7 +6,7 @@ import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { LogType } from "../../data/LogType.js";
-import { keys, zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils.js";
+import { zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils.js";
 import { MessageBuffer } from "../../utils/MessageBuffer.js";
 import {
   TemplateSafeCase,

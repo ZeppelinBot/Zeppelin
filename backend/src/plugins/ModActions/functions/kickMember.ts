@@ -3,7 +3,13 @@ import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { LogType } from "../../../data/LogType.js";
 import { renderTemplate, TemplateParseError, TemplateSafeValueContainer } from "../../../templateFormatter.js";
-import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils.js";
+import {
+  createUserNotificationError,
+  notifyUser,
+  resolveUser,
+  ucfirst,
+  UserNotificationResult,
+} from "../../../utils.js";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
 import { CasesPlugin } from "../../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";

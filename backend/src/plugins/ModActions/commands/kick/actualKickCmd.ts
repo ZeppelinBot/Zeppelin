@@ -2,7 +2,14 @@ import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } f
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../../data/LogType.js";
 import { canActOn } from "../../../../pluginUtils.js";
-import { DAYS, SECONDS, UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils.js";
+import {
+  DAYS,
+  SECONDS,
+  UnknownUser,
+  UserNotificationMethod,
+  renderUsername,
+  resolveMember,
+} from "../../../../utils.js";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
 import {
   formatReasonWithAttachments,

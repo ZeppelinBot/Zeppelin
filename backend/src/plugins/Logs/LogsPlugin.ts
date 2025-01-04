@@ -30,7 +30,7 @@ import {
 import { LogsThreadCreateEvt, LogsThreadDeleteEvt, LogsThreadUpdateEvt } from "./events/LogsThreadModifyEvts.js";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts.js";
 import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts.js";
-import { FORMAT_NO_TIMESTAMP, LogsPluginType, zLogsConfig } from "./types.js";
+import { LogsPluginType, zLogsConfig } from "./types.js";
 import { getLogMessage } from "./util/getLogMessage.js";
 import { log } from "./util/log.js";
 import { onMessageDelete } from "./util/onMessageDelete.js";

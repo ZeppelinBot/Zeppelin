@@ -1,5 +1,9 @@
 import { GuildPluginData } from "knub";
-import { getPhishermanDomainInfo, phishermanDomainIsSafe, trackPhishermanCaughtDomain } from "../../../data/Phisherman.js";
+import {
+  getPhishermanDomainInfo,
+  phishermanDomainIsSafe,
+  trackPhishermanCaughtDomain,
+} from "../../../data/Phisherman.js";
 import { PhishermanDomainInfo } from "../../../data/types/phisherman.js";
 import { PhishermanPluginType } from "../types.js";
 

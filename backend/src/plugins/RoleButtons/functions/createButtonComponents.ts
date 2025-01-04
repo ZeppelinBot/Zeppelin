@@ -4,7 +4,10 @@ import { TRoleButtonsConfigItem } from "../types.js";
 import { TooManyComponentsError } from "./TooManyComponentsError.js";
 import { convertButtonStyleStringToEnum } from "./convertButtonStyleStringToEnum.js";
 
-export function createButtonComponents(configItem: TRoleButtonsConfigItem, configName: string): Array<ActionRowBuilder<ButtonBuilder>> {
+export function createButtonComponents(
+  configItem: TRoleButtonsConfigItem,
+  configName: string,
+): Array<ActionRowBuilder<ButtonBuilder>> {
   const rows: Array<ActionRowBuilder<ButtonBuilder>> = [];
 
   let currentRow = new ActionRowBuilder<ButtonBuilder>();

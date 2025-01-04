@@ -2,7 +2,12 @@ import { GuildPluginData } from "knub";
 import { convertDelayStringToMS } from "../../../utils.js";
 import { AutomodContext, AutomodPluginType, TRule } from "../types.js";
 
-export function applyCooldown(pluginData: GuildPluginData<AutomodPluginType>, rule: TRule, ruleName: string, context: AutomodContext) {
+export function applyCooldown(
+  pluginData: GuildPluginData<AutomodPluginType>,
+  rule: TRule,
+  ruleName: string,
+  context: AutomodContext,
+) {
   const cooldownKey = `${ruleName}-${context.user?.id}`;
 
   const cooldownTime = convertDelayStringToMS(rule.cooldown, "s");

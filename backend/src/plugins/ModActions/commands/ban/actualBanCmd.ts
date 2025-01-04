@@ -1,9 +1,9 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { getMemberLevel } from "knub/helpers";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { clearExpiringTempban, registerExpiringTempban } from "../../../../data/loops/expiringTempbansLoop.js";
+import { humanizeDuration } from "../../../../humanizeDuration.js";
 import { canActOn, getContextChannel } from "../../../../pluginUtils.js";
 import { UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils.js";
 import { banLock } from "../../../../utils/lockNameHelpers.js";
