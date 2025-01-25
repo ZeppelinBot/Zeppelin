@@ -65,8 +65,7 @@ export const StarboardReactionAddEvt = starboardEvt({
       // Save reaction into the database
       await pluginData.state.starboardReactions.createStarboardReaction(msg.id, userId).catch(noop);
 
-      const reactions = await pluginData.state.starboardReactions.getAllReactionsForMessageId(msg.id);
-      const reactionsCount = reactions.length;
+      const reactionsCount = meta.args.reaction.count!;
 
       const starboardMessages = await pluginData.state.starboardMessages.getMatchingStarboardMessages(
         starboard.channel_id,
