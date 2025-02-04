@@ -274,7 +274,7 @@ connect().then(async () => {
     }
   });
 
-  client.on("error", (err) => {
+  client.on(Events.Error, (err) => {
     errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
   });
 
@@ -371,7 +371,7 @@ connect().then(async () => {
     },
   });
 
-  client.once("ready", () => {
+  client.once(Events.ClientReady, () => {
     startUptimeCounter();
   });
 
