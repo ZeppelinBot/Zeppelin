@@ -262,6 +262,7 @@ export const zEmbedInput = z.object({
       z.object({
         name: z.string(),
         url: z.string().optional(),
+        icon_url: z.string().optional(),
         width: z.number().optional(),
         height: z.number().optional(),
       }),
