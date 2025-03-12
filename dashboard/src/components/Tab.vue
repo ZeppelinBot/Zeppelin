@@ -15,7 +15,7 @@
     }
   }
 
-  a {
+  :deep(a) {
     @apply block;
     @apply py-2;
     @apply px-4;
