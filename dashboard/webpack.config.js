@@ -65,7 +65,12 @@ let config = {
       // Vue / Babel / Typescript
       {
         test: /\.vue$/,
-        use: ["vue-loader"],
+        loader: "vue-loader",
+        options: {
+          compilerOptions: {
+              whitespace: 'preserve', // not the default despite the docs saying so
+          },
+        }
       },
       {
         test: /\.tsx?$/,

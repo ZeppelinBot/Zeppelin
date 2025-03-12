@@ -1,14 +1,11 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import { authGuard, authRedirectGuard, loginCallbackGuard } from "./auth";
 
-Vue.use(VueRouter);
-
-export const router = new VueRouter({
-  mode: "history",
+export const router = createRouter({
+  history: createWebHistory(),
   routes: [
-    { path: "/login", beforeEnter: authRedirectGuard },
-    { path: "/login-callback", beforeEnter: loginCallbackGuard },
+    { path: "/login", components: {}, beforeEnter: authRedirectGuard },
+    { path: "/login-callback", component: {}, beforeEnter: loginCallbackGuard },
 
     // Privacy policy
     {
@@ -97,12 +94,12 @@ export const router = new VueRouter({
   scrollBehavior(to, from, savedPosition) {
     if (to.hash) {
       return {
-        selector: to.hash,
+        el: to.hash,
       };
     } else if (savedPosition) {
       return savedPosition;
     } else {
-      return { x: 0, y: 0 };
+      return { left: 0, top: 0 };
     }
   },
 });

@@ -175,7 +175,7 @@ export default {
           expiresAt: null,
         });
 
-        this.$set(perm, "permissions", new Set(perm.permissions));
+        perm.permissions = new Set(perm.permissions);
       },
 
       onTreeUpdate(targetPermissions) {
