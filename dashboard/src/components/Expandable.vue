@@ -76,7 +76,7 @@
     @apply bg-gray-900;
   }
 
-  .codeblock {
+  :deep(.codeblock) {
     box-shadow: none;
   }
 </style>
