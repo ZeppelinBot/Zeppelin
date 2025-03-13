@@ -5,7 +5,7 @@ import shuffle from "lodash/shuffle.js";
 import moment from "moment-timezone";
 import { rootDir } from "../../../paths.js";
 import { getCurrentUptime } from "../../../uptime.js";
-import { resolveMember, sorter } from "../../../utils.js";
+import { resolveMember, sorter, toRelativeNativeTimestamp } from "../../../utils.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 import { utilityCmd } from "../types.js";
 
@@ -31,23 +31,18 @@ export const AboutCmd = utilityCmd({
     let version;
 
     if (lastCommit) {
-      lastUpdate = timeAndDate
-        .inGuildTz(moment.utc(lastCommit.committer.date, "X"))
-        .format(pluginData.getPlugin(TimeAndDatePlugin).getDateFormat("pretty_datetime"));
+      lastUpdate = toRelativeNativeTimestamp(moment.utc(lastCommit.committer.data, "X"), 0);
       version = lastCommit.shortHash;
     } else {
       lastUpdate = "?";
       version = "?";
     }
 
-    const lastReload = humanizeDuration(Date.now() - pluginData.state.lastReload, {
-      largest: 2,
-      round: true,
-    });
+    const lastReload = toRelativeNativeTimestamp(pluginData.state.lastReload, 0);
 
     const basicInfoRows = [
       ["Uptime", prettyUptime],
-      ["Last config reload", `${lastReload} ago`],
+      ["Last config reload", lastReload],
       ["Last bot update", lastUpdate],
       ["Version", version],
       ["API latency", `${pluginData.client.ws.ping}ms`],
@@ -101,7 +96,9 @@ export const AboutCmd = utilityCmd({
 
     // Use the bot avatar as the embed image
     if (pluginData.client.user!.displayAvatarURL()) {
-      aboutEmbed.thumbnail = { url: pluginData.client.user!.displayAvatarURL()! };
+      aboutEmbed.thumbnail = {
+        url: pluginData.client.user!.displayAvatarURL()!,
+      };
     }
 
     msg.channel.send({ embeds: [aboutEmbed] });

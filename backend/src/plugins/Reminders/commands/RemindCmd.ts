@@ -1,9 +1,8 @@
-import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { registerUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop.js";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
-import { convertDelayStringToMS, messageLink } from "../../../utils.js";
+import { convertDelayStringToMS, toNativeTimestamp, toRelativeNativeTimestamp, messageLink } from "../../../utils.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 import { remindersCmd } from "../types.js";
 
@@ -61,16 +60,9 @@ export const RemindCmd = remindersCmd({
 
     registerUpcomingReminder(reminder);
 
-    const msUntilReminder = reminderTime.diff(now);
-    const timeUntilReminder = humanizeDuration(msUntilReminder, { largest: 2, round: true });
-    const prettyReminderTime = (await timeAndDate.inMemberTz(msg.author.id, reminderTime)).format(
-      pluginData.getPlugin(TimeAndDatePlugin).getDateFormat("pretty_datetime"),
-    );
+    const timeUntilReminder = toRelativeNativeTimestamp(reminderTime, 0);
+    const prettyReminderTime = toNativeTimestamp(reminderTime);
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `I will remind you in **${timeUntilReminder}** at **${prettyReminderTime}**`,
-    );
+    sendSuccessMessage(pluginData, msg.channel, `I will remind you ${timeUntilReminder} at ${prettyReminderTime}`);
   },
 });

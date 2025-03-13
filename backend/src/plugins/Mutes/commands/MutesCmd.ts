@@ -10,7 +10,7 @@ import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { humanizeDurationShort } from "../../../humanizeDurationShort.js";
 import { getBaseUrl } from "../../../pluginUtils.js";
-import { DBDateFormat, MINUTES, renderUsername, resolveMember } from "../../../utils.js";
+import { DBDateFormat, MINUTES, renderUsername, resolveMember, toRelativeNativeTimestamp } from "../../../utils.js";
 import { IMuteWithDetails, mutesCmd } from "../types.js";
 
 export const MutesCmd = mutesCmd({
@@ -131,15 +131,15 @@ export const MutesCmd = mutesCmd({
 
         if (mute.expires_at) {
           const timeUntilExpiry = moment.utc().diff(moment.utc(mute.expires_at, DBDateFormat));
-          const humanizedTime = humanizeDurationShort(timeUntilExpiry, { largest: 2, round: true });
-          line += `   ⏰ Expires in ${humanizedTime}`;
+          const humanizedTime = toRelativeNativeTimestamp(timeUntilExpiry, 0);
+          line += `   ⏰ Expires ${humanizedTime}`;
         } else {
           line += `   ⏰ Indefinite`;
         }
 
-        const timeFromMute = moment.utc(mute.created_at, DBDateFormat).diff(moment.utc());
-        const humanizedTimeFromMute = humanizeDurationShort(timeFromMute, { largest: 2, round: true });
-        line += `   🕒 Muted ${humanizedTimeFromMute} ago`;
+        const timeFromMute = moment.utc(mute.created_at, DBDateFormat);
+        const humanizedTimeFromMute = toRelativeNativeTimestamp(timeFromMute);
+        line += `   🕒 Muted ${humanizedTimeFromMute}`;
 
         if (mute.banned) {
           line += `   🔨 Banned`;
@@ -207,12 +207,17 @@ export const MutesCmd = mutesCmd({
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
         await listMessage.edit({ components: [row] });
 
-        const collector = listMessage.createMessageComponentCollector({ time: stopCollectionDebounce });
+        const collector = listMessage.createMessageComponentCollector({
+          time: stopCollectionDebounce,
+        });
 
         collector.on("collect", async (interaction: MessageComponentInteraction) => {
           if (msg.author.id !== interaction.user.id) {
             interaction
-              .reply({ content: `You are not permitted to use these buttons.`, ephemeral: true })
+              .reply({
+                content: `You are not permitted to use these buttons.`,
+                ephemeral: true,
+              })
               // tslint:disable-next-line no-console
               .catch((err) => console.trace(err.message));
           } else {
@@ -228,7 +233,10 @@ export const MutesCmd = mutesCmd({
 
         stopCollectionFn = async () => {
           collector.stop();
-          await listMessage.edit({ content: listMessage.content, components: [] });
+          await listMessage.edit({
+            content: listMessage.content,
+            components: [],
+          });
         };
         bumpCollectionTimeout();
       }

@@ -446,6 +446,14 @@ export function convertMSToDelayString(ms: number): string {
   return result;
 }
 
+export function toNativeTimestamp(time, flag = "f") {
+  return `<t:${Math.round(time / 1000)}:${flag}>`;
+}
+
+export function toRelativeNativeTimestamp(ms, offset = Date.now()) {
+  return `<t:${Math.round((offset + ms) / 1000)}:R>`;
+}
+
 export function successMessage(str: string, emoji = "<:zep_check:906897402101891093>") {
   return emoji ? `${emoji} ${str}` : str;
 }

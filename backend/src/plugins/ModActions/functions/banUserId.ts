@@ -14,6 +14,7 @@ import {
   notifyUser,
   resolveMember,
   resolveUser,
+  toRelativeNativeTimestamp,
   ucfirst,
 } from "../../../utils.js";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
@@ -172,7 +173,7 @@ export async function banUserId(
       user,
       caseNumber: createdCase.case_number,
       reason: reason ?? "",
-      banTime: humanizeDuration(banTime),
+      banTime: toRelativeNativeTimestamp(banTime),
     });
   } else {
     pluginData.getPlugin(LogsPlugin).logMemberBan({
