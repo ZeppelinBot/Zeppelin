@@ -174,6 +174,7 @@
 </style>
 
 <script lang="ts">
+  import Vue from "vue";
   import {mapState} from "vuex";
   import yaml from "js-yaml";
   import CodeBlock from "./CodeBlock.vue";
