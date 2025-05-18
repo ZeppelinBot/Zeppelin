@@ -21,7 +21,7 @@
     "prettier-plugin-organize-imports": "^3.2.2",
     "ts-toolbelt": "^9.6.0",
     "tsc-watch": "^6.0.4",
-    "typescript": "^5.0.4"
+    "typescript": "^5.8.3"
   },
   "workspaces": [
     "shared",
