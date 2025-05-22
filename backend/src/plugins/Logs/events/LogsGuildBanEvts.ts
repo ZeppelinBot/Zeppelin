@@ -49,7 +49,6 @@ export const LogsGuildBanRemoveEvt = logsEvt({
       user.id,
     );
     const mod = relevantAuditLogEntry?.executor ?? null;
-
     logMemberUnban(pluginData, {
       mod,
       userId: user.id,

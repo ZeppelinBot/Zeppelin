@@ -4,6 +4,7 @@ import { resolveUser } from "../../../../utils.js";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs.js";
 import { modActionsMsgCmd } from "../../types.js";
 import { actualKickCmd } from "./actualKickCmd.js";
+import { resolveMessageMember } from "../../../../pluginUtils.js";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -33,8 +34,10 @@ export const KickMsgCmd = modActionsMsgCmd({
       return;
     }
 
+    const authorMember = await resolveMessageMember(msg);
+
     // The moderator who did the action is the message author or, if used, the specified -mod
-    let mod = msg.member;
+    let mod = authorMember;
     if (args.mod) {
       if (!(await hasPermission(await pluginData.config.getForMessage(msg), "can_act_as_other"))) {
         pluginData.state.common.sendErrorMessage(msg, "You don't have permission to use -mod");
@@ -55,7 +58,7 @@ export const KickMsgCmd = modActionsMsgCmd({
     actualKickCmd(
       pluginData,
       msg,
-      msg.member,
+      authorMember,
       user,
       args.reason,
       [...msg.attachments.values()],

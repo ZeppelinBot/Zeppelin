@@ -1,5 +1,5 @@
 import { BasePluginType } from "knub";
-import z from "zod";
+import z from "zod/v4";
 
 export const zCommonConfig = z.strictObject({
   success_emoji: z.string(),

@@ -41,8 +41,8 @@ async function sendExpandedCases(
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
 
   for (const theCase of cases) {
-    const embed = await casesPlugin.getCaseEmbed(theCase.id);
-    await sendContextResponse(context, { ...embed, ephemeral: !show });
+    const content = await casesPlugin.getCaseEmbed(theCase.id);
+    await sendContextResponse(context, content, !show);
   }
 }
 

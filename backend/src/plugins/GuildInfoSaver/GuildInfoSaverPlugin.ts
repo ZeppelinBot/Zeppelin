@@ -1,6 +1,6 @@
 import { Guild } from "discord.js";
 import { guildPlugin, guildPluginEventListener } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments.js";
 import { MINUTES } from "../../utils.js";

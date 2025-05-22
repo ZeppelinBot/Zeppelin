@@ -1,5 +1,5 @@
 import { PluginOptions, guildPlugin } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { Queue } from "../../Queue.js";
 import { Webhooks } from "../../data/Webhooks.js";
 import { makePublicFn } from "../../pluginUtils.js";

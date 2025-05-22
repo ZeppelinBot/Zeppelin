@@ -1,5 +1,5 @@
 import { guildPlugin } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
 import { ArchiveChannelCmd } from "./commands/ArchiveChannelCmd.js";

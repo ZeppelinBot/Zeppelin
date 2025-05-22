@@ -36,6 +36,11 @@ export async function actualDeleteCaseCmd(
 
   for (const theCase of validCases) {
     if (!force) {
+      const channel = await getContextChannel(context);
+      if (!channel) {
+        return;
+      }
+
       const cases = pluginData.getPlugin(CasesPlugin);
       const embedContent = await cases.getCaseEmbed(theCase);
       sendContextResponse(context, {
@@ -45,7 +50,7 @@ export async function actualDeleteCaseCmd(
 
       const reply = await helpers.waitForReply(
         pluginData.client,
-        await getContextChannel(context),
+        channel,
         author.id,
         15 * SECONDS,
       );

@@ -2,7 +2,7 @@ import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflak
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { LogType } from "../../../../data/LogType.js";
-import { isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
+import { deleteContextResponse, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
 import { MINUTES, noop } from "../../../../utils.js";
 import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
@@ -69,7 +69,7 @@ export async function actualMassUnbanCmd(
 
   if (!isContextInteraction(context)) {
     // Clear loading indicator
-    loadingMsg.delete().catch(noop);
+    await deleteContextResponse(loadingMsg).catch(noop);
   }
 
   const successfulUnbanCount = userIds.length - failedUnbans.length;

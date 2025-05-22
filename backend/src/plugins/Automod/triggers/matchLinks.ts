@@ -1,5 +1,5 @@
 import { escapeInlineCode } from "discord.js";
-import z from "zod";
+import z from "zod/v4";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { phishermanDomainIsSafe } from "../../../data/Phisherman.js";
 import { getUrlsInString, zRegex } from "../../../utils.js";

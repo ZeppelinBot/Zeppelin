@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { BasePluginType, pluginUtils } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { GuildCounters, MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../data/GuildCounters.js";
 import {
   CounterTrigger,
@@ -18,10 +18,6 @@ const MAX_TRIGGERS_PER_COUNTER = 5;
 export const zTrigger = z
   .strictObject({
     // Dummy type because name gets replaced by the property key in transform()
-    name: z
-      .never()
-      .optional()
-      .transform(() => ""),
     pretty_name: zBoundedCharacters(0, 100).nullable().default(null),
     condition: zBoundedCharacters(1, 64).refine((str) => parseCounterConditionString(str) !== null, {
       message: "Invalid counter trigger condition",
@@ -31,28 +27,9 @@ export const zTrigger = z
         message: "Invalid counter trigger reverse condition",
       })
       .optional(),
-  })
-  .transform((val, ctx) => {
-    const ruleName = String(ctx.path[ctx.path.length - 1]).trim();
-
-    let reverseCondition = val.reverse_condition;
-    if (!reverseCondition) {
-      const parsedCondition = parseCounterConditionString(val.condition)!;
-      reverseCondition = buildCounterConditionString(
-        getReverseCounterComparisonOp(parsedCondition[0]),
-        parsedCondition[1],
-      );
-    }
-
-    return {
-      ...val,
-      name: ruleName,
-      reverse_condition: reverseCondition,
-    };
   });
 
 const zTriggerFromString = zBoundedCharacters(0, 100).transform((val, ctx) => {
-  const ruleName = String(ctx.path[ctx.path.length - 1]).trim();
   const parsedCondition = parseCounterConditionString(val);
   if (!parsedCondition) {
     ctx.addIssue({
@@ -62,7 +39,6 @@ const zTriggerFromString = zBoundedCharacters(0, 100).transform((val, ctx) => {
     return z.NEVER;
   }
   return {
-    name: ruleName,
     pretty_name: null,
     condition: buildCounterConditionString(parsedCondition[0], parsedCondition[1]),
     reverse_condition: buildCounterConditionString(

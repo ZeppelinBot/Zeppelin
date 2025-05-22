@@ -2,7 +2,7 @@ import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflak
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../../data/LogType.js";
 import { logger } from "../../../../logger.js";
-import { canActOn, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
+import { canActOn, deleteContextResponse, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
 import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
@@ -11,6 +11,7 @@ import {
   formatReasonWithMessageLinkForAttachments,
 } from "../../functions/formatReasonForAttachments.js";
 import { ModActionsPluginType } from "../../types.js";
+import { noop } from "../../../../utils.js";
 
 export async function actualMassMuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -50,7 +51,7 @@ export async function actualMassMuteCmd(
   });
 
   // Show loading indicator
-  const loadingMsg = await sendContextResponse(context, { content: "Muting...", ephemeral: true });
+  const loadingMsg = await sendContextResponse(context, "Muting...", true);
 
   // Mute everyone and count fails
   const modId = author.id;
@@ -71,7 +72,7 @@ export async function actualMassMuteCmd(
 
   if (!isContextInteraction(context)) {
     // Clear loading indicator
-    loadingMsg.delete();
+    deleteContextResponse(loadingMsg).catch(noop);
   }
 
   const successfulMuteCount = userIds.length - failedMutes.length;

@@ -1,5 +1,5 @@
 import { guildPlugin } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { GuildMemberCache } from "../../data/GuildMemberCache.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { SECONDS } from "../../utils.js";

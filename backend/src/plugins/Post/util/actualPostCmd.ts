@@ -27,13 +27,13 @@ export async function actualPostCmd(
     "repeat-times"?: number;
   } = {},
 ) {
-  if (!targetChannel.isTextBased()) {
-    msg.channel.send(errorMessage("Specified channel is not a text-based channel"));
+  if (!targetChannel.isSendable()) {
+    msg.reply(errorMessage("Specified channel is not a sendable channel"));
     return;
   }
 
   if (content == null && msg.attachments.size === 0) {
-    msg.channel.send(errorMessage("Message content or attachment required"));
+    msg.reply(errorMessage("Message content or attachment required"));
     return;
   }
 

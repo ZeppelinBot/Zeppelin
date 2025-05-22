@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+import { EventEmitter } from "node:events";
 import { CooldownManager } from "knub";
 import { RegExpWorker, TimeoutError } from "regexp-worker";
 import { MINUTES, SECONDS } from "./utils.js";

@@ -18,7 +18,7 @@ export async function cleanAction(
   amount: number,
   target: string,
   targetMessage: Message,
-  targetChannel: string,
+  targetChannelId: string,
   interaction: ModalSubmitInteraction,
 ) {
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
@@ -28,9 +28,17 @@ export async function cleanAction(
   });
   const utility = pluginData.getPlugin(UtilityPlugin);
 
-  if (!userCfg.can_use || !(await utility.hasPermission(executingMember, targetChannel, "can_clean"))) {
+  if (!userCfg.can_use || !(await utility.hasPermission(executingMember, targetChannelId, "can_clean"))) {
     await interaction
       .editReply({ content: "Cannot clean: insufficient permissions", embeds: [], components: [] })
+      .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
+    return;
+  }
+  
+  const targetChannel = await pluginData.guild.channels.fetch(targetChannelId);
+  if (!targetChannel?.isTextBased()) {
+    await interaction
+      .editReply({ content: "Cannot clean: target channel is not a text channel", embeds: [], components: [] })
       .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
     return;
   }
@@ -43,7 +51,21 @@ export async function cleanAction(
     })
     .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
 
-  await utility.clean({ count: amount, channel: targetChannel, "response-interaction": interaction }, targetMessage);
+  const fetchMessagesResult = await utility.fetchChannelMessagesToClean(targetChannel, {
+    count: amount,
+    beforeId: targetMessage.id,
+  });
+  if ("error" in fetchMessagesResult) {
+    interaction.editReply(fetchMessagesResult.error);
+    return;
+  }
+
+  if (fetchMessagesResult.messages.length > 0) {
+    await utility.cleanMessages(targetChannel, fetchMessagesResult.messages, interaction.user);
+    interaction.editReply(`Cleaned ${fetchMessagesResult.messages.length} ${fetchMessagesResult.messages.length === 1 ? "message" : "messages"}`);
+  } else {
+    interaction.editReply("No messages to clean");
+  }
 }
 
 export async function launchCleanActionModal(

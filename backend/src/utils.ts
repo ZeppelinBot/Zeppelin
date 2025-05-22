@@ -15,13 +15,17 @@ import {
   GuildTextBasedChannel,
   Invite,
   InviteGuild,
+  InviteType,
   LimitedCollection,
   Message,
   MessageCreateOptions,
   MessageMentionOptions,
   PartialChannelData,
+  PartialGroupDMChannel,
   PartialMessage,
+  PartialUser,
   RoleResolvable,
+  SendableChannels,
   Sticker,
   TextBasedChannel,
   User,
@@ -31,10 +35,10 @@ import fs from "fs";
 import https from "https";
 import isEqual from "lodash/isEqual.js";
 import { performance } from "perf_hooks";
-import tlds from "tlds" assert { type: "json" };
+import tlds from "tlds" with { type: "json" };
 import tmp from "tmp";
 import { URL } from "url";
-import { z, ZodEffects, ZodError, ZodRecord, ZodString } from "zod";
+import { z, ZodError, ZodPipe, ZodRecord, ZodString, ZodTransform } from "zod/v4";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage.js";
 import { delayStringMultipliers, humanizeDuration } from "./humanizeDuration.js";
 import { getProfiler } from "./profiler.js";
@@ -42,6 +46,7 @@ import { SimpleCache } from "./SimpleCache.js";
 import { sendDM } from "./utils/sendDM.js";
 import { Brand } from "./utils/typeUtils.js";
 import { waitForButtonConfirm } from "./utils/waitForInteraction.js";
+import { GenericCommandSource } from "./pluginUtils.js";
 
 const fsp = fs.promises;
 
@@ -83,7 +88,7 @@ export function isDiscordAPIError(err: Error | string): err is DiscordAPIError {
 // null | undefined -> undefined
 export function zNullishToUndefined<T extends z.ZodTypeAny>(
   type: T,
-): ZodEffects<T, NonNullable<z.output<T>> | undefined> {
+): ZodPipe<T, ZodTransform<NonNullable<z.output<T>> | undefined>> {
   return type.transform((v) => v ?? undefined);
 }
 
@@ -142,8 +147,7 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
 
 export type GuildInvite = Invite & { guild: InviteGuild | Guild };
 export type GroupDMInvite = Invite & {
-  channel: PartialChannelData;
-  type: typeof ChannelType.GroupDM;
+  channel: PartialGroupDMChannel;
 };
 
 export function zBoundedCharacters(min: number, max: number) {
@@ -374,7 +378,7 @@ export function zBoundedRecord<TRecord extends ZodRecord<any, any>>(
   record: TRecord,
   minKeys: number,
   maxKeys: number,
-): ZodEffects<TRecord> {
+): TRecord {
   return record.refine(
     (data) => {
       const len = Object.keys(data).length;
@@ -832,7 +836,7 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: TextBasedChannel | User,
+  channel: SendableChannels | User,
   messageText: string,
   allowedMentions?: MessageMentionOptions,
 ) {
@@ -1299,7 +1303,7 @@ export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Stic
 }
 
 export async function confirm(
-  context: Message | User | ChatInputCommandInteraction,
+  context: GenericCommandSource,
   userId: string,
   content: MessageCreateOptions,
 ): Promise<boolean> {
@@ -1472,11 +1476,11 @@ export function isFullMessage(msg: Message | PartialMessage): msg is Message {
 }
 
 export function isGuildInvite(invite: Invite): invite is GuildInvite {
-  return invite.guild != null;
+  return invite.type === InviteType.Guild;
 }
 
 export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
-  return invite.guild == null && invite.channel?.type === ChannelType.GroupDM;
+  return invite.type === InviteType.GroupDM;
 }
 
 export function inviteHasCounts(invite: Invite): invite is Invite {

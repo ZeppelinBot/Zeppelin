@@ -1,6 +1,6 @@
 import { VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { canActOn } from "../../../pluginUtils.js";
+import { canActOn, resolveMessageMember } from "../../../pluginUtils.js";
 import { renderUsername } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { utilityCmd } from "../types.js";
@@ -16,7 +16,8 @@ export const VcdisconnectCmd = utilityCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    if (!canActOn(pluginData, msg.member, args.member)) {
+    const authorMember = await resolveMessageMember(msg);
+    if (!canActOn(pluginData, authorMember, args.member)) {
       void pluginData.state.common.sendErrorMessage(msg, "Cannot move: insufficient permissions");
       return;
     }

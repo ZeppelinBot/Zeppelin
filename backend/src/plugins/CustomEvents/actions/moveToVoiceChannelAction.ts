@@ -1,6 +1,6 @@
 import { Snowflake, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { canActOn } from "../../../pluginUtils.js";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import { resolveMember, zSnowflake } from "../../../utils.js";

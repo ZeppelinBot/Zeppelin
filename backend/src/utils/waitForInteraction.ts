@@ -2,20 +2,17 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ChatInputCommandInteraction,
-  Message,
   MessageActionRowComponentBuilder,
   MessageComponentInteraction,
-  MessageCreateOptions,
-  User,
+  MessageCreateOptions
 } from "discord.js";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
-import { isContextInteraction } from "../pluginUtils.js";
+import { GenericCommandSource, isContextInteraction, sendContextResponse } from "../pluginUtils.js";
 import { noop } from "../utils.js";
 
 export async function waitForButtonConfirm(
-  context: Message | User | ChatInputCommandInteraction,
+  context: GenericCommandSource,
   toPost: Omit<MessageCreateOptions, "flags">,
   options?: WaitForOptions,
 ): Promise<boolean> {
@@ -33,15 +30,7 @@ export async function waitForButtonConfirm(
         .setLabel(options?.cancelText || "Cancel")
         .setCustomId(`cancelButton:${idMod}:${uuidv4()}`),
     ]);
-    const sendMethod = () => {
-      if (contextIsInteraction) {
-        return context.replied ? context.editReply.bind(context) : context.reply.bind(context);
-      } else {
-        return "send" in context ? context.send.bind(context) : context.channel.send.bind(context.channel);
-      }
-    };
-    const extraParameters = contextIsInteraction ? { fetchReply: true, ephemeral: true } : {};
-    const message = (await sendMethod()({ ...toPost, components: [row], ...extraParameters })) as Message;
+    const message = await sendContextResponse(context, { ...toPost, components: [row] }, true);
 
     const collector = message.createMessageComponentCollector({ time: 10000 });
 

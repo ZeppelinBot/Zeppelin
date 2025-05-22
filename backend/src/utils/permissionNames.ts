@@ -48,4 +48,8 @@ export const PERMISSION_NAMES = {
   UseExternalSounds: "Use External Sounds",
   UseSoundboard: "Use Soundboard",
   ViewCreatorMonetizationAnalytics: "View Creator Monetization Analytics",
+  CreateGuildExpressions: "Create Guild Expressions",
+  CreateEvents: "Create Events",
+  SendPolls: "Send Polls",
+  UseExternalApps: "Use External Apps",
 } as const satisfies Record<keyof typeof PermissionFlagsBits, string>;

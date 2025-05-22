@@ -1,6 +1,6 @@
 import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
-import { getContextChannel, sendContextResponse } from "../../../../pluginUtils.js";
+import { getContextChannel, resolveMessageMember, sendContextResponse } from "../../../../pluginUtils.js";
 import { modActionsMsgCmd } from "../../types.js";
 import { actualMassMuteCmd } from "./actualMassMuteCmd.js";
 
@@ -17,8 +17,8 @@ export const MassMuteMsgCmd = modActionsMsgCmd({
 
   async run({ pluginData, message: msg, args }) {
     // Ask for mute reason
-    sendContextResponse(msg, "Mute reason? `cancel` to cancel");
-    const muteReasonReceived = await waitForReply(pluginData.client, await getContextChannel(msg), msg.author.id);
+    msg.reply("Mute reason? `cancel` to cancel");
+    const muteReasonReceived = await waitForReply(pluginData.client, msg.channel, msg.author.id);
     if (
       !muteReasonReceived ||
       !muteReasonReceived.content ||
@@ -28,7 +28,8 @@ export const MassMuteMsgCmd = modActionsMsgCmd({
       return;
     }
 
-    actualMassMuteCmd(pluginData, msg, args.userIds, msg.member, muteReasonReceived.content, [
+    const member = await resolveMessageMember(msg);
+    actualMassMuteCmd(pluginData, msg, args.userIds, member, muteReasonReceived.content, [
       ...muteReasonReceived.attachments.values(),
     ]);
   },

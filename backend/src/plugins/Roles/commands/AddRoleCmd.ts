@@ -1,6 +1,6 @@
 import { GuildChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { canActOn } from "../../../pluginUtils.js";
+import { canActOn, resolveMessageMember } from "../../../pluginUtils.js";
 import { resolveRoleId, verboseUserMention } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin.js";
@@ -17,7 +17,8 @@ export const AddRoleCmd = rolesCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    if (!canActOn(pluginData, msg.member, args.member, true)) {
+    const member = await resolveMessageMember(msg);
+    if (!canActOn(pluginData, member, args.member, true)) {
       void pluginData.state.common.sendErrorMessage(msg, "Cannot add roles to this user: insufficient permissions");
       return;
     }

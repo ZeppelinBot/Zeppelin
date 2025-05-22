@@ -46,7 +46,7 @@ export class SimpleCache<T = any> {
     });
 
     if (this.maxItems && this.store.size > this.maxItems) {
-      const keyToDelete = this.store.keys().next().value;
+      const keyToDelete = this.store.keys().next().value!;
       this.store.delete(keyToDelete);
     }
   }

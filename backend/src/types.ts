@@ -1,5 +1,5 @@
 import { GlobalPluginBlueprint, GuildPluginBlueprint, Knub } from "knub";
-import z, { ZodTypeAny } from "zod";
+import z from "zod/v4";
 import { zSnowflake } from "./utils.js";
 
 export const zZeppelinGuildConfig = z.strictObject({
@@ -31,7 +31,7 @@ export type DocsPluginType = "stable" | "legacy" | "internal";
 
 export interface ZeppelinPluginDocs {
   type: DocsPluginType;
-  configSchema: ZodTypeAny;
+  configSchema: z.ZodType;
 
   prettyName?: string;
   description?: TMarkdown;

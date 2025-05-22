@@ -3,6 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { messageLink } from "../../../utils.js";
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { utilityCmd } from "../types.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 
 export const ContextCmd = utilityCmd({
   trigger: "context",
@@ -29,7 +30,8 @@ export const ContextCmd = utilityCmd({
     const channel = args.channel ?? args.message.channel;
     const messageId = args.messageId ?? args.message.messageId;
 
-    if (!canReadChannel(channel, msg.member)) {
+    const authorMember = await resolveMessageMember(msg);
+    if (!canReadChannel(channel, authorMember)) {
       void pluginData.state.common.sendErrorMessage(msg, "Message context not found");
       return;
     }

@@ -29,7 +29,7 @@
     "migrate-rollback-prod": "npm run migrate-rollback",
     "migrate-rollback-dev": "npm run build && npm run migrate-rollback",
     "validate-active-configs": "node --enable-source-maps dist/validateActiveConfigs.js > ../config-errors.txt",
-    "export-config-json-schema": "node --enable-source-maps dist/exportSchemas.js > ../config-schema.json",
+    "export-config-json-schema": "node --enable-source-maps dist/exportSchemas.js",
     "test": "npm run build && npm run run-tests",
     "run-tests": "ava",
     "test-watch": "tsc-watch --build --onSuccess \"npx ava\""
@@ -41,7 +41,7 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "deep-diff": "^1.0.2",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.19.3",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "escape-string-regexp": "^1.0.5",
@@ -49,7 +49,7 @@
     "fp-ts": "^2.0.1",
     "humanize-duration": "^3.15.0",
     "js-yaml": "^4.1.0",
-    "knub": "^32.0.0-next.21",
+    "knub": "^32.0.0-next.23",
     "knub-command-manager": "^9.1.0",
     "last-commit-log": "^2.1.0",
     "lodash-es": "^4.17.21",
@@ -76,7 +76,7 @@
     "uuid": "^9.0.0",
     "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
     "zlib-sync": "^0.1.7",
-    "zod": "^3.7.2"
+    "zod": "^3.25.17"
   },
   "devDependencies": {
     "@types/cors": "^2.8.5",

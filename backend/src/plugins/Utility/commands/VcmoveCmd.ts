@@ -1,6 +1,6 @@
 import { ChannelType, Snowflake, VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { canActOn } from "../../../pluginUtils.js";
+import { canActOn, resolveMessageMember } from "../../../pluginUtils.js";
 import { channelMentionRegex, isSnowflake, renderUsername, simpleClosestStringMatch } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { utilityCmd } from "../types.js";
@@ -144,15 +144,17 @@ export const VcmoveAllCmd = utilityCmd({
       return;
     }
 
+    const authorMember = await resolveMessageMember(msg);
+
     // Cant leave null, otherwise we get an assignment error in the catch
-    let currMember = msg.member;
+    let currMember = authorMember;
     const moveAmt = args.oldChannel.members.size;
     let errAmt = 0;
     for (const memberWithId of args.oldChannel.members) {
       currMember = memberWithId[1];
 
       // Check for permissions but allow self-moves
-      if (currMember.id !== msg.member.id && !canActOn(pluginData, msg.member, currMember)) {
+      if (currMember.id !== authorMember.id && !canActOn(pluginData, authorMember, currMember)) {
         void pluginData.state.common.sendErrorMessage(
           msg,
           `Failed to move ${renderUsername(currMember)} (${currMember.id}): You cannot act on this member`,
@@ -166,7 +168,7 @@ export const VcmoveAllCmd = utilityCmd({
           channel: channel.id,
         });
       } catch {
-        if (msg.member.id === currMember.id) {
+        if (authorMember.id === currMember.id) {
           void pluginData.state.common.sendErrorMessage(msg, "Unknown error when trying to move members");
           return;
         }

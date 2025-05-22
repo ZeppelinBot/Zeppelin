@@ -1,6 +1,6 @@
 import { GuildMember, GuildTextBasedChannel, PartialGuildMember, ThreadChannel, User } from "discord.js";
 import { BasePluginType, CooldownManager, pluginUtils } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { Queue } from "../../Queue.js";
 import { RegExpRunner } from "../../RegExpRunner.js";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels.js";

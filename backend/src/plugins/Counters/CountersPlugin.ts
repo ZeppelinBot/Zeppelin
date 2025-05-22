@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildCounters } from "../../data/GuildCounters.js";
-import { CounterTrigger, parseCounterConditionString } from "../../data/entities/CounterTrigger.js";
+import { buildCounterConditionString, CounterTrigger, getReverseCounterComparisonOp, parseCounterConditionString } from "../../data/entities/CounterTrigger.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { MINUTES, convertDelayStringToMS } from "../../utils.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
@@ -89,7 +89,7 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
     const { state, guild } = pluginData;
 
     state.counters = new GuildCounters(guild.id);
-    state.events = new EventEmitter();
+    state.events = new EventEmitter() as any;
     state.counterTriggersByCounterId = new Map();
 
     const activeTriggerIds: number[] = [];
@@ -107,7 +107,8 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
       // Initialize triggers
       for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
         const parsedCondition = parseCounterConditionString(trigger.condition)!;
-        const parsedReverseCondition = parseCounterConditionString(trigger.reverse_condition)!;
+        const rawReverseCondition = trigger.reverse_condition || buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
+        const parsedReverseCondition = parseCounterConditionString(rawReverseCondition)!;
         const counterTrigger = await state.counters.initCounterTrigger(
           dbCounter.id,
           triggerName,
@@ -167,6 +168,6 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
       }
     }
 
-    state.events.removeAllListeners();
+    (state.events as any).removeAllListeners();
   },
 });

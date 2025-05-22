@@ -12,7 +12,6 @@ import {
   TextChannel,
   ThreadChannel,
 } from "discord.js";
-import { EventEmitter } from "events";
 import { Knub, PluginError, PluginLoadError, PluginNotLoadedError } from "knub";
 import moment from "moment-timezone";
 import { performance } from "perf_hooks";
@@ -252,9 +251,8 @@ connect().then(async () => {
       GatewayIntentBits.GuildVoiceStates,
     ],
   });
-  // FIXME: TS doesn't see Client as a child of EventEmitter for some reason
-  // If you're here because of an error from TS 5.5.2, see https://github.com/discordjs/discord.js/issues/10358
-  (client as unknown as EventEmitter).setMaxListeners(200);
+
+  client.setMaxListeners(200);
 
   const safe429DecayInterval = 5 * SECONDS;
   const safe429MaxCount = 5;

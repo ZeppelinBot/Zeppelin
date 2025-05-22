@@ -1,5 +1,5 @@
 import { globalPlugin } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { Configs } from "../../data/Configs.js";
 import { reloadChangedGuilds } from "./functions/reloadChangedGuilds.js";
 import { GuildConfigReloaderPluginType } from "./types.js";

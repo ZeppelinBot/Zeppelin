@@ -5,6 +5,7 @@ import {
   GuildMember,
   Message,
   MessageComponentInteraction,
+  OmitPartialGroupDMChannel,
   PermissionsBitField,
   Snowflake,
   User,
@@ -73,22 +74,22 @@ export async function displaySearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams,
   searchType: SearchType.MemberSearch,
-  msg: Message,
+  msg: OmitPartialGroupDMChannel<Message>,
 );
 export async function displaySearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: BanSearchParams,
   searchType: SearchType.BanSearch,
-  msg: Message,
+  msg: OmitPartialGroupDMChannel<Message>,
 );
 export async function displaySearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams | BanSearchParams,
   searchType: SearchType,
-  msg: Message,
+  msg: OmitPartialGroupDMChannel<Message>,
 ) {
   // If we're not exporting, load 1 page of search results at a time and allow the user to switch pages with reactions
-  let originalSearchMsg: Message;
+  let originalSearchMsg: OmitPartialGroupDMChannel<Message>;
   let searching = false;
   let currentPage = args.page || 1;
   let stopCollectionFn: () => void;
@@ -107,7 +108,7 @@ export async function displaySearch(
       searchMsgPromise = originalSearchMsg.edit("Searching...");
     } else {
       searchMsgPromise = msg.channel.send("Searching...");
-      searchMsgPromise.then((m) => (originalSearchMsg = m));
+      searchMsgPromise.then((m) => (originalSearchMsg = m as OmitPartialGroupDMChannel<Message>));
     }
 
     let searchResult;
@@ -240,19 +241,19 @@ export async function archiveSearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams,
   searchType: SearchType.MemberSearch,
-  msg: Message,
+  msg: OmitPartialGroupDMChannel<Message>,
 );
 export async function archiveSearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: BanSearchParams,
   searchType: SearchType.BanSearch,
-  msg: Message,
+  msg: OmitPartialGroupDMChannel<Message>,
 );
 export async function archiveSearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams | BanSearchParams,
   searchType: SearchType,
-  msg: Message,
+  msg: OmitPartialGroupDMChannel<Message>,
 ) {
   let results;
   try {

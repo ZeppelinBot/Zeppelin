@@ -1,4 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { resolveMessageMember } from "../../../../pluginUtils.js";
 import { trimLines } from "../../../../utils.js";
 import { modActionsMsgCmd } from "../../types.js";
 import { actualDeleteCaseCmd } from "./actualDeleteCaseCmd.js";
@@ -18,6 +19,7 @@ export const DeleteCaseMsgCmd = modActionsMsgCmd({
   },
 
   async run({ pluginData, message, args }) {
-    actualDeleteCaseCmd(pluginData, message, message.member, args.caseNumber, args.force);
+    const member = await resolveMessageMember(message);
+    actualDeleteCaseCmd(pluginData, message, member, args.caseNumber, args.force);
   },
 });

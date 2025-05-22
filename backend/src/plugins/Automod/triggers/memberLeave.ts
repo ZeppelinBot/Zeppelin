@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import { automodTrigger } from "../helpers.js";
 
 const configSchema = z.strictObject({});

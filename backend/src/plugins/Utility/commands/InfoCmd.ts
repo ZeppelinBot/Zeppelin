@@ -15,6 +15,7 @@ import { getServerInfoEmbed } from "../functions/getServerInfoEmbed.js";
 import { getSnowflakeInfoEmbed } from "../functions/getSnowflakeInfoEmbed.js";
 import { getUserInfoEmbed } from "../functions/getUserInfoEmbed.js";
 import { utilityCmd } from "../types.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 
 export const InfoCmd = utilityCmd({
   trigger: "info",
@@ -77,7 +78,8 @@ export const InfoCmd = utilityCmd({
     if (userCfg.can_messageinfo) {
       const messageTarget = await resolveMessageTarget(pluginData, value);
       if (messageTarget) {
-        if (canReadChannel(messageTarget.channel, message.member)) {
+        const authorMember = await resolveMessageMember(message);
+        if (canReadChannel(messageTarget.channel, authorMember)) {
           const embed = await getMessageInfoEmbed(pluginData, messageTarget.channel.id, messageTarget.messageId);
           if (embed) {
             message.channel.send({ embeds: [embed] });

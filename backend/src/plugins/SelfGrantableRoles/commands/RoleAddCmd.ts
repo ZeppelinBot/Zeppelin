@@ -6,6 +6,7 @@ import { findMatchingRoles } from "../util/findMatchingRoles.js";
 import { getApplyingEntries } from "../util/getApplyingEntries.js";
 import { normalizeRoleNames } from "../util/normalizeRoleNames.js";
 import { splitRoleNames } from "../util/splitRoleNames.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 
 export const RoleAddCmd = selfGrantableRolesCmd({
   trigger: ["role", "role add"],
@@ -49,8 +50,10 @@ export const RoleAddCmd = selfGrantableRolesCmd({
       return;
     }
 
+    const authorMember = await resolveMessageMember(msg);
+
     // Grant the roles
-    const newRoleIds = new Set([...rolesToAdd.keys(), ...msg.member.roles.cache.keys()]);
+    const newRoleIds = new Set([...rolesToAdd.keys(), ...authorMember.roles.cache.keys()]);
 
     // Remove extra roles (max_roles) for each entry
     const skipped: Set<Role> = new Set();
@@ -69,7 +72,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
             newRoleIds.delete(roleId);
             rolesToAdd.delete(roleId);
 
-            if (msg.member.roles.cache.has(roleId as Snowflake)) {
+            if (authorMember.roles.cache.has(roleId as Snowflake)) {
               removed.add(pluginData.guild.roles.cache.get(roleId as Snowflake)!);
             } else {
               skipped.add(pluginData.guild.roles.cache.get(roleId as Snowflake)!);
@@ -80,7 +83,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     }
 
     try {
-      await msg.member.edit({
+      await authorMember.edit({
         roles: Array.from(newRoleIds) as Snowflake[],
       });
     } catch {

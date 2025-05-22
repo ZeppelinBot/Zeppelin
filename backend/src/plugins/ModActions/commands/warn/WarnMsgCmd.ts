@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
-import { canActOn, hasPermission } from "../../../../pluginUtils.js";
+import { canActOn, hasPermission, resolveMessageMember } from "../../../../pluginUtils.js";
 import { errorMessage, resolveMember, resolveUser } from "../../../../utils.js";
 import { isBanned } from "../../functions/isBanned.js";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs.js";
@@ -27,6 +27,7 @@ export const WarnMsgCmd = modActionsMsgCmd({
       return;
     }
 
+    const authorMember = await resolveMessageMember(msg);
     const memberToWarn = await resolveMember(pluginData.client, pluginData.guild, user.id);
 
     if (!memberToWarn) {
@@ -41,13 +42,13 @@ export const WarnMsgCmd = modActionsMsgCmd({
     }
 
     // Make sure we're allowed to warn this member
-    if (!canActOn(pluginData, msg.member, memberToWarn)) {
+    if (!canActOn(pluginData, authorMember, memberToWarn)) {
       await pluginData.state.common.sendErrorMessage(msg, "Cannot warn: insufficient permissions");
       return;
     }
 
     // The moderator who did the action is the message author or, if used, the specified -mod
-    let mod = msg.member;
+    let mod = authorMember;
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
         msg.channel.send(errorMessage("You don't have permission to use -mod"));

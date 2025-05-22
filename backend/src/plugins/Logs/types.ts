@@ -1,5 +1,5 @@
 import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { RegExpRunner } from "../../RegExpRunner.js";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildCases } from "../../data/GuildCases.js";
@@ -29,6 +29,7 @@ const MAX_BATCH_TIME = 5000;
 // A bit of a workaround so we can pass LogType keys to z.enum()
 const logTypes = Object.keys(LogType) as [keyof typeof LogType, ...Array<keyof typeof LogType>];
 const zLogFormats = z.record(z.enum(logTypes), zMessageContent);
+type TLogFormats = z.infer<typeof zLogFormats>;
 
 const zLogChannel = z.strictObject({
   include: z.array(zBoundedCharacters(1, 255)).default([]),
@@ -42,7 +43,7 @@ const zLogChannel = z.strictObject({
   excluded_threads: z.array(zSnowflake).nullable().default(null),
   exclude_bots: z.boolean().default(false),
   excluded_roles: z.array(zSnowflake).nullable().default(null),
-  format: zLogFormats.default({}),
+  format: zLogFormats.default({} as TLogFormats),
   timestamp_format: z.string().nullable().default(null),
   include_embed_timestamp: z.boolean().nullable().default(null),
 });

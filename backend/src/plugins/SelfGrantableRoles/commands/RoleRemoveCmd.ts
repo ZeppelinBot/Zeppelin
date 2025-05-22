@@ -6,6 +6,7 @@ import { findMatchingRoles } from "../util/findMatchingRoles.js";
 import { getApplyingEntries } from "../util/getApplyingEntries.js";
 import { normalizeRoleNames } from "../util/normalizeRoleNames.js";
 import { splitRoleNames } from "../util/splitRoleNames.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 
 export const RoleRemoveCmd = selfGrantableRolesCmd({
   trigger: "role remove",
@@ -32,12 +33,14 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
     );
     const roleIdsToRemove = rolesToRemove.map((r) => r.id);
 
+    const authorMember = await resolveMessageMember(msg);
+
     // Remove the roles
     if (rolesToRemove.length) {
-      const newRoleIds = msg.member.roles.cache.filter((role) => !roleIdsToRemove.includes(role.id));
+      const newRoleIds = authorMember.roles.cache.filter((role) => !roleIdsToRemove.includes(role.id));
 
       try {
-        await msg.member.edit({
+        await authorMember.edit({
           roles: newRoleIds,
         });
 

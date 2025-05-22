@@ -10,7 +10,7 @@ export const ListFollowCmd = locateUserCmd({
   permission: "can_alert",
 
   async run({ message: msg, pluginData }) {
-    const alerts = await pluginData.state.alerts.getAlertsByRequestorId(msg.member.id);
+    const alerts = await pluginData.state.alerts.getAlertsByRequestorId(msg.author.id);
     if (alerts.length === 0) {
       void pluginData.state.common.sendErrorMessage(msg, "You have no active alerts!");
       return;
@@ -41,7 +41,7 @@ export const DeleteFollowCmd = locateUserCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const alerts = await pluginData.state.alerts.getAlertsByRequestorId(msg.member.id);
+    const alerts = await pluginData.state.alerts.getAlertsByRequestorId(msg.author.id);
     alerts.sort(sorter("expires_at"));
 
     if (args.num > alerts.length || args.num <= 0) {

@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { LogType } from "../../../../data/LogType.js";
 import { humanizeDurationShort } from "../../../../humanizeDuration.js";
-import { canActOn, getContextChannel, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
+import { canActOn, deleteContextResponse, editContextResponse, getConfigForContext, getContextChannel, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
 import { DAYS, MINUTES, SECONDS, noop } from "../../../../utils.js";
 import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
@@ -52,46 +52,31 @@ export async function actualMassBanCmd(
     pluginData.state.massbanQueue.length === 0
       ? "Banning..."
       : `Massban queued. Waiting for previous massban to finish (max wait ${maxWaitTimeFormatted}).`;
-  const loadingMsg = await sendContextResponse(context, { content: initialLoadingText, ephemeral: true });
+  const loadingMsg = await sendContextResponse(context, initialLoadingText, true);
 
   const waitTimeStart = performance.now();
   const waitingInterval = setInterval(() => {
     const waitTime = humanizeDurationShort(performance.now() - waitTimeStart, { round: true });
     const waitMessageContent = `Massban queued. Still waiting for previous massban to finish (waited ${waitTime}).`;
 
-    if (isContextInteraction(context)) {
-      context.editReply(waitMessageContent).catch(() => clearInterval(waitingInterval));
-    } else {
-      loadingMsg.edit(waitMessageContent).catch(() => clearInterval(waitingInterval));
-    }
+    editContextResponse(loadingMsg, waitMessageContent).catch(() => clearInterval(waitingInterval));
   }, 1 * MINUTES);
 
   pluginData.state.massbanQueue.add(async () => {
     clearInterval(waitingInterval);
 
     if (pluginData.state.unloaded) {
-      if (isContextInteraction(context)) {
-        void context.deleteReply().catch(noop);
-      } else {
-        void loadingMsg.delete().catch(noop);
-      }
-
+      await deleteContextResponse(loadingMsg);
       return;
     }
 
-    if (isContextInteraction(context)) {
-      void context.editReply("Banning...").catch(noop);
-    } else {
-      void loadingMsg.edit("Banning...").catch(noop);
-    }
+    editContextResponse(loadingMsg, "Banning...").catch(noop);
 
     // Ban each user and count failed bans (if any)
     const startTime = performance.now();
     const failedBans: string[] = [];
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
-    const messageConfig = isContextInteraction(context)
-      ? await pluginData.config.getForInteraction(context)
-      : await pluginData.config.getForChannel(await getContextChannel(context));
+    const messageConfig = await getConfigForContext(pluginData.config, context);
     const deleteDays = messageConfig.ban_delete_message_days;
 
     for (const [i, userId] of userIds.entries()) {

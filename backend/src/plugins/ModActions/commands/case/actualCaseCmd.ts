@@ -19,7 +19,7 @@ export async function actualCaseCmd(
   }
 
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
-  const embed = await casesPlugin.getCaseEmbed(theCase.id, authorId);
+  const content = await casesPlugin.getCaseEmbed(theCase.id, authorId);
 
-  void sendContextResponse(context, { ...embed, ephemeral: show !== true });
+  void sendContextResponse(context, content, show !== true);
 }

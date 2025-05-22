@@ -17,8 +17,8 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
   scheduleNextDeletion(pluginData);
 
   const channel = pluginData.guild.channels.cache.get(itemToDelete.message.channel_id as Snowflake);
-  if (!channel || channel.type === ChannelType.GuildCategory) {
-    // Channel was deleted, ignore
+  if (!channel || !("messages" in channel)) {
+    // Channel does not exist or does not support messages, ignore
     return;
   }
 

@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { canActOn } from "../../../pluginUtils.js";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter.js";
 import { resolveMember, zSnowflake } from "../../../utils.js";

@@ -4,6 +4,7 @@ import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescripti
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { TReactionRolePair, reactionRolesCmd } from "../types.js";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -32,7 +33,8 @@ export const InitReactionRolesCmd = reactionRolesCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    if (!canReadChannel(args.message.channel, msg.member)) {
+    const member = await resolveMessageMember(msg);
+    if (!canReadChannel(args.message.channel, member)) {
       void pluginData.state.common.sendErrorMessage(
         msg,
         "You can't add reaction roles to channels you can't see yourself",

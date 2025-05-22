@@ -1,6 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import { zBoundedCharacters, zSnowflake } from "../../../utils.js";
 import { ActionError } from "../ActionError.js";

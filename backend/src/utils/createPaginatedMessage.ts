@@ -1,20 +1,17 @@
 import {
-  ChatInputCommandInteraction,
   Client,
   Message,
-  MessageCreateOptions,
-  MessageEditOptions,
   MessageReaction,
   PartialMessageReaction,
   PartialUser,
-  User,
+  User
 } from "discord.js";
-import { sendContextResponse } from "../pluginUtils.js";
+import { ContextResponseOptions, fetchContextChannel, GenericCommandSource } from "../pluginUtils.js";
 import { MINUTES, noop } from "../utils.js";
 import { Awaitable } from "./typeUtils.js";
 import Timeout = NodeJS.Timeout;
 
-export type LoadPageFn = (page: number) => Awaitable<MessageCreateOptions & MessageEditOptions>;
+export type LoadPageFn = (page: number) => Awaitable<ContextResponseOptions>;
 
 export interface PaginateMessageOpts {
   timeout: number;
@@ -28,14 +25,19 @@ const defaultOpts: PaginateMessageOpts = {
 
 export async function createPaginatedMessage(
   client: Client,
-  context: Message | User | ChatInputCommandInteraction,
+  context: GenericCommandSource,
   totalPages: number,
   loadPageFn: LoadPageFn,
   opts: Partial<PaginateMessageOpts> = {},
 ): Promise<Message> {
   const fullOpts = { ...defaultOpts, ...opts } as PaginateMessageOpts;
+  const channel = await fetchContextChannel(context);
+  if (!channel.isSendable()) {
+    throw new Error("Context channel is not sendable");
+  }
+
   const firstPageContent = await loadPageFn(1);
-  const message = await sendContextResponse(context, firstPageContent);
+  const message = await channel.send(firstPageContent);
 
   let page = 1;
   let pageLoadId = 0; // Used to avoid race conditions when rapidly switching pages

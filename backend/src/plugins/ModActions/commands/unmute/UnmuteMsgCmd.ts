@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
-import { canActOn, hasPermission } from "../../../../pluginUtils.js";
+import { canActOn, hasPermission, resolveMessageMember } from "../../../../pluginUtils.js";
 import { resolveMember, resolveUser } from "../../../../utils.js";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction.js";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
@@ -39,6 +39,7 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
       return;
     }
 
+    const authorMember = await resolveMessageMember(msg);
     const memberToUnmute = await resolveMember(pluginData.client, pluginData.guild, user.id);
     const mutesPlugin = pluginData.getPlugin(MutesPlugin);
     const hasMuteRole = memberToUnmute && mutesPlugin.hasMutedRole(memberToUnmute);
@@ -67,7 +68,7 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
         const reply = await waitForButtonConfirm(
           msg,
           { content: "User not on server, forceunmute instead?" },
-          { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
+          { confirmText: "Yes", cancelText: "No", restrictToId: authorMember.id },
         );
 
         if (!reply) {
@@ -78,13 +79,13 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
     }
 
     // Make sure we're allowed to unmute this member
-    if (memberToUnmute && !canActOn(pluginData, msg.member, memberToUnmute)) {
+    if (memberToUnmute && !canActOn(pluginData, authorMember, memberToUnmute)) {
       pluginData.state.common.sendErrorMessage(msg, "Cannot unmute: insufficient permissions");
       return;
     }
 
     // The moderator who did the action is the message author or, if used, the specified -mod
-    let mod = msg.member;
+    let mod = authorMember;
     let ppId: string | undefined;
 
     if (args.mod) {

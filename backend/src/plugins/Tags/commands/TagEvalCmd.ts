@@ -5,6 +5,7 @@ import { TemplateParseError } from "../../../templateFormatter.js";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
 import { tagsCmd } from "../types.js";
 import { renderTagBody } from "../util/renderTagBody.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 
 export const TagEvalCmd = tagsCmd({
   trigger: "tag eval",
@@ -15,14 +16,15 @@ export const TagEvalCmd = tagsCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
+    const authorMember = await resolveMessageMember(msg);
     try {
       const rendered = (await renderTagBody(
         pluginData,
         args.body,
         [],
         {
-          member: memberToTemplateSafeMember(msg.member),
-          user: userToTemplateSafeUser(msg.member.user),
+          member: memberToTemplateSafeMember(authorMember),
+          user: userToTemplateSafeUser(msg.author),
         },
         { member: msg.member },
       )) as MessageCreateOptions;

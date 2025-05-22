@@ -1,5 +1,5 @@
 import { CooldownManager, PluginOptions, guildPlugin } from "knub";
-import DefaultLogMessages from "../../data/DefaultLogMessages.json" assert { type: "json" };
+import DefaultLogMessages from "../../data/DefaultLogMessages.json" with { type: "json" };
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";

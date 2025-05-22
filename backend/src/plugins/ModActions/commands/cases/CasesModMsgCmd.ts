@@ -1,4 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { resolveMessageMember } from "../../../../pluginUtils.js";
 import { modActionsMsgCmd } from "../../types.js";
 import { actualCasesCmd } from "./actualCasesCmd.js";
 
@@ -29,12 +30,13 @@ export const CasesModMsgCmd = modActionsMsgCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
+    const member = await resolveMessageMember(msg);
     return actualCasesCmd(
       pluginData,
       msg,
       args.mod,
       null,
-      msg.member,
+      member,
       args.notes,
       args.warns,
       args.mutes,

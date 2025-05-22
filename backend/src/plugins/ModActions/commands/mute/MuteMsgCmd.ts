@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
-import { canActOn, hasPermission } from "../../../../pluginUtils.js";
+import { canActOn, hasPermission, resolveMessageMember } from "../../../../pluginUtils.js";
 import { resolveMember, resolveUser } from "../../../../utils.js";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction.js";
 import { isBanned } from "../../functions/isBanned.js";
@@ -41,6 +41,7 @@ export const MuteMsgCmd = modActionsMsgCmd({
       return;
     }
 
+    const authorMember = await resolveMessageMember(msg);
     const memberToMute = await resolveMember(pluginData.client, pluginData.guild, user.id);
 
     if (!memberToMute) {
@@ -57,7 +58,7 @@ export const MuteMsgCmd = modActionsMsgCmd({
         const reply = await waitForButtonConfirm(
           msg,
           { content: "User not found on the server, forcemute instead?" },
-          { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
+          { confirmText: "Yes", cancelText: "No", restrictToId: authorMember.id },
         );
 
         if (!reply) {
@@ -68,13 +69,13 @@ export const MuteMsgCmd = modActionsMsgCmd({
     }
 
     // Make sure we're allowed to mute this member
-    if (memberToMute && !canActOn(pluginData, msg.member, memberToMute)) {
+    if (memberToMute && !canActOn(pluginData, authorMember, memberToMute)) {
       pluginData.state.common.sendErrorMessage(msg, "Cannot mute: insufficient permissions");
       return;
     }
 
     // The moderator who did the action is the message author or, if used, the specified -mod
-    let mod = msg.member;
+    let mod = authorMember;
     let ppId: string | undefined;
 
     if (args.mod) {

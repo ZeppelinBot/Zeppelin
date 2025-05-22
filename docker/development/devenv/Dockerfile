@@ -18,8 +18,8 @@ RUN mkdir /var/run/sshd
 RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u $DEVELOPMENT_UID ubuntu
 RUN echo "ubuntu:${DEVELOPMENT_SSH_PASSWORD}" | chpasswd
 
-# Install Node.js 20 and packages needed to build native packages
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+# Install Node.js 22 and packages needed to build native packages
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 RUN apt-get install -y nodejs gcc g++ make python3
 
 CMD ["/usr/sbin/sshd", "-D", "-e"]

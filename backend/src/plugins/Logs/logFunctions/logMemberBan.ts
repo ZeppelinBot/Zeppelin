@@ -1,4 +1,4 @@
-import { User } from "discord.js";
+import { PartialUser, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType.js";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";
@@ -8,7 +8,7 @@ import { LogsPluginType } from "../types.js";
 import { log } from "../util/log.js";
 
 export interface LogMemberBanData {
-  mod: User | UnknownUser | null;
+  mod: User | UnknownUser | PartialUser | null;
   user: User | UnknownUser;
   caseNumber: number;
   reason: string;

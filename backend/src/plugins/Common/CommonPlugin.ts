@@ -1,16 +1,18 @@
 import {
   Attachment,
   ChatInputCommandInteraction,
+  InteractionResponse,
   Message,
   MessageCreateOptions,
   MessageMentionOptions,
   ModalSubmitInteraction,
+  SendableChannels,
   TextBasedChannel,
   User,
 } from "discord.js";
 import { PluginOptions, guildPlugin } from "knub";
 import { logger } from "../../logger.js";
-import { isContextInteraction, sendContextResponse } from "../../pluginUtils.js";
+import { GenericCommandSource, isContextInteraction, sendContextResponse } from "../../pluginUtils.js";
 import { errorMessage, successMessage } from "../../utils.js";
 import { getErrorEmoji, getSuccessEmoji } from "./functions/getEmoji.js";
 import { CommonPluginType, zCommonConfig } from "./types.js";
@@ -34,101 +36,39 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
       getErrorEmoji,
 
       sendSuccessMessage: async (
-        context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+        context: GenericCommandSource | SendableChannels,
         body: string,
         allowedMentions?: MessageMentionOptions,
-        responseInteraction?: ModalSubmitInteraction,
+        responseInteraction?: never,
         ephemeral = true,
-      ): Promise<Message | undefined> => {
+      ) => {
         const emoji = getSuccessEmoji(pluginData);
         const formattedBody = successMessage(body, emoji);
-        const content: MessageCreateOptions = allowedMentions
+        const content = allowedMentions
           ? { content: formattedBody, allowedMentions }
           : { content: formattedBody };
-
-        if (responseInteraction) {
-          await responseInteraction
-            .editReply({ content: formattedBody, embeds: [], components: [] })
-            .catch((err) => logger.error(`Interaction reply failed: ${err}`));
-
-          return;
+        if ("isSendable" in context) {
+          return context.send(content);
         }
-
-        if (!isContextInteraction(context)) {
-          // noinspection TypeScriptValidateJSTypes
-          return sendContextResponse(context, { ...content }) // Force line break
-            .catch((err) => {
-              const channelInfo =
-                "guild" in context && context.guild ? `${context.id} (${context.guild.id})` : context.id;
-
-              logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
-
-              return undefined;
-            });
-        }
-
-        const replyMethod = context.replied || context.deferred ? "editReply" : "reply";
-
-        return context[replyMethod]({
-          content: formattedBody,
-          embeds: [],
-          components: [],
-          fetchReply: true,
-          ephemeral,
-        }).catch((err) => {
-          logger.error(`Context reply failed: ${err}`);
-
-          return undefined;
-        }) as Promise<Message>;
+        return sendContextResponse(context, content, ephemeral);
       },
 
       sendErrorMessage: async (
-        context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+        context: GenericCommandSource | SendableChannels,
         body: string,
         allowedMentions?: MessageMentionOptions,
-        responseInteraction?: ModalSubmitInteraction,
+        responseInteraction?: never,
         ephemeral = true,
-      ): Promise<Message | undefined> => {
+      ) => {
         const emoji = getErrorEmoji(pluginData);
         const formattedBody = errorMessage(body, emoji);
-        const content: MessageCreateOptions = allowedMentions
+        const content = allowedMentions
           ? { content: formattedBody, allowedMentions }
           : { content: formattedBody };
-
-        if (responseInteraction) {
-          await responseInteraction
-            .editReply({ content: formattedBody, embeds: [], components: [] })
-            .catch((err) => logger.error(`Interaction reply failed: ${err}`));
-
-          return;
+        if ("isSendable" in context) {
+          return context.send(content);
         }
-
-        if (!isContextInteraction(context)) {
-          // noinspection TypeScriptValidateJSTypes
-          return sendContextResponse(context, { ...content }) // Force line break
-            .catch((err) => {
-              const channelInfo =
-                "guild" in context && context.guild ? `${context.id} (${context.guild.id})` : context.id;
-
-              logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
-
-              return undefined;
-            });
-        }
-
-        const replyMethod = context.replied || context.deferred ? "editReply" : "reply";
-
-        return context[replyMethod]({
-          content: formattedBody,
-          embeds: [],
-          components: [],
-          fetchReply: true,
-          ephemeral,
-        }).catch((err) => {
-          logger.error(`Context reply failed: ${err}`);
-
-          return undefined;
-        }) as Promise<Message>;
+        return sendContextResponse(context, content, ephemeral);
       },
 
       storeAttachmentsAsMessage: async (attachments: Attachment[], backupChannel?: TextBasedChannel | null) => {
@@ -142,8 +82,13 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
             "Cannot store attachments: no attachment storing channel configured, and no backup channel passed",
           );
         }
+        if (!channel.isSendable()) {
+          throw new Error(
+            "Passed attachment storage channel is not sendable",
+          );
+        }
 
-        return channel!.send({
+        return channel.send({
           content: `Storing ${attachments.length} attachment${attachments.length === 1 ? "" : "s"}`,
           files: attachments.map((a) => a.url),
         });

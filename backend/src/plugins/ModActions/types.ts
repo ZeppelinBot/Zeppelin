@@ -8,7 +8,7 @@ import {
   guildPluginSlashGroup,
   pluginUtils,
 } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { Queue } from "../../Queue.js";
 import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";

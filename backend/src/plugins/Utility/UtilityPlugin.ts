@@ -15,7 +15,7 @@ import { AboutCmd } from "./commands/AboutCmd.js";
 import { AvatarCmd } from "./commands/AvatarCmd.js";
 import { BanSearchCmd } from "./commands/BanSearchCmd.js";
 import { ChannelInfoCmd } from "./commands/ChannelInfoCmd.js";
-import { CleanCmd, cleanCmd } from "./commands/CleanCmd.js";
+import { CleanCmd } from "./commands/CleanCmd.js";
 import { ContextCmd } from "./commands/ContextCmd.js";
 import { EmojiInfoCmd } from "./commands/EmojiInfoCmd.js";
 import { HelpCmd } from "./commands/HelpCmd.js";
@@ -43,6 +43,8 @@ import { hasPermission } from "./functions/hasPermission.js";
 import { activeReloads } from "./guildReloads.js";
 import { refreshMembersIfNeeded } from "./refreshMembers.js";
 import { UtilityPluginType, zUtilityConfig } from "./types.js";
+import { cleanMessages } from "./functions/cleanMessages.js";
+import { fetchChannelMessagesToClean } from "./functions/fetchChannelMessagesToClean.js";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -158,7 +160,8 @@ export const UtilityPlugin = guildPlugin<UtilityPluginType>()({
 
   public(pluginData) {
     return {
-      clean: makePublicFn(pluginData, cleanCmd),
+      fetchChannelMessagesToClean: makePublicFn(pluginData, fetchChannelMessagesToClean),
+      cleanMessages: makePublicFn(pluginData, cleanMessages),
       userInfo: (userId: Snowflake) => getUserInfoEmbed(pluginData, userId, false),
       hasPermission: makePublicFn(pluginData, hasPermission),
     };

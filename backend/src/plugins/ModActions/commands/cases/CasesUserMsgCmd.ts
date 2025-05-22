@@ -1,4 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { resolveMessageMember } from "../../../../pluginUtils.js";
 import { resolveMember, resolveUser, UnknownUser } from "../../../../utils.js";
 import { modActionsMsgCmd } from "../../types.js";
 import { actualCasesCmd } from "./actualCasesCmd.js";
@@ -40,13 +41,15 @@ export const CasesUserMsgCmd = modActionsMsgCmd({
       pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;
     }
+    
+    const member = await resolveMessageMember(msg);
 
     return actualCasesCmd(
       pluginData,
       msg,
       args.mod,
       user,
-      msg.member,
+      member,
       args.notes,
       args.warns,
       args.mutes,

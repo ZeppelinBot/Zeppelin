@@ -1,6 +1,6 @@
 import { WebhookClient } from "discord.js";
 import { BasePluginType } from "knub";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Queue } from "../../Queue.js";
 import { Webhooks } from "../../data/Webhooks.js";
 

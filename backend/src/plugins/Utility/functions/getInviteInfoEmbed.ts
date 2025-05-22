@@ -100,9 +100,8 @@ export async function getInviteInfoEmbed(
       fields: [],
     };
 
-    invite = invite as GroupDMInvite;
     embed.author = {
-      name: invite.channel!.name ? `Group DM invite:  ${invite.channel!.name}` : `Group DM invite`,
+      name: invite.channel.name ? `Group DM invite:  ${invite.channel.name}` : `Group DM invite`,
       url: `https://discord.gg/${invite.code}`,
     }; // FIXME pending invite re-think
 

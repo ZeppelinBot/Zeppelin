@@ -1,61 +1,13 @@
-import { Message, ModalSubmitInteraction, Snowflake, TextChannel, User } from "discord.js";
-import { GuildPluginData } from "knub";
-import { allowTimeout } from "../../../RegExpRunner.js";
+import { Message, Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { LogType } from "../../../data/LogType.js";
-import { SavedMessage } from "../../../data/entities/SavedMessage.js";
-import { humanizeDurationShort } from "../../../humanizeDuration.js";
-import { getBaseUrl } from "../../../pluginUtils.js";
+import { ContextResponse, deleteContextResponse } from "../../../pluginUtils.js";
 import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin.js";
-import { DAYS, SECONDS, chunkArray, getInviteCodesInString, noop } from "../../../utils.js";
-import { LogsPlugin } from "../../Logs/LogsPlugin.js";
-import { UtilityPluginType, utilityCmd } from "../types.js";
+import { SECONDS, noop } from "../../../utils.js";
+import { cleanMessages } from "../functions/cleanMessages.js";
+import { fetchChannelMessagesToClean } from "../functions/fetchChannelMessagesToClean.js";
+import { utilityCmd } from "../types.js";
 
-const MAX_CLEAN_COUNT = 300;
-const MAX_CLEAN_TIME = 1 * DAYS;
-const MAX_CLEAN_API_REQUESTS = 20;
 const CLEAN_COMMAND_DELETE_DELAY = 10 * SECONDS;
-
-export async function cleanMessages(
-  pluginData: GuildPluginData<UtilityPluginType>,
-  channel: TextChannel,
-  savedMessages: SavedMessage[],
-  mod: User,
-) {
-  pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, savedMessages[0].id);
-  pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, savedMessages[0].id);
-
-  // Delete & archive in ID order
-  savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
-  const idsToDelete = savedMessages.map((m) => m.id) as Snowflake[];
-
-  // Make sure the deletions aren't double logged
-  idsToDelete.forEach((id) => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
-  pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
-
-  // Actually delete the messages (in chunks of 100)
-
-  const chunks = chunkArray(idsToDelete, 100);
-  await Promise.all(
-    chunks.map((chunk) =>
-      Promise.all([channel.bulkDelete(chunk), pluginData.state.savedMessages.markBulkAsDeleted(chunk)]),
-    ),
-  );
-
-  // Create an archive
-  const archiveId = await pluginData.state.archives.createFromSavedMessages(savedMessages, pluginData.guild);
-  const baseUrl = getBaseUrl(pluginData);
-  const archiveUrl = pluginData.state.archives.getUrl(baseUrl, archiveId);
-
-  pluginData.getPlugin(LogsPlugin).logClean({
-    mod,
-    channel,
-    count: savedMessages.length,
-    archiveUrl,
-  });
-
-  return { archiveUrl };
-}
 
 const opts = {
   user: ct.userId({ option: true, shortcut: "u" }),
@@ -66,188 +18,6 @@ const opts = {
   match: ct.regex({ option: true, shortcut: "m" }),
   "to-id": ct.anyId({ option: true, shortcut: "id" }),
 };
-
-export interface CleanArgs {
-  count: number;
-  update?: boolean;
-  user?: string;
-  channel?: string;
-  bots?: boolean;
-  "delete-pins"?: boolean;
-  "has-invites"?: boolean;
-  match?: RegExp;
-  "to-id"?: string;
-  "response-interaction"?: ModalSubmitInteraction;
-}
-
-export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, args: CleanArgs | any, msg) {
-  if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
-    void pluginData.state.common.sendErrorMessage(
-      msg,
-      `Clean count must be between 1 and ${MAX_CLEAN_COUNT}`,
-      undefined,
-      args["response-interaction"],
-    );
-    return;
-  }
-
-  const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel as Snowflake) : msg.channel;
-  if (!targetChannel?.isTextBased()) {
-    void pluginData.state.common.sendErrorMessage(
-      msg,
-      `Invalid channel specified`,
-      undefined,
-      args["response-interaction"],
-    );
-    return;
-  }
-
-  if (targetChannel.id !== msg.channel.id) {
-    const configForTargetChannel = await pluginData.config.getMatchingConfig({
-      userId: msg.author.id,
-      member: msg.member,
-      channelId: targetChannel.id,
-      categoryId: targetChannel.parentId,
-    });
-    if (configForTargetChannel.can_clean !== true) {
-      void pluginData.state.common.sendErrorMessage(
-        msg,
-        `Missing permissions to use clean on that channel`,
-        undefined,
-        args["response-interaction"],
-      );
-      return;
-    }
-  }
-
-  let cleaningMessage: Message | undefined = undefined;
-  if (!args["response-interaction"]) {
-    cleaningMessage = await msg.channel.send("Cleaning...");
-  }
-
-  const messagesToClean: Message[] = [];
-  let beforeId = msg.id;
-  const timeCutoff = msg.createdTimestamp - MAX_CLEAN_TIME;
-  const upToMsgId = args["to-id"];
-  let foundId = false;
-
-  const deletePins = args["delete-pins"] != null ? args["delete-pins"] : false;
-  let pinIds: Set<Snowflake> = new Set();
-  if (!deletePins) {
-    pinIds = new Set((await msg.channel.messages.fetchPinned()).keys());
-  }
-
-  let note: string | null = null;
-  let requests = 0;
-  while (messagesToClean.length < args.count) {
-    const potentialMessages = await targetChannel.messages.fetch({
-      before: beforeId,
-      limit: 100,
-    });
-    if (potentialMessages.size === 0) break;
-
-    requests++;
-
-    const filtered: Message[] = [];
-    for (const message of potentialMessages.values()) {
-      const contentString = message.content || "";
-      if (args.user && message.author.id !== args.user) continue;
-      if (args.bots && !message.author.bot) continue;
-      if (!deletePins && pinIds.has(message.id)) continue;
-      if (args["has-invites"] && getInviteCodesInString(contentString).length === 0) continue;
-      if (upToMsgId != null && message.id < upToMsgId) {
-        foundId = true;
-        break;
-      }
-      if (message.createdTimestamp < timeCutoff) continue;
-      if (args.match && !(await pluginData.state.regexRunner.exec(args.match, contentString).catch(allowTimeout))) {
-        continue;
-      }
-
-      filtered.push(message);
-    }
-    const remaining = args.count - messagesToClean.length;
-    const withoutOverflow = filtered.slice(0, remaining);
-    messagesToClean.push(...withoutOverflow);
-
-    beforeId = potentialMessages.lastKey()!;
-
-    if (foundId) {
-      break;
-    }
-
-    if (messagesToClean.length < args.count) {
-      if (potentialMessages.last()!.createdTimestamp < timeCutoff) {
-        note = `stopped looking after reaching ${humanizeDurationShort(MAX_CLEAN_TIME)} old messages`;
-        break;
-      }
-
-      if (requests >= MAX_CLEAN_API_REQUESTS) {
-        note = `stopped looking after ${requests * 100} messages`;
-        break;
-      }
-    }
-  }
-
-  let responseMsg: Message | undefined;
-  if (messagesToClean.length > 0) {
-    // Save to-be-deleted messages that were missing from the database
-    const existingStored = await pluginData.state.savedMessages.getMultiple(messagesToClean.map((m) => m.id));
-    const alreadyStored = existingStored.map((stored) => stored.id);
-    const messagesToStore = messagesToClean.filter((potentialMsg) => !alreadyStored.includes(potentialMsg.id));
-    await pluginData.state.savedMessages.createFromMessages(messagesToStore);
-
-    const savedMessagesToClean = await pluginData.state.savedMessages.getMultiple(messagesToClean.map((m) => m.id));
-    const cleanResult = await cleanMessages(pluginData, targetChannel, savedMessagesToClean, msg.author);
-
-    let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;
-    if (note) {
-      responseText += ` (${note})`;
-    }
-    if (targetChannel.id !== msg.channel.id) {
-      responseText += ` in <#${targetChannel.id}>: ${cleanResult.archiveUrl}`;
-    }
-
-    if (args.update) {
-      const modActions = pluginData.getPlugin(ModActionsPlugin);
-      const channelId = targetChannel.id !== msg.channel.id ? targetChannel.id : msg.channel.id;
-      const updateMessage = `Cleaned ${messagesToClean.length} ${
-        messagesToClean.length === 1 ? "message" : "messages"
-      } in <#${channelId}>: ${cleanResult.archiveUrl}`;
-      if (typeof args.update === "number") {
-        modActions.updateCase(msg, args.update, updateMessage);
-      } else {
-        modActions.updateCase(msg, null, updateMessage);
-      }
-    }
-
-    responseMsg = await pluginData.state.common.sendSuccessMessage(
-      msg,
-      responseText,
-      undefined,
-      args["response-interaction"],
-    );
-  } else {
-    const responseText = `Found no messages to clean${note ? ` (${note})` : ""}!`;
-    responseMsg = await pluginData.state.common.sendErrorMessage(
-      msg,
-      responseText,
-      undefined,
-      args["response-interaction"],
-    );
-  }
-
-  cleaningMessage?.delete();
-
-  if (targetChannel.id === msg.channel.id) {
-    // Delete the !clean command and the bot response if a different channel wasn't specified
-    // (so as not to spam the cleaned channel with the command itself)
-    msg.delete().catch(noop);
-    setTimeout(() => {
-      responseMsg?.delete().catch(noop);
-    }, CLEAN_COMMAND_DELETE_DELAY);
-  }
-}
 
 export const CleanCmd = utilityCmd({
   trigger: ["clean", "clear"],
@@ -271,6 +41,108 @@ export const CleanCmd = utilityCmd({
   ],
 
   async run({ message: msg, args, pluginData }) {
-    cleanCmd(pluginData, args, msg);
+    const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel as Snowflake) : msg.channel;
+    if (!targetChannel?.isTextBased()) {
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `Invalid channel specified`,
+        undefined,
+        args["response-interaction"],
+      );
+      return;
+    }
+
+    if (targetChannel.id !== msg.channel.id) {
+      const configForTargetChannel = await pluginData.config.getMatchingConfig({
+        userId: msg.author.id,
+        member: msg.member,
+        channelId: targetChannel.id,
+        categoryId: targetChannel.parentId,
+      });
+      if (configForTargetChannel.can_clean !== true) {
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          `Missing permissions to use clean on that channel`,
+          undefined,
+          args["response-interaction"],
+        );
+        return;
+      }
+    }
+
+    let cleaningMessage: Message | undefined = undefined;
+    if (!args["response-interaction"]) {
+      cleaningMessage = await msg.channel.send("Cleaning...");
+    }
+
+    const fetchMessagesResult = await fetchChannelMessagesToClean(pluginData, targetChannel, {
+      beforeId: msg.id,
+      count: args.count,
+      authorId: args.user,
+      includePins: args["delete-pins"],
+      onlyBotMessages: args.bots,
+      onlyWithInvites: args["has-invites"],
+      upToId: args["to-id"],
+      matchContent: args.match,
+    });
+    if ("error" in fetchMessagesResult) {
+      void pluginData.state.common.sendErrorMessage(msg, fetchMessagesResult.error);
+      return;
+    }
+
+    const { messages: messagesToClean, note } = fetchMessagesResult;
+
+    let responseMsg: ContextResponse | null = null;
+    if (messagesToClean.length > 0) {
+      const cleanResult = await cleanMessages(pluginData, targetChannel, messagesToClean, msg.author);
+
+      let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;
+      if (note) {
+        responseText += ` (${note})`;
+      }
+      if (targetChannel.id !== msg.channel.id) {
+        responseText += ` in <#${targetChannel.id}>: ${cleanResult.archiveUrl}`;
+      }
+
+      if (args.update) {
+        const modActions = pluginData.getPlugin(ModActionsPlugin);
+        const channelId = targetChannel.id !== msg.channel.id ? targetChannel.id : msg.channel.id;
+        const updateMessage = `Cleaned ${messagesToClean.length} ${
+          messagesToClean.length === 1 ? "message" : "messages"
+        } in <#${channelId}>: ${cleanResult.archiveUrl}`;
+        if (typeof args.update === "number") {
+          modActions.updateCase(msg, args.update, updateMessage);
+        } else {
+          modActions.updateCase(msg, null, updateMessage);
+        }
+      }
+
+      responseMsg = await pluginData.state.common.sendSuccessMessage(
+        msg,
+        responseText,
+        undefined,
+        args["response-interaction"],
+      );
+    } else {
+      const responseText = `Found no messages to clean${note ? ` (${note})` : ""}!`;
+      responseMsg = await pluginData.state.common.sendErrorMessage(
+        msg,
+        responseText,
+        undefined,
+        args["response-interaction"],
+      );
+    }
+
+    cleaningMessage?.delete();
+
+    if (targetChannel.id === msg.channel.id) {
+      // Delete the !clean command and the bot response if a different channel wasn't specified
+      // (so as not to spam the cleaned channel with the command itself)
+      msg.delete().catch(noop);
+      setTimeout(() => {
+        deleteContextResponse(responseMsg).catch(noop);
+        responseMsg?.delete().catch(noop);
+      }, CLEAN_COMMAND_DELETE_DELAY);
+    }
   },
 });

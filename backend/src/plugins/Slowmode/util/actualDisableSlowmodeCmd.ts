@@ -24,7 +24,7 @@ export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
     return;
   }
 
-  const initMsg = await msg.channel.send("Disabling slowmode...");
+  const initMsg = await msg.reply("Disabling slowmode...");
 
   // Disable bot-maintained slowmode
   let failedUsers: string[] = [];

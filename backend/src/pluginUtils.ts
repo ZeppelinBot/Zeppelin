@@ -3,16 +3,27 @@
  */
 
 import {
+  BaseChannel,
+  BitField,
+  BitFieldResolvable,
   ChatInputCommandInteraction,
+  CommandInteraction,
   GuildMember,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
+  InteractionResponse,
   Message,
   MessageCreateOptions,
+  MessageEditOptions,
+  MessageFlags,
+  MessageFlagsString,
+  ModalSubmitInteraction,
   PermissionsBitField,
+  SendableChannels,
   TextBasedChannel,
   User,
 } from "discord.js";
-import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
+import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers, PluginConfigManager } from "knub";
 import { isStaff } from "./staff.js";
 import { TZeppelinKnub } from "./types.js";
 import { Tail } from "./utils/typeUtils.js";
@@ -49,57 +60,124 @@ export async function hasPermission(
   return helpers.hasPermission(config, permission);
 }
 
+export type GenericCommandSource = Message | CommandInteraction | ModalSubmitInteraction;
+
 export function isContextInteraction(
-  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
-): context is ChatInputCommandInteraction {
-  return "commandId" in context && !!context.commandId;
+  context: GenericCommandSource,
+): context is CommandInteraction | ModalSubmitInteraction {
+  return (context instanceof CommandInteraction || context instanceof ModalSubmitInteraction);
 }
 
 export function isContextMessage(
-  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+  context: GenericCommandSource,
 ): context is Message {
-  return "content" in context || "embeds" in context;
+  return (context instanceof Message);
 }
 
 export async function getContextChannel(
-  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
-): Promise<TextBasedChannel> {
+  context: GenericCommandSource,
+): Promise<TextBasedChannel | null> {
   if (isContextInteraction(context)) {
-    // context is ChatInputCommandInteraction
-    return context.channel!;
-  } else if ("username" in context) {
-    // context is User
-    return await (context as User).createDM();
-  } else if ("send" in context) {
-    // context is TextBaseChannel
-    return context as TextBasedChannel;
-  } else {
-    // context is Message
     return context.channel;
   }
+  if (context instanceof Message) {
+    return context.channel;
+  }
+  throw new Error("Unknown context type");
 }
 
+export function getContextChannelId(
+  context: GenericCommandSource,
+): string | null {
+  return context.channelId;
+}
+
+export async function fetchContextChannel(context: GenericCommandSource) {
+  if (!context.guild) {
+    throw new Error("Missing context guild");
+  }
+  const channelId = getContextChannelId(context);
+  if (!channelId) {
+    throw new Error("Missing context channel ID");
+  }
+  return (await context.guild.channels.fetch(channelId))!;
+}
+
+function flagsWithEphemeral<
+  TFlags extends string,
+  TType extends number | bigint
+>(flags: BitFieldResolvable<TFlags, any>, ephemeral: boolean): BitFieldResolvable<
+  TFlags | Extract<MessageFlagsString, "Ephemeral">,
+  TType | MessageFlags.Ephemeral
+> {
+  if (!ephemeral) {
+    return flags;
+  }
+  return new BitField(flags).add(MessageFlags.Ephemeral) as any;
+}
+
+export type ContextResponseOptions = MessageCreateOptions & InteractionReplyOptions & InteractionEditReplyOptions;
+export type ContextResponse = Message | InteractionResponse;
+
 export async function sendContextResponse(
-  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
-  response: string | Omit<MessageCreateOptions, "flags"> | InteractionReplyOptions,
+  context: GenericCommandSource,
+  content: string | ContextResponseOptions,
+  ephemeral = false,
 ): Promise<Message> {
   if (isContextInteraction(context)) {
-    const options = { ...(typeof response === "string" ? { content: response } : response), fetchReply: true };
+    const options = { ...(typeof content === "string" ? { content: content } : content), fetchReply: true };
 
-    return (
-      context.replied
-        ? context.followUp(options)
-        : context.deferred
-        ? context.editReply(options)
-        : context.reply(options)
-    ) as Promise<Message>;
+    if (context.replied) {
+      return context.followUp({
+        ...options,
+        flags: flagsWithEphemeral(options.flags, ephemeral),
+      });
+    }
+    if (context.deferred) {
+      return context.editReply(options);
+    }
+
+    const replyResult = await context.reply({
+      ...options,
+      flags: flagsWithEphemeral(options.flags, ephemeral),
+      withResponse: true,
+    });
+    return replyResult.resource!.message!;
   }
 
-  if (typeof response !== "string" && "ephemeral" in response) {
-    delete response.ephemeral;
+  const contextChannel = await fetchContextChannel(context);
+  if (!contextChannel?.isSendable()) {
+    throw new Error("Context channel does not exist or is not sendable");
   }
+  
+  return contextChannel.send(content);
+}
 
-  return (await getContextChannel(context)).send(response as string | Omit<MessageCreateOptions, "flags">);
+export type ContextResponseEditOptions = MessageEditOptions & InteractionEditReplyOptions;
+
+export function editContextResponse(
+  response: ContextResponse,
+  content: string | ContextResponseEditOptions,
+): Promise<ContextResponse> {
+  return response.edit(content);
+}
+
+export async function deleteContextResponse(response: ContextResponse): Promise<void> {
+  await response.delete();
+}
+
+export async function getConfigForContext<TPluginData extends BasePluginData<any>>(config: PluginConfigManager<TPluginData>, context: GenericCommandSource): Promise<TPluginData["_pluginType"]["config"]> {
+  if (context instanceof ChatInputCommandInteraction) {
+    // TODO: Support for modal interactions (here and Knub)
+    return config.getForInteraction(context);
+  }
+  const channel = await getContextChannel(context);
+  const member = isContextMessage(context) && context.inGuild() ? await resolveMessageMember(context) : null;
+
+  return config.getMatchingConfig({
+    channel,
+    member,
+  });
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {
@@ -147,4 +225,6 @@ export function makePublicFn<TPluginData extends BasePluginData<any>, T extends 
   };
 }
 
-// ???
+export function resolveMessageMember(message: Message<true>) {
+  return Promise.resolve(message.member || message.guild.members.fetch(message.author.id));
+}

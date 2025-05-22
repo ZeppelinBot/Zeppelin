@@ -5,6 +5,7 @@ import {
   GuildMember,
   Message,
   PartialGuildMember,
+  PartialUser,
   Role,
   Snowflake,
   StageInstance,
@@ -242,15 +243,15 @@ export function guildToTemplateSafeGuild(guild: Guild): TemplateSafeGuild {
   });
 }
 
-export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUser {
-  if (user instanceof UnknownUser) {
+export function userToTemplateSafeUser(user: User | UnknownUser | PartialUser): TemplateSafeUser {
+  if (user instanceof UnknownUser || user.partial) {
     return new TemplateSafeUser({
       id: user.id,
       username: "Unknown",
       discriminator: "0000",
       mention: `<@${user.id}>`,
       tag: "Unknown#0000",
-      renderedUsername: renderUsername(user),
+      renderedUsername: "Unknown",
     });
   }
 
