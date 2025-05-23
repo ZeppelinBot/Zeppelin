@@ -5,11 +5,13 @@ import { GuildReactionRoles } from "../../data/GuildReactionRoles.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 
+const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
+
 export const zReactionRolesConfig = z.strictObject({
-  auto_refresh_interval: z.number(),
-  remove_user_reactions: z.boolean(),
-  can_manage: z.boolean(),
-  button_groups: z.nullable(z.unknown()),
+  auto_refresh_interval: z.number().min(MIN_AUTO_REFRESH).default(MIN_AUTO_REFRESH),
+  remove_user_reactions: z.boolean().default(true),
+  can_manage: z.boolean().default(false),
+  button_groups: z.null().default(null),
 });
 
 export type RoleChangeMode = "+" | "-";
@@ -27,7 +29,7 @@ const zReactionRolePair = z.union([z.tuple([z.string(), z.string(), z.string()])
 export type TReactionRolePair = z.infer<typeof zReactionRolePair>;
 
 export interface ReactionRolesPluginType extends BasePluginType {
-  config: z.infer<typeof zReactionRolesConfig>;
+  configSchema: typeof zReactionRolesConfig;
   state: {
     reactionRoles: GuildReactionRoles;
     savedMessages: GuildSavedMessages;

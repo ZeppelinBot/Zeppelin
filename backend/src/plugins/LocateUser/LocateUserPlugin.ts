@@ -11,12 +11,11 @@ import { LocateUserPluginType, zLocateUserConfig } from "./types.js";
 import { clearExpiredAlert } from "./utils/clearExpiredAlert.js";
 import { fillActiveAlertsList } from "./utils/fillAlertsList.js";
 
-const defaultOptions: PluginOptions<LocateUserPluginType> = {
-  config: {
-    can_where: false,
-    can_alert: false,
-  },
-  overrides: [
+export const LocateUserPlugin = guildPlugin<LocateUserPluginType>()({
+  name: "locate_user",
+
+  configSchema: zLocateUserConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -25,13 +24,6 @@ const defaultOptions: PluginOptions<LocateUserPluginType> = {
       },
     },
   ],
-};
-
-export const LocateUserPlugin = guildPlugin<LocateUserPluginType>()({
-  name: "locate_user",
-
-  configParser: (input) => zLocateUserConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [

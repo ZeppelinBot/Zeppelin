@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { PluginOptions, PluginOverride, guildPlugin } from "knub";
 import { GuildCases } from "../../data/GuildCases.js";
 import { CasesPlugin } from "../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
@@ -13,30 +13,23 @@ import { NoteCmd } from "./commands/NoteUserCtxCmd.js";
 import { WarnCmd } from "./commands/WarnUserCtxCmd.js";
 import { ContextMenuPluginType, zContextMenusConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<ContextMenuPluginType> = {
-  config: {
-    can_use: false,
+const defaultOverrides: Array<PluginOverride<ContextMenuPluginType>> = [
+  {
+    level: ">=50",
+    config: {
+      can_use: true,
 
-    can_open_mod_menu: false,
-  },
-  overrides: [
-    {
-      level: ">=50",
-      config: {
-        can_use: true,
-
-        can_open_mod_menu: true,
-      },
+      can_open_mod_menu: true,
     },
-  ],
-};
+  },
+];
 
 export const ContextMenuPlugin = guildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
 
   dependencies: () => [CasesPlugin, MutesPlugin, ModActionsPlugin, LogsPlugin, UtilityPlugin],
-  configParser: (input) => zContextMenusConfig.parse(input),
-  defaultOptions,
+  configSchema: zContextMenusConfig,
+  defaultOverrides,
 
   contextMenuCommands: [ModMenuCmd, NoteCmd, WarnCmd, MuteCmd, BanCmd, CleanCmd],
 

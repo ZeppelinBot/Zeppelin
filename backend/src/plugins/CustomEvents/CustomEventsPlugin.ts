@@ -16,18 +16,11 @@ import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { runEvent } from "./functions/runEvent.js";
 import { CustomEventsPluginType, zCustomEventsConfig } from "./types.js";
 
-const defaultOptions = {
-  config: {
-    events: {},
-  },
-};
-
 export const CustomEventsPlugin = guildPlugin<CustomEventsPluginType>()({
   name: "custom_events",
 
   dependencies: () => [LogsPlugin],
-  configParser: (input) => zCustomEventsConfig.parse(input),
-  defaultOptions,
+  configSchema: zCustomEventsConfig,
 
   beforeStart(pluginData) {
     pluginData.state.common = pluginData.getPlugin(CommonPlugin);

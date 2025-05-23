@@ -7,14 +7,14 @@ import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zSlowmodeConfig = z.strictObject({
-  use_native_slowmode: z.boolean(),
+  use_native_slowmode: z.boolean().default(true),
 
-  can_manage: z.boolean(),
-  is_affected: z.boolean(),
+  can_manage: z.boolean().default(false),
+  is_affected: z.boolean().default(true),
 });
 
 export interface SlowmodePluginType extends BasePluginType {
-  config: z.infer<typeof zSlowmodeConfig>;
+  configSchema: typeof zSlowmodeConfig;
   state: {
     slowmodes: GuildSlowmodes;
     savedMessages: GuildSavedMessages;

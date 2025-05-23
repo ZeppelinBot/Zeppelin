@@ -5,18 +5,12 @@ import { Webhooks } from "../../data/Webhooks.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { editMessage } from "./functions/editMessage.js";
 import { sendMessage } from "./functions/sendMessage.js";
-import { InternalPosterPluginType } from "./types.js";
-
-const defaultOptions: PluginOptions<InternalPosterPluginType> = {
-  config: {},
-  overrides: [],
-};
+import { InternalPosterPluginType, zInternalPosterConfig } from "./types.js";
 
 export const InternalPosterPlugin = guildPlugin<InternalPosterPluginType>()({
   name: "internal_poster",
 
-  configParser: (input) => z.strictObject({}).parse(input),
-  defaultOptions,
+  configSchema: zInternalPosterConfig,
 
   public(pluginData) {
     return {

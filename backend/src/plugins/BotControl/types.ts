@@ -7,16 +7,16 @@ import { GuildArchives } from "../../data/GuildArchives.js";
 import { zBoundedCharacters } from "../../utils.js";
 
 export const zBotControlConfig = z.strictObject({
-  can_use: z.boolean(),
-  can_eligible: z.boolean(),
-  can_performance: z.boolean(),
-  can_add_server_from_invite: z.boolean(),
-  can_list_dashboard_perms: z.boolean(),
-  update_cmd: zBoundedCharacters(0, 2000).nullable(),
+  can_use: z.boolean().default(false),
+  can_eligible: z.boolean().default(false),
+  can_performance: z.boolean().default(false),
+  can_add_server_from_invite: z.boolean().default(false),
+  can_list_dashboard_perms: z.boolean().default(false),
+  update_cmd: zBoundedCharacters(0, 2000).nullable().default(null),
 });
 
 export interface BotControlPluginType extends BasePluginType {
-  config: z.output<typeof zBotControlConfig>;
+  configSchema: typeof zBotControlConfig;
   state: {
     archives: GuildArchives;
     allowedGuilds: AllowedGuilds;

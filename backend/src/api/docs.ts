@@ -131,7 +131,7 @@ export function initDocs(router: express.Router) {
       config: cmd.config,
     }));
 
-    const defaultOptions = pluginInfo.plugin.defaultOptions || {};
+    const defaultOptions = (pluginInfo.plugin as any /* TODO */).defaultOptions || {};
 
     res.json({
       name: pluginInfo.plugin.name,

@@ -13,14 +13,11 @@ import { inGuildTz } from "./functions/inGuildTz.js";
 import { inMemberTz } from "./functions/inMemberTz.js";
 import { TimeAndDatePluginType, zTimeAndDateConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
-  config: {
-    timezone: "Etc/UTC",
-    can_set_timezone: false,
-    date_formats: defaultDateFormats,
-  },
+export const TimeAndDatePlugin = guildPlugin<TimeAndDatePluginType>()({
+  name: "time_and_date",
 
-  overrides: [
+  configSchema: zTimeAndDateConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -28,13 +25,6 @@ const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
       },
     },
   ],
-};
-
-export const TimeAndDatePlugin = guildPlugin<TimeAndDatePluginType>()({
-  name: "time_and_date",
-
-  configParser: (input) => zTimeAndDateConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [

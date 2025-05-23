@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import moment from "moment-timezone";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
@@ -22,25 +22,12 @@ import { onMessageCreate } from "./util/onMessageCreate.js";
 import { onMessageDelete } from "./util/onMessageDelete.js";
 import { renderTagBody } from "./util/renderTagBody.js";
 
-const defaultOptions: PluginOptions<TagsPluginType> = {
-  config: {
-    prefix: "!!",
-    delete_with_command: true,
+export const TagsPlugin = guildPlugin<TagsPluginType>()({
+  name: "tags",
 
-    user_tag_cooldown: null,
-    global_tag_cooldown: null,
-    user_cooldown: null,
-    allow_mentions: false,
-    global_cooldown: null,
-    auto_delete_command: false,
-
-    categories: {},
-
-    can_create: false,
-    can_use: false,
-    can_list: false,
-  },
-  overrides: [
+  dependencies: () => [LogsPlugin],
+  configSchema: zTagsConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -50,13 +37,6 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
       },
     },
   ],
-};
-
-export const TagsPlugin = guildPlugin<TagsPluginType>()({
-  name: "tags",
-
-  dependencies: () => [LogsPlugin],
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [
@@ -78,8 +58,6 @@ export const TagsPlugin = guildPlugin<TagsPluginType>()({
       findTagByName: makePublicFn(pluginData, findTagByName),
     };
   },
-
-  configParser: (input) => zTagsConfig.parse(input),
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;

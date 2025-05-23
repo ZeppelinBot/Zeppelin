@@ -6,11 +6,11 @@ import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { NamesCmd } from "./commands/NamesCmd.js";
 import { NameHistoryPluginType, zNameHistoryConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<NameHistoryPluginType> = {
-  config: {
-    can_view: false,
-  },
-  overrides: [
+export const NameHistoryPlugin = guildPlugin<NameHistoryPluginType>()({
+  name: "name_history",
+
+  configSchema: zNameHistoryConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -18,13 +18,6 @@ const defaultOptions: PluginOptions<NameHistoryPluginType> = {
       },
     },
   ],
-};
-
-export const NameHistoryPlugin = guildPlugin<NameHistoryPluginType>()({
-  name: "name_history",
-
-  configParser: (input) => zNameHistoryConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [

@@ -73,7 +73,7 @@ function overrides(configSchema: z.ZodType): z.ZodType {
 const pluginSchemaMap = availableGuildPlugins.reduce((map, pluginInfo) => {
   map[pluginInfo.plugin.name] = z.object({
     config: pluginInfo.docs.configSchema.optional(),
-    overrides: overrides(pluginInfo.docs.configSchema).optional(),
+    overrides: z.array(overrides(pluginInfo.docs.configSchema)).optional(),
   });
   return map;
 }, {});

@@ -4,18 +4,10 @@ import { makePublicFn } from "../../pluginUtils.js";
 import { getDomainInfo } from "./functions/getDomainInfo.js";
 import { PhishermanPluginType, zPhishermanConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<PhishermanPluginType> = {
-  config: {
-    api_key: null,
-  },
-  overrides: [],
-};
-
 export const PhishermanPlugin = guildPlugin<PhishermanPluginType>()({
   name: "phisherman",
 
-  configParser: (input) => zPhishermanConfig.parse(input),
-  defaultOptions,
+  configSchema: zPhishermanConfig,
 
   public(pluginData) {
     return {

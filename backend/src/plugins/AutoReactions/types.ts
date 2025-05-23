@@ -7,11 +7,11 @@ import { AutoReaction } from "../../data/entities/AutoReaction.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zAutoReactionsConfig = z.strictObject({
-  can_manage: z.boolean(),
+  can_manage: z.boolean().default(false),
 });
 
 export interface AutoReactionsPluginType extends BasePluginType {
-  config: z.output<typeof zAutoReactionsConfig>;
+  configSchema: typeof zAutoReactionsConfig;
   state: {
     logs: GuildLogs;
     savedMessages: GuildSavedMessages;

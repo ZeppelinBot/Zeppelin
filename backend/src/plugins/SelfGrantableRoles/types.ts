@@ -20,12 +20,12 @@ const zSelfGrantableRoleEntry = z.strictObject({
 export type TSelfGrantableRoleEntry = z.infer<typeof zSelfGrantableRoleEntry>;
 
 export const zSelfGrantableRolesConfig = z.strictObject({
-  entries: zBoundedRecord(z.record(zBoundedCharacters(0, 255), zSelfGrantableRoleEntry), 0, 100),
-  mention_roles: z.boolean(),
+  entries: zBoundedRecord(z.record(zBoundedCharacters(0, 255), zSelfGrantableRoleEntry), 0, 100).default({}),
+  mention_roles: z.boolean().default(false),
 });
 
 export interface SelfGrantableRolesPluginType extends BasePluginType {
-  config: z.infer<typeof zSelfGrantableRolesConfig>;
+  configSchema: typeof zSelfGrantableRolesConfig;
   state: {
     cooldowns: CooldownManager;
     common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;

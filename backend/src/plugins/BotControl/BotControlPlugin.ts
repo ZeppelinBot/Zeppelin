@@ -23,21 +23,9 @@ import { RestPerformanceCmd } from "./commands/RestPerformanceCmd.js";
 import { ServersCmd } from "./commands/ServersCmd.js";
 import { BotControlPluginType, zBotControlConfig } from "./types.js";
 
-const defaultOptions = {
-  config: {
-    can_use: false,
-    can_eligible: false,
-    can_performance: false,
-    can_add_server_from_invite: false,
-    can_list_dashboard_perms: false,
-    update_cmd: null,
-  },
-};
-
 export const BotControlPlugin = globalPlugin<BotControlPluginType>()({
   name: "bot_control",
-  configParser: (input) => zBotControlConfig.parse(input),
-  defaultOptions,
+  configSchema: zBotControlConfig,
 
   // prettier-ignore
   messageCommands: [

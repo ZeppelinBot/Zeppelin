@@ -14,12 +14,12 @@ export interface IDeletionQueueItem {
 }
 
 export const zAutoDeleteConfig = z.strictObject({
-  enabled: z.boolean(),
-  delay: zDelayString,
+  enabled: z.boolean().default(false),
+  delay: zDelayString.default("5s"),
 });
 
 export interface AutoDeletePluginType extends BasePluginType {
-  config: z.output<typeof zAutoDeleteConfig>;
+  configSchema: typeof zAutoDeleteConfig;
   state: {
     guildSavedMessages: GuildSavedMessages;
     guildLogs: GuildLogs;

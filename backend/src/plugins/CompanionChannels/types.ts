@@ -13,11 +13,11 @@ export const zCompanionChannelOpts = z.strictObject({
 export type TCompanionChannelOpts = z.infer<typeof zCompanionChannelOpts>;
 
 export const zCompanionChannelsConfig = z.strictObject({
-  entries: z.record(zBoundedCharacters(0, 100), zCompanionChannelOpts),
+  entries: z.record(zBoundedCharacters(0, 100), zCompanionChannelOpts).default({}),
 });
 
 export interface CompanionChannelsPluginType extends BasePluginType {
-  config: z.infer<typeof zCompanionChannelsConfig>;
+  configSchema: typeof zCompanionChannelsConfig;
   state: {
     errorCooldownManager: CooldownManager;
     serverLogs: GuildLogs;

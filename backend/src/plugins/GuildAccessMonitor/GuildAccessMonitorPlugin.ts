@@ -3,13 +3,7 @@ import { BasePluginType, GlobalPluginData, globalPlugin, globalPluginEventListen
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { Configs } from "../../data/Configs.js";
 import { env } from "../../env.js";
-import { zGuildAccessMonitorConfig } from "./types.js";
-
-interface GuildAccessMonitorPluginType extends BasePluginType {
-  state: {
-    allowedGuilds: AllowedGuilds;
-  };
-}
+import { GuildAccessMonitorPluginType, zGuildAccessMonitorConfig } from "./types.js";
 
 async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginType>, guild: Guild) {
   if (!(await pluginData.state.allowedGuilds.isAllowed(guild.id))) {
@@ -24,7 +18,7 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
  */
 export const GuildAccessMonitorPlugin = globalPlugin<GuildAccessMonitorPluginType>()({
   name: "guild_access_monitor",
-  configParser: (input) => zGuildAccessMonitorConfig.parse(input),
+  configSchema: zGuildAccessMonitorConfig,
 
   events: [
     globalPluginEventListener<GuildAccessMonitorPluginType>()({

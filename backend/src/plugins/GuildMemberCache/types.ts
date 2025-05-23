@@ -5,7 +5,7 @@ import { GuildMemberCache } from "../../data/GuildMemberCache.js";
 export const zGuildMemberCacheConfig = z.strictObject({});
 
 export interface GuildMemberCachePluginType extends BasePluginType {
-  config: z.infer<typeof zGuildMemberCacheConfig>;
+  configSchema: typeof zGuildMemberCacheConfig;
   state: {
     memberCache: GuildMemberCache;
     saveInterval: NodeJS.Timeout;

@@ -27,6 +27,7 @@ import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, Gui
 import { isStaff } from "./staff.js";
 import { TZeppelinKnub } from "./types.js";
 import { Tail } from "./utils/typeUtils.js";
+import z from "zod/v4";
 
 const { getMemberLevel } = helpers;
 
@@ -166,7 +167,7 @@ export async function deleteContextResponse(response: ContextResponse): Promise<
   await response.delete();
 }
 
-export async function getConfigForContext<TPluginData extends BasePluginData<any>>(config: PluginConfigManager<TPluginData>, context: GenericCommandSource): Promise<TPluginData["_pluginType"]["config"]> {
+export async function getConfigForContext<TPluginData extends BasePluginData<any>>(config: PluginConfigManager<TPluginData>, context: GenericCommandSource): Promise<z.output<TPluginData["_pluginType"]["configSchema"]>> {
   if (context instanceof ChatInputCommandInteraction) {
     // TODO: Support for modal interactions (here and Knub)
     return config.getForInteraction(context);

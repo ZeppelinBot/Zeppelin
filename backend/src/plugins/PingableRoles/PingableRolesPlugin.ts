@@ -1,15 +1,15 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildPingableRoles } from "../../data/GuildPingableRoles.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { PingableRoleDisableCmd } from "./commands/PingableRoleDisableCmd.js";
 import { PingableRoleEnableCmd } from "./commands/PingableRoleEnableCmd.js";
 import { PingableRolesPluginType, zPingableRolesConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<PingableRolesPluginType> = {
-  config: {
-    can_manage: false,
-  },
-  overrides: [
+export const PingableRolesPlugin = guildPlugin<PingableRolesPluginType>()({
+  name: "pingable_roles",
+
+  configSchema: zPingableRolesConfig,
+  defaultOverrides: [
     {
       level: ">=100",
       config: {
@@ -17,13 +17,6 @@ const defaultOptions: PluginOptions<PingableRolesPluginType> = {
       },
     },
   ],
-};
-
-export const PingableRolesPlugin = guildPlugin<PingableRolesPluginType>()({
-  name: "pingable_roles",
-
-  configParser: (input) => zPingableRolesConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [

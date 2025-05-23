@@ -2,12 +2,11 @@ import { BasePluginType } from "knub";
 import z from "zod/v4";
 
 export const zPhishermanConfig = z.strictObject({
-  api_key: z.string().max(255).nullable(),
+  api_key: z.string().max(255).nullable().default(null),
 });
 
 export interface PhishermanPluginType extends BasePluginType {
-  config: z.infer<typeof zPhishermanConfig>;
-
+  configSchema: typeof zPhishermanConfig;
   state: {
     validApiKey: string | null;
   };

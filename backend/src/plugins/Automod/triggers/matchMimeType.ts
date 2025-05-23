@@ -1,31 +1,19 @@
 import { escapeInlineCode } from "discord.js";
-import z from "zod/v4";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils.js";
 import { automodTrigger } from "../helpers.js";
+import z from "zod/v4";
 
 interface MatchResultType {
   matchedType: string;
   mode: "blacklist" | "whitelist";
 }
 
-const baseConfig = z.strictObject({
-  mime_type_blacklist: z.array(z.string().max(32)).max(255).default([]),
+const configSchema = z.strictObject({
+  whitelist_enabled: z.boolean().default(false),
   mime_type_whitelist: z.array(z.string().max(32)).max(255).default([]),
+  blacklist_enabled: z.boolean().default(false),
+  mime_type_blacklist: z.array(z.string().max(32)).max(255).default([]),
 });
-const configWithWhitelist = baseConfig.merge(
-  z.strictObject({
-    whitelist_enabled: z.literal(true),
-    blacklist_enabled: z.literal(false).default(false),
-  }),
-);
-const configWithBlacklist = baseConfig.merge(
-  z.strictObject({
-    blacklist_enabled: z.literal(true),
-    whitelist_enabled: z.literal(false).default(false),
-  }),
-);
-
-const configSchema = z.union([configWithWhitelist, configWithBlacklist]);
 
 export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
   configSchema,

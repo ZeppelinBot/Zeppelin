@@ -49,7 +49,7 @@
     "fp-ts": "^2.0.1",
     "humanize-duration": "^3.15.0",
     "js-yaml": "^4.1.0",
-    "knub": "^32.0.0-next.23",
+    "knub": "^32.0.0-next.25",
     "knub-command-manager": "^9.1.0",
     "last-commit-log": "^2.1.0",
     "lodash-es": "^4.17.21",

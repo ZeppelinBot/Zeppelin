@@ -11,22 +11,15 @@ import { RoleButtonsPluginType, zRoleButtonsConfig } from "./types.js";
 export const RoleButtonsPlugin = guildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",
 
-  defaultOptions: {
-    config: {
-      buttons: {},
-      can_reset: false,
-    },
-    overrides: [
-      {
-        level: ">=100",
-        config: {
-          can_reset: true,
-        },
+  configSchema: zRoleButtonsConfig,
+  defaultOverrides: [
+    {
+      level: ">=100",
+      config: {
+        can_reset: true,
       },
-    ],
-  },
-
-  configParser: (input) => zRoleButtonsConfig.parse(input),
+    },
+  ],
 
   dependencies: () => [LogsPlugin, RoleManagerPlugin],
 

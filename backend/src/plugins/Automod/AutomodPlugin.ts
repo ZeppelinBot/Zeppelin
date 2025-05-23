@@ -34,29 +34,6 @@ import { clearOldRecentActions } from "./functions/clearOldRecentActions.js";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam.js";
 import { AutomodPluginType, zAutomodConfig } from "./types.js";
 
-const defaultOptions = {
-  config: {
-    rules: {},
-    antiraid_levels: ["low", "medium", "high"],
-    can_set_antiraid: false,
-    can_view_antiraid: false,
-  },
-  overrides: [
-    {
-      level: ">=50",
-      config: {
-        can_view_antiraid: true,
-      },
-    },
-    {
-      level: ">=100",
-      config: {
-        can_set_antiraid: true,
-      },
-    },
-  ],
-};
-
 export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
   name: "automod",
 
@@ -71,8 +48,7 @@ export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
     RoleManagerPlugin,
   ],
 
-  defaultOptions,
-  configParser: (input) => zAutomodConfig.parse(input),
+  configSchema: zAutomodConfig,
 
   customOverrideCriteriaFunctions: {
     antiraid_level: (pluginData, matchParams, value) => {

@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildMutes } from "../../data/GuildMutes.js";
@@ -9,20 +9,12 @@ import { SpamPluginType, zSpamConfig } from "./types.js";
 import { clearOldRecentActions } from "./util/clearOldRecentActions.js";
 import { onMessageCreate } from "./util/onMessageCreate.js";
 
-const defaultOptions: PluginOptions<SpamPluginType> = {
-  config: {
-    max_censor: null,
-    max_messages: null,
-    max_mentions: null,
-    max_links: null,
-    max_attachments: null,
-    max_emojis: null,
-    max_newlines: null,
-    max_duplicates: null,
-    max_characters: null,
-    max_voice_moves: null,
-  },
-  overrides: [
+export const SpamPlugin = guildPlugin<SpamPluginType>()({
+  name: "spam",
+
+  dependencies: () => [LogsPlugin],
+  configSchema: zSpamConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -38,14 +30,6 @@ const defaultOptions: PluginOptions<SpamPluginType> = {
       },
     },
   ],
-};
-
-export const SpamPlugin = guildPlugin<SpamPluginType>()({
-  name: "spam",
-
-  dependencies: () => [LogsPlugin],
-  configParser: (input) => zSpamConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   events: [

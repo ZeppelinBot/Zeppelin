@@ -13,7 +13,7 @@ export const RoleManagerPlugin = guildPlugin<RoleManagerPluginType>()({
   name: "role_manager",
 
   dependencies: () => [LogsPlugin],
-  configParser: (input) => zRoleManagerConfig.parse(input),
+  configSchema: zRoleManagerConfig,
 
   public(pluginData) {
     return {

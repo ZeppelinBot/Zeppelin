@@ -9,11 +9,12 @@ import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd.js";
 import { postReminder } from "./functions/postReminder.js";
 import { RemindersPluginType, zRemindersConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<RemindersPluginType> = {
-  config: {
-    can_use: false,
-  },
-  overrides: [
+export const RemindersPlugin = guildPlugin<RemindersPluginType>()({
+  name: "reminders",
+
+  dependencies: () => [TimeAndDatePlugin],
+  configSchema: zRemindersConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -21,14 +22,6 @@ const defaultOptions: PluginOptions<RemindersPluginType> = {
       },
     },
   ],
-};
-
-export const RemindersPlugin = guildPlugin<RemindersPluginType>()({
-  name: "reminders",
-
-  dependencies: () => [TimeAndDatePlugin],
-  configParser: (input) => zRemindersConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [

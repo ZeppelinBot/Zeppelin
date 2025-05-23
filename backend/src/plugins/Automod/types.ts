@@ -58,14 +58,14 @@ const zRule = z.strictObject({
 export type TRule = z.infer<typeof zRule>;
 
 export const zAutomodConfig = z.strictObject({
-  rules: zBoundedRecord(z.record(z.string().max(100), zRule), 0, 255),
-  antiraid_levels: z.array(z.string().max(100)).max(10),
-  can_set_antiraid: z.boolean(),
-  can_view_antiraid: z.boolean(),
+  rules: zBoundedRecord(z.record(z.string().max(100), zRule), 0, 255).default({}),
+  antiraid_levels: z.array(z.string().max(100)).max(10).default(["low", "medium", "high"]),
+  can_set_antiraid: z.boolean().default(false),
+  can_view_antiraid: z.boolean().default(false),
 });
 
 export interface AutomodPluginType extends BasePluginType {
-  config: z.output<typeof zAutomodConfig>;
+  configSchema: typeof zAutomodConfig;
 
   customOverrideCriteria: {
     antiraid_level?: string;

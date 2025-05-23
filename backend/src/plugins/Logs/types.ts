@@ -21,6 +21,7 @@ import {
   TemplateSafeUnknownUser,
   TemplateSafeUser,
 } from "../../utils/templateSafeObjects.js";
+import DefaultLogMessages from "../../data/DefaultLogMessages.json" with { type: "json" };
 
 const DEFAULT_BATCH_TIME = 1000;
 const MIN_BATCH_TIME = 250;
@@ -53,20 +54,20 @@ const zLogChannelMap = z.record(zSnowflake, zLogChannel);
 export type TLogChannelMap = z.infer<typeof zLogChannelMap>;
 
 export const zLogsConfig = z.strictObject({
-  channels: zLogChannelMap,
-  format: zLogFormats,
+  channels: zLogChannelMap.default({}),
+  format: zLogFormats.default(DefaultLogMessages),
   // Legacy/deprecated, if below is false mentions wont actually ping. In case you really want the old behavior, set below to true
-  ping_user: z.boolean(),
-  allow_user_mentions: z.boolean(),
-  timestamp_format: z.string().nullable(),
-  include_embed_timestamp: z.boolean(),
+  ping_user: z.boolean().default(true),
+  allow_user_mentions: z.boolean().default(false),
+  timestamp_format: z.string().nullable().default("[<t:]X[>]"),
+  include_embed_timestamp: z.boolean().default(true),
 });
 
 // Hacky way of allowing a """null""" default value for config.format.timestamp due to legacy io-ts reasons
 export const FORMAT_NO_TIMESTAMP = "__NO_TIMESTAMP__";
 
 export interface LogsPluginType extends BasePluginType {
-  config: z.infer<typeof zLogsConfig>;
+  configSchema: typeof zLogsConfig;
   state: {
     guildLogs: GuildLogs;
     savedMessages: GuildSavedMessages;

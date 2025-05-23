@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
@@ -16,11 +16,12 @@ import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd.js";
 import { PostPluginType, zPostConfig } from "./types.js";
 import { postScheduledPost } from "./util/postScheduledPost.js";
 
-const defaultOptions: PluginOptions<PostPluginType> = {
-  config: {
-    can_post: false,
-  },
-  overrides: [
+export const PostPlugin = guildPlugin<PostPluginType>()({
+  name: "post",
+
+  dependencies: () => [TimeAndDatePlugin, LogsPlugin],
+  configSchema: zPostConfig,
+  defaultOverrides: [
     {
       level: ">=100",
       config: {
@@ -28,14 +29,6 @@ const defaultOptions: PluginOptions<PostPluginType> = {
       },
     },
   ],
-};
-
-export const PostPlugin = guildPlugin<PostPluginType>()({
-  name: "post",
-
-  dependencies: () => [TimeAndDatePlugin, LogsPlugin],
-  configParser: (input) => zPostConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [

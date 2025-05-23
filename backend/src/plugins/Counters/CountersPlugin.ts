@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { PluginOptions, guildPlugin } from "knub";
+import { PluginOptions, PluginOverride, guildPlugin } from "knub";
 import { GuildCounters } from "../../data/GuildCounters.js";
 import { buildCounterConditionString, CounterTrigger, getReverseCounterComparisonOp, parseCounterConditionString } from "../../data/entities/CounterTrigger.js";
 import { makePublicFn } from "../../pluginUtils.js";
@@ -23,28 +23,20 @@ import { CountersPluginType, zCountersConfig } from "./types.js";
 
 const DECAY_APPLY_INTERVAL = 5 * MINUTES;
 
-const defaultOptions: PluginOptions<CountersPluginType> = {
-  config: {
-    counters: {},
-    can_view: false,
-    can_edit: false,
-    can_reset_all: false,
+const defaultOverrides: Array<PluginOverride<CountersPluginType>> = [
+  {
+    level: ">=50",
+    config: {
+      can_view: true,
+    },
   },
-  overrides: [
-    {
-      level: ">=50",
-      config: {
-        can_view: true,
-      },
+  {
+    level: ">=100",
+    config: {
+      can_edit: true,
     },
-    {
-      level: ">=100",
-      config: {
-        can_edit: true,
-      },
-    },
-  ],
-};
+  },
+];
 
 /**
  * The Counters plugin keeps track of simple integer values that are tied to a user, channel, both, or neither — "counters".
@@ -59,9 +51,8 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
 export const CountersPlugin = guildPlugin<CountersPluginType>()({
   name: "counters",
 
-  defaultOptions,
-  // TODO: Separate input and output types
-  configParser: (input) => zCountersConfig.parse(input),
+  configSchema: zCountersConfig,
+  defaultOverrides,
 
   public(pluginData) {
     return {

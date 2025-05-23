@@ -67,8 +67,8 @@ export type TRoleButtonsConfigItem = z.infer<typeof zRoleButtonsConfigItem>;
 
 export const zRoleButtonsConfig = z
   .strictObject({
-    buttons: zBoundedRecord(z.record(zBoundedCharacters(1, 16), zRoleButtonsConfigItem), 0, 100),
-    can_reset: z.boolean(),
+    buttons: zBoundedRecord(z.record(zBoundedCharacters(1, 16), zRoleButtonsConfigItem), 0, 100).default({}),
+    can_reset: z.boolean().default(false),
   })
   .refine(
     (parsed) => {
@@ -91,7 +91,7 @@ export const zRoleButtonsConfig = z
   );
 
 export interface RoleButtonsPluginType extends BasePluginType {
-  config: z.infer<typeof zRoleButtonsConfig>;
+  configSchema: typeof zRoleButtonsConfig;
   state: {
     roleButtons: GuildRoleButtons;
     common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;

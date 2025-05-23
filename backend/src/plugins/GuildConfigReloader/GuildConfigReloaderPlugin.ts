@@ -1,13 +1,12 @@
 import { globalPlugin } from "knub";
-import z from "zod/v4";
 import { Configs } from "../../data/Configs.js";
 import { reloadChangedGuilds } from "./functions/reloadChangedGuilds.js";
-import { GuildConfigReloaderPluginType } from "./types.js";
+import { GuildConfigReloaderPluginType, zGuildConfigReloaderPluginConfig } from "./types.js";
 
 export const GuildConfigReloaderPlugin = globalPlugin<GuildConfigReloaderPluginType>()({
   name: "guild_config_reloader",
 
-  configParser: (input) => z.strictObject({}).parse(input),
+  configSchema: zGuildConfigReloaderPluginConfig,
 
   async beforeLoad(pluginData) {
     const { state } = pluginData;

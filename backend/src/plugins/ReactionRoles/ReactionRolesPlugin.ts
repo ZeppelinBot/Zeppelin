@@ -11,19 +11,12 @@ import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt.js";
 import { MessageDeletedEvt } from "./events/MessageDeletedEvt.js";
 import { ReactionRolesPluginType, zReactionRolesConfig } from "./types.js";
 
-const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
+export const ReactionRolesPlugin = guildPlugin<ReactionRolesPluginType>()({
+  name: "reaction_roles",
 
-const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
-  config: {
-    auto_refresh_interval: MIN_AUTO_REFRESH,
-    remove_user_reactions: true,
-
-    can_manage: false,
-
-    button_groups: null,
-  },
-
-  overrides: [
+  dependencies: () => [LogsPlugin],
+  configSchema: zReactionRolesConfig,
+  defaultOverrides: [
     {
       level: ">=100",
       config: {
@@ -31,14 +24,6 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
       },
     },
   ],
-};
-
-export const ReactionRolesPlugin = guildPlugin<ReactionRolesPluginType>()({
-  name: "reaction_roles",
-
-  dependencies: () => [LogsPlugin],
-  configParser: (input) => zReactionRolesConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [

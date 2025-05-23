@@ -69,10 +69,10 @@ export const zCounter = z.strictObject({
 });
 
 export const zCountersConfig = z.strictObject({
-  counters: zBoundedRecord(z.record(zBoundedCharacters(0, 100), zCounter), 0, MAX_COUNTERS),
-  can_view: z.boolean(),
-  can_edit: z.boolean(),
-  can_reset_all: z.boolean(),
+  counters: zBoundedRecord(z.record(zBoundedCharacters(0, 100), zCounter), 0, MAX_COUNTERS).default({}),
+  can_view: z.boolean().default(false),
+  can_edit: z.boolean().default(false),
+  can_reset_all: z.boolean().default(false),
 });
 
 export interface CounterEvents {
@@ -86,7 +86,7 @@ export interface CounterEventEmitter extends EventEmitter {
 }
 
 export interface CountersPluginType extends BasePluginType {
-  config: z.infer<typeof zCountersConfig>;
+  configSchema: typeof zCountersConfig;
   state: {
     counters: GuildCounters;
     counterIds: Record<string, number>;

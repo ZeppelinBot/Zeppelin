@@ -1,35 +1,19 @@
 import {
   Attachment,
-  ChatInputCommandInteraction,
-  InteractionResponse,
-  Message,
-  MessageCreateOptions,
   MessageMentionOptions,
-  ModalSubmitInteraction,
   SendableChannels,
-  TextBasedChannel,
-  User,
+  TextBasedChannel
 } from "discord.js";
-import { PluginOptions, guildPlugin } from "knub";
-import { logger } from "../../logger.js";
-import { GenericCommandSource, isContextInteraction, sendContextResponse } from "../../pluginUtils.js";
+import { guildPlugin } from "knub";
+import { GenericCommandSource, sendContextResponse } from "../../pluginUtils.js";
 import { errorMessage, successMessage } from "../../utils.js";
 import { getErrorEmoji, getSuccessEmoji } from "./functions/getEmoji.js";
 import { CommonPluginType, zCommonConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<CommonPluginType> = {
-  config: {
-    success_emoji: "✅",
-    error_emoji: "❌",
-    attachment_storing_channel: null,
-  },
-};
-
 export const CommonPlugin = guildPlugin<CommonPluginType>()({
   name: "common",
   dependencies: () => [],
-  configParser: (input) => zCommonConfig.parse(input),
-  defaultOptions,
+  configSchema: zCommonConfig,
   public(pluginData) {
     return {
       getSuccessEmoji,

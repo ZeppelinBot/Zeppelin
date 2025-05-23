@@ -22,39 +22,39 @@ import { CommonPlugin } from "../Common/CommonPlugin.js";
 export type AttachmentLinkReactionType = "none" | "warn" | "restrict" | null;
 
 export const zModActionsConfig = z.strictObject({
-  dm_on_warn: z.boolean(),
-  dm_on_kick: z.boolean(),
-  dm_on_ban: z.boolean(),
-  message_on_warn: z.boolean(),
-  message_on_kick: z.boolean(),
-  message_on_ban: z.boolean(),
-  message_channel: z.nullable(z.string()),
-  warn_message: z.nullable(z.string()),
-  kick_message: z.nullable(z.string()),
-  ban_message: z.nullable(z.string()),
-  tempban_message: z.nullable(z.string()),
-  alert_on_rejoin: z.boolean(),
-  alert_channel: z.nullable(z.string()),
-  warn_notify_enabled: z.boolean(),
-  warn_notify_threshold: z.number(),
-  warn_notify_message: z.string(),
-  ban_delete_message_days: z.number(),
-  attachment_link_reaction: z.nullable(z.union([z.literal("none"), z.literal("warn"), z.literal("restrict")])),
-  can_note: z.boolean(),
-  can_warn: z.boolean(),
-  can_mute: z.boolean(),
-  can_kick: z.boolean(),
-  can_ban: z.boolean(),
-  can_unban: z.boolean(),
-  can_view: z.boolean(),
-  can_addcase: z.boolean(),
-  can_massunban: z.boolean(),
-  can_massban: z.boolean(),
-  can_massmute: z.boolean(),
-  can_hidecase: z.boolean(),
-  can_deletecase: z.boolean(),
-  can_act_as_other: z.boolean(),
-  create_cases_for_manual_actions: z.boolean(),
+  dm_on_warn: z.boolean().default(true),
+  dm_on_kick: z.boolean().default(false),
+  dm_on_ban: z.boolean().default(false),
+  message_on_warn: z.boolean().default(false),
+  message_on_kick: z.boolean().default(false),
+  message_on_ban: z.boolean().default(false),
+  message_channel: z.nullable(z.string()).default(null),
+  warn_message: z.nullable(z.string()).default("You have received a warning on the {guildName} server: {reason}"),
+  kick_message: z.nullable(z.string()).default("You have been kicked from the {guildName} server. Reason given: {reason}"),
+  ban_message: z.nullable(z.string()).default("You have been banned from the {guildName} server. Reason given: {reason}"),
+  tempban_message: z.nullable(z.string()).default("You have been banned from the {guildName} server for {banTime}. Reason given: {reason}"),
+  alert_on_rejoin: z.boolean().default(false),
+  alert_channel: z.nullable(z.string()).default(null),
+  warn_notify_enabled: z.boolean().default(false),
+  warn_notify_threshold: z.number().default(5),
+  warn_notify_message: z.string().default("The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?"),
+  ban_delete_message_days: z.number().default(1),
+  attachment_link_reaction: z.nullable(z.union([z.literal("none"), z.literal("warn"), z.literal("restrict")])).default("warn"),
+  can_note: z.boolean().default(false),
+  can_warn: z.boolean().default(false),
+  can_mute: z.boolean().default(false),
+  can_kick: z.boolean().default(false),
+  can_ban: z.boolean().default(false),
+  can_unban: z.boolean().default(false),
+  can_view: z.boolean().default(false),
+  can_addcase: z.boolean().default(false),
+  can_massunban: z.boolean().default(false),
+  can_massban: z.boolean().default(false),
+  can_massmute: z.boolean().default(false),
+  can_hidecase: z.boolean().default(false),
+  can_deletecase: z.boolean().default(false),
+  can_act_as_other: z.boolean().default(false),
+  create_cases_for_manual_actions: z.boolean().default(true),
 });
 
 export interface ModActionsEvents {
@@ -72,7 +72,7 @@ export interface ModActionsEventEmitter extends EventEmitter {
 }
 
 export interface ModActionsPluginType extends BasePluginType {
-  config: z.infer<typeof zModActionsConfig>;
+  configSchema: typeof zModActionsConfig;
   state: {
     mutes: GuildMutes;
     cases: GuildCases;

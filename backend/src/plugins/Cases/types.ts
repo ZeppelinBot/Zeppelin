@@ -11,16 +11,16 @@ import { zColor } from "../../utils/zColor.js";
 const caseKeys = keys(CaseNameToType) as U.ListOf<keyof typeof CaseNameToType>;
 
 export const zCasesConfig = z.strictObject({
-  log_automatic_actions: z.boolean(),
-  case_log_channel: zSnowflake.nullable(),
-  show_relative_times: z.boolean(),
+  log_automatic_actions: z.boolean().default(true),
+  case_log_channel: zSnowflake.nullable().default(null),
+  show_relative_times: z.boolean().default(true),
   relative_time_cutoff: zDelayString.default("1w"),
-  case_colors: z.record(z.enum(caseKeys), zColor).nullable(),
-  case_icons: z.record(z.enum(caseKeys), zBoundedCharacters(0, 100)).nullable(),
+  case_colors: z.record(z.enum(caseKeys), zColor).nullable().default(null),
+  case_icons: z.record(z.enum(caseKeys), zBoundedCharacters(0, 100)).nullable().default(null),
 });
 
 export interface CasesPluginType extends BasePluginType {
-  config: z.infer<typeof zCasesConfig>;
+  configSchema: typeof zCasesConfig;
   state: {
     logs: GuildLogs;
     cases: GuildCases;

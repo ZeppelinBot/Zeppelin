@@ -72,47 +72,14 @@ import { offModActionsEvent } from "./functions/offModActionsEvent.js";
 import { onModActionsEvent } from "./functions/onModActionsEvent.js";
 import { updateCase } from "./functions/updateCase.js";
 import { warnMember } from "./functions/warnMember.js";
-import { AttachmentLinkReactionType, ModActionsPluginType, modActionsSlashGroup, zModActionsConfig } from "./types.js";
+import { ModActionsPluginType, modActionsSlashGroup, zModActionsConfig } from "./types.js";
 
-const defaultOptions = {
-  config: {
-    dm_on_warn: true,
-    dm_on_kick: false,
-    dm_on_ban: false,
-    message_on_warn: false,
-    message_on_kick: false,
-    message_on_ban: false,
-    message_channel: null,
-    warn_message: "You have received a warning on the {guildName} server: {reason}",
-    kick_message: "You have been kicked from the {guildName} server. Reason given: {reason}",
-    ban_message: "You have been banned from the {guildName} server. Reason given: {reason}",
-    tempban_message: "You have been banned from the {guildName} server for {banTime}. Reason given: {reason}",
-    alert_on_rejoin: false,
-    alert_channel: null,
-    warn_notify_enabled: false,
-    warn_notify_threshold: 5,
-    warn_notify_message:
-      "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
-    ban_delete_message_days: 1,
-    attachment_link_reaction: "warn" as AttachmentLinkReactionType,
+export const ModActionsPlugin = guildPlugin<ModActionsPluginType>()({
+  name: "mod_actions",
 
-    can_note: false,
-    can_warn: false,
-    can_mute: false,
-    can_kick: false,
-    can_ban: false,
-    can_unban: false,
-    can_view: false,
-    can_addcase: false,
-    can_massunban: false,
-    can_massban: false,
-    can_massmute: false,
-    can_hidecase: false,
-    can_deletecase: false,
-    can_act_as_other: false,
-    create_cases_for_manual_actions: true,
-  },
-  overrides: [
+  dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
+  configSchema: zModActionsConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -137,14 +104,6 @@ const defaultOptions = {
       },
     },
   ],
-};
-
-export const ModActionsPlugin = guildPlugin<ModActionsPluginType>()({
-  name: "mod_actions",
-
-  dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
-  configParser: (input) => zModActionsConfig.parse(input),
-  defaultOptions,
 
   events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt, AuditLogEvents],
 

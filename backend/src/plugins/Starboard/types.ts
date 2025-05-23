@@ -19,13 +19,12 @@ const zStarboardOpts = z.strictObject({
 export type TStarboardOpts = z.infer<typeof zStarboardOpts>;
 
 export const zStarboardConfig = z.strictObject({
-  boards: zBoundedRecord(z.record(z.string(), zStarboardOpts), 0, 100),
-  can_migrate: z.boolean(),
+  boards: zBoundedRecord(z.record(z.string(), zStarboardOpts), 0, 100).default({}),
+  can_migrate: z.boolean().default(false),
 });
 
 export interface StarboardPluginType extends BasePluginType {
-  config: z.infer<typeof zStarboardConfig>;
-
+  configSchema: typeof zStarboardConfig;
   state: {
     savedMessages: GuildSavedMessages;
     starboardMessages: GuildStarboardMessages;

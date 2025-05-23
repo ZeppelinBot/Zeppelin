@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages.js";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions.js";
@@ -9,13 +9,11 @@ import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./eve
 import { StarboardPluginType, zStarboardConfig } from "./types.js";
 import { onMessageDelete } from "./util/onMessageDelete.js";
 
-const defaultOptions: PluginOptions<StarboardPluginType> = {
-  config: {
-    can_migrate: false,
-    boards: {},
-  },
+export const StarboardPlugin = guildPlugin<StarboardPluginType>()({
+  name: "starboard",
 
-  overrides: [
+  configSchema: zStarboardConfig,
+  defaultOverrides: [
     {
       level: ">=100",
       config: {
@@ -23,13 +21,6 @@ const defaultOptions: PluginOptions<StarboardPluginType> = {
       },
     },
   ],
-};
-
-export const StarboardPlugin = guildPlugin<StarboardPluginType>()({
-  name: "starboard",
-
-  configParser: (input) => zStarboardConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [
