@@ -47,6 +47,7 @@ body {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .editor-wrap {
@@ -71,10 +72,11 @@ body {
   flex-direction: column;
   
   padding: 10px;
+
+  overflow-y: auto;
 }
 
 #errors {
-  flex: 0 0 max(300px, 40vh);
 }
 
 .error {
