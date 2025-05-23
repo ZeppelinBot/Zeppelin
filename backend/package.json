@@ -29,7 +29,7 @@
     "migrate-rollback-prod": "npm run migrate-rollback",
     "migrate-rollback-dev": "npm run build && npm run migrate-rollback",
     "validate-active-configs": "node --enable-source-maps dist/validateActiveConfigs.js > ../config-errors.txt",
-    "export-config-json-schema": "node --enable-source-maps dist/exportSchemas.js",
+    "export-config-json-schema": "node --enable-source-maps dist/exportSchemas.js ../config-checker/public/config-schema.json",
     "test": "npm run build && npm run run-tests",
     "run-tests": "ava",
     "test-watch": "tsc-watch --build --onSuccess \"npx ava\""
