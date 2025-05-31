@@ -6,7 +6,7 @@ import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { LogType } from "../../data/LogType.js";
-import { zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils.js";
+import { keys, zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils.js";
 import { MessageBuffer } from "../../utils/MessageBuffer.js";
 import {
   TemplateSafeCase,
@@ -28,9 +28,12 @@ const MIN_BATCH_TIME = 250;
 const MAX_BATCH_TIME = 5000;
 
 // A bit of a workaround so we can pass LogType keys to z.enum()
-const logTypes = Object.keys(LogType) as [keyof typeof LogType, ...Array<keyof typeof LogType>];
-const zLogFormats = z.record(z.enum(logTypes), zMessageContent);
-type TLogFormats = z.infer<typeof zLogFormats>;
+const logTypes = keys(LogType);
+const logTypeProps = logTypes.reduce((map, type) => {
+  map[type] = zMessageContent;
+  return map;
+}, {} as Record<keyof typeof LogType, typeof zMessageContent>);
+const zLogFormats = z.strictObject(logTypeProps);
 
 const zLogChannel = z.strictObject({
   include: z.array(zBoundedCharacters(1, 255)).default([]),
@@ -44,7 +47,7 @@ const zLogChannel = z.strictObject({
   excluded_threads: z.array(zSnowflake).nullable().default(null),
   exclude_bots: z.boolean().default(false),
   excluded_roles: z.array(zSnowflake).nullable().default(null),
-  format: zLogFormats.default({} as TLogFormats),
+  format: zLogFormats.partial().default({}),
   timestamp_format: z.string().nullable().default(null),
   include_embed_timestamp: z.boolean().nullable().default(null),
 });
