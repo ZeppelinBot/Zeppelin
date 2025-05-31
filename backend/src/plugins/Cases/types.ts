@@ -10,13 +10,23 @@ import { zColor } from "../../utils/zColor.js";
 
 const caseKeys = keys(CaseNameToType) as U.ListOf<keyof typeof CaseNameToType>;
 
+const caseColorsTypeMap = caseKeys.reduce((map, key) => {
+  map[key] = zColor;
+  return map;
+}, {} as Record<typeof caseKeys[number], typeof zColor>);
+
+const caseIconsTypeMap = caseKeys.reduce((map, key) => {
+  map[key] = zBoundedCharacters(0, 100);
+  return map;
+}, {} as Record<typeof caseKeys[number], z.ZodString>);
+
 export const zCasesConfig = z.strictObject({
   log_automatic_actions: z.boolean().default(true),
   case_log_channel: zSnowflake.nullable().default(null),
   show_relative_times: z.boolean().default(true),
   relative_time_cutoff: zDelayString.default("1w"),
-  case_colors: z.record(z.enum(caseKeys), zColor).nullable().default(null),
-  case_icons: z.record(z.enum(caseKeys), zBoundedCharacters(0, 100)).nullable().default(null),
+  case_colors: z.strictObject(caseColorsTypeMap).partial().nullable().default(null),
+  case_icons: z.strictObject(caseIconsTypeMap).partial().nullable().default(null),
 });
 
 export interface CasesPluginType extends BasePluginType {
