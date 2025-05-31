@@ -277,6 +277,10 @@ connect().then(async () => {
   });
 
   client.on("error", (err) => {
+    if (err instanceof PluginLoadError) {
+      errorHandler(err);
+      return;
+    }
     errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
   });
 
