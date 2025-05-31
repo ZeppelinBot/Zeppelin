@@ -2,13 +2,13 @@ import { PermissionsBitField, PermissionsString, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import z from "zod/v4";
 import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
-import { zSnowflake } from "../../../utils.js";
+import { zBoundedCharacters, zSnowflake } from "../../../utils.js";
 import { ActionError } from "../ActionError.js";
 import { CustomEventsPluginType, TCustomEvent } from "../types.js";
 
 export const zSetChannelPermissionOverridesAction = z.strictObject({
   type: z.literal("set_channel_permission_overrides"),
-  channel: zSnowflake,
+  channel: zBoundedCharacters(0, 100),
   overrides: z
     .array(
       z.strictObject({

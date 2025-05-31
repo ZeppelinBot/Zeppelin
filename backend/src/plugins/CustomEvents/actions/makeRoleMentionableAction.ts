@@ -2,13 +2,13 @@ import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import z from "zod/v4";
 import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
-import { convertDelayStringToMS, noop, zDelayString, zSnowflake } from "../../../utils.js";
+import { convertDelayStringToMS, noop, zBoundedCharacters, zDelayString } from "../../../utils.js";
 import { ActionError } from "../ActionError.js";
 import { CustomEventsPluginType, TCustomEvent } from "../types.js";
 
 export const zMakeRoleMentionableAction = z.strictObject({
   type: z.literal("make_role_mentionable"),
-  role: zSnowflake,
+  role: zBoundedCharacters(0, 100),
   timeout: zDelayString,
 });
 export type TMakeRoleMentionableAction = z.infer<typeof zMakeRoleMentionableAction>;
