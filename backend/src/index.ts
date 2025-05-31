@@ -95,7 +95,7 @@ function errorHandler(err) {
 
   if (err instanceof PluginLoadError) {
     // tslint:disable:no-console
-    console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}'`);
+    console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
     return;
   }
 
