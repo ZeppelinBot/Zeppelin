@@ -270,6 +270,13 @@ export const zStrictMessageContent = z.strictObject({
   content: z.string().optional(),
   tts: z.boolean().optional(),
   embeds: z.array(zEmbedInput).optional(),
+  embed: zEmbedInput.optional(),
+}).transform((data) => {
+  if (data.embed) {
+    data.embeds = [data.embed];
+    delete data.embed;
+  }
+  return data as StrictMessageContent;
 });
 
 export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;

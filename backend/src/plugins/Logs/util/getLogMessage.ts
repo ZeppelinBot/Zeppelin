@@ -37,11 +37,6 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
   const format = opts?.format?.[LogType[type]] || config.format[LogType[type]] || "";
   if (format === "" || format == null) return null;
 
-  if (typeof format === "object" && format.embed) {
-    format.embeds = [format.embed];
-    delete format.embed;
-  }
-
   // See comment on FORMAT_NO_TIMESTAMP in types.ts
   const timestampFormat = opts?.timestamp_format ?? config.timestamp_format;
 
