@@ -21,6 +21,7 @@ import { RecoverablePluginError } from "./RecoverablePluginError.js";
 import { SimpleError } from "./SimpleError.js";
 import { AllowedGuilds } from "./data/AllowedGuilds.js";
 import { Configs } from "./data/Configs.js";
+import { FishFishError, initFishFish } from "./data/FishFish.js";
 import { GuildLogs } from "./data/GuildLogs.js";
 import { LogType } from "./data/LogType.js";
 import { hasPhishermanMasterAPIKey } from "./data/Phisherman.js";
@@ -139,6 +140,12 @@ function errorHandler(err) {
     // We don't want to crash the bot here, although this *should not happen*
     // TODO: Proper system for preventing plugin load/unload race conditions
     console.error(err);
+    return;
+  }
+
+  if (err instanceof FishFishError) {
+    // FishFish errors are not critical, so we just log them
+    console.error(`[FISHFISH] ${err.message}`);
     return;
   }
 
@@ -402,6 +409,8 @@ connect().then(async () => {
       enableProfiling();
     }
 
+    initFishFish();
+
     runExpiringMutesLoop();
     await sleep(10 * SECONDS);
     runExpiringTempbansLoop();
@@ -419,13 +428,6 @@ connect().then(async () => {
     runExpiredMemberCacheDeletionLoop();
     await sleep(10 * SECONDS);
     runMemberCacheDeletionLoop();
-
-    if (hasPhishermanMasterAPIKey()) {
-      await sleep(10 * SECONDS);
-      runPhishermanCacheCleanupLoop();
-      await sleep(10 * SECONDS);
-      runPhishermanReportingLoop();
-    }
   });
 
   let lowestGlobalRemaining = Infinity;

@@ -7,7 +7,5 @@ export const zPhishermanConfig = z.strictObject({
 
 export interface PhishermanPluginType extends BasePluginType {
   configSchema: typeof zPhishermanConfig;
-  state: {
-    validApiKey: string | null;
-  };
+  state: {};
 }
