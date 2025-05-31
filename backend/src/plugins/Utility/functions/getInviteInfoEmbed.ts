@@ -2,7 +2,6 @@ import { APIEmbed, ChannelType } from "discord.js";
 import { GuildPluginData } from "knub";
 import {
   EmbedWith,
-  GroupDMInvite,
   formatNumber,
   inviteHasCounts,
   isGroupDMInvite,

@@ -1,11 +1,10 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd.js";
 import { SetTimezoneCmd } from "./commands/SetTimezoneCmd.js";
 import { ViewTimezoneCmd } from "./commands/ViewTimezoneCmd.js";
-import { defaultDateFormats } from "./defaultDateFormats.js";
 import { getDateFormat } from "./functions/getDateFormat.js";
 import { getGuildTz } from "./functions/getGuildTz.js";
 import { getMemberTz } from "./functions/getMemberTz.js";

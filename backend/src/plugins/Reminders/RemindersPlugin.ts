@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents.js";
 import { GuildReminders } from "../../data/GuildReminders.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";

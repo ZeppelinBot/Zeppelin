@@ -1,10 +1,10 @@
 import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescription } from "../../../utils.js";
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { TReactionRolePair, reactionRolesCmd } from "../types.js";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage.js";
-import { resolveMessageMember } from "../../../pluginUtils.js";
 
 const CLEAR_ROLES_EMOJI = "❌";
 

@@ -1,6 +1,6 @@
 import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
-import { getContextChannel, resolveMessageMember, sendContextResponse } from "../../../../pluginUtils.js";
+import { resolveMessageMember } from "../../../../pluginUtils.js";
 import { modActionsMsgCmd } from "../../types.js";
 import { actualMassBanCmd } from "./actualMassBanCmd.js";
 

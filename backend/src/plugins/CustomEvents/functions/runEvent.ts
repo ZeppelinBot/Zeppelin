@@ -1,4 +1,3 @@
-import { Message } from "discord.js";
 import { GuildPluginData } from "knub";
 import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
 import { ActionError } from "../ActionError.js";

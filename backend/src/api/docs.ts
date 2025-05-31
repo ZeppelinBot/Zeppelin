@@ -73,7 +73,10 @@ function formatZodConfigSchema(schema: z.ZodType) {
     return schema.def.values;
   }
   if (isZodIntersection(schema)) {
-    return [formatZodConfigSchema(schema.def.left as z.ZodType), formatZodConfigSchema(schema.def.right as z.ZodType)].join(" & ");
+    return [
+      formatZodConfigSchema(schema.def.left as z.ZodType),
+      formatZodConfigSchema(schema.def.right as z.ZodType),
+    ].join(" & ");
   }
   if (schema.def.type === "string") {
     return "string";
@@ -131,7 +134,7 @@ export function initDocs(router: express.Router) {
       config: cmd.config,
     }));
 
-    const defaultOptions = (pluginInfo.plugin as any /* TODO */).defaultOptions || {};
+    const defaultOptions = (pluginInfo.plugin as any) /* TODO */.defaultOptions || {};
 
     res.json({
       name: pluginInfo.plugin.name,

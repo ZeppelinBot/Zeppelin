@@ -39,7 +39,7 @@ export const ForceMuteMsgCmd = modActionsMsgCmd({
       return;
     }
 
-    const authorMember = await resolveMessageMember(msg)
+    const authorMember = await resolveMessageMember(msg);
     const memberToMute = await resolveMember(pluginData.client, pluginData.guild, user.id);
 
     // Make sure we're allowed to mute this user

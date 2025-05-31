@@ -1,7 +1,12 @@
 import { EventEmitter } from "events";
-import { PluginOptions, PluginOverride, guildPlugin } from "knub";
+import { PluginOverride, guildPlugin } from "knub";
 import { GuildCounters } from "../../data/GuildCounters.js";
-import { buildCounterConditionString, CounterTrigger, getReverseCounterComparisonOp, parseCounterConditionString } from "../../data/entities/CounterTrigger.js";
+import {
+  CounterTrigger,
+  buildCounterConditionString,
+  getReverseCounterComparisonOp,
+  parseCounterConditionString,
+} from "../../data/entities/CounterTrigger.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { MINUTES, convertDelayStringToMS } from "../../utils.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
@@ -98,7 +103,9 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
       // Initialize triggers
       for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
         const parsedCondition = parseCounterConditionString(trigger.condition)!;
-        const rawReverseCondition = trigger.reverse_condition || buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
+        const rawReverseCondition =
+          trigger.reverse_condition ||
+          buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
         const parsedReverseCondition = parseCounterConditionString(rawReverseCondition)!;
         const counterTrigger = await state.counters.initCounterTrigger(
           dbCounter.id,

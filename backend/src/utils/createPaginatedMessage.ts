@@ -1,11 +1,4 @@
-import {
-  Client,
-  Message,
-  MessageReaction,
-  PartialMessageReaction,
-  PartialUser,
-  User
-} from "discord.js";
+import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
 import { ContextResponseOptions, fetchContextChannel, GenericCommandSource } from "../pluginUtils.js";
 import { MINUTES, noop } from "../utils.js";
 import { Awaitable } from "./typeUtils.js";

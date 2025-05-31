@@ -31,7 +31,7 @@ export const AddCaseMsgCmd = modActionsMsgCmd({
       return;
     }
 
-    const member = msg.member || await msg.guild.members.fetch(msg.author.id);
+    const member = msg.member || (await msg.guild.members.fetch(msg.author.id));
 
     // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = member;

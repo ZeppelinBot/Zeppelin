@@ -23,7 +23,10 @@ export const zMutesConfig = z.strictObject({
   message_on_update: z.boolean().default(false),
   message_channel: z.string().nullable().default(null),
   mute_message: z.string().nullable().default("You have been muted on the {guildName} server. Reason given: {reason}"),
-  timed_mute_message: z.string().nullable().default("You have been muted on the {guildName} server for {time}. Reason given: {reason}"),
+  timed_mute_message: z
+    .string()
+    .nullable()
+    .default("You have been muted on the {guildName} server for {time}. Reason given: {reason}"),
   update_mute_message: z.string().nullable().default("Your mute on the {guildName} server has been updated to {time}."),
   remove_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
   restore_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),

@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";

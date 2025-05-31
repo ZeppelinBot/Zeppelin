@@ -1,11 +1,11 @@
 import { GuildBasedChannel, Message, OmitPartialGroupDMChannel, Snowflake, TextBasedChannel } from "discord.js";
-import { DAYS, getInviteCodesInString } from "../../../utils.js";
 import { GuildPluginData } from "knub";
-import { UtilityPluginType } from "../types.js";
-import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp.js";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { humanizeDurationShort } from "../../../humanizeDuration.js";
 import { allowTimeout } from "../../../RegExpRunner.js";
-import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { DAYS, getInviteCodesInString } from "../../../utils.js";
+import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp.js";
+import { UtilityPluginType } from "../types.js";
 
 const MAX_CLEAN_COUNT = 300;
 const MAX_CLEAN_TIME = 1 * DAYS;
@@ -33,7 +33,11 @@ export interface ErrorResult {
 
 export type FetchChannelMessagesToCleanResult = SuccessResult | ErrorResult;
 
-export async function fetchChannelMessagesToClean(pluginData: GuildPluginData<UtilityPluginType>, targetChannel: GuildBasedChannel & TextBasedChannel, opts: FetchChannelMessagesToCleanOpts): Promise<FetchChannelMessagesToCleanResult> {
+export async function fetchChannelMessagesToClean(
+  pluginData: GuildPluginData<UtilityPluginType>,
+  targetChannel: GuildBasedChannel & TextBasedChannel,
+  opts: FetchChannelMessagesToCleanOpts,
+): Promise<FetchChannelMessagesToCleanResult> {
   if (opts.count > MAX_CLEAN_COUNT || opts.count <= 0) {
     return { error: `Clean count must be between 1 and ${MAX_CLEAN_COUNT}` };
   }
@@ -75,7 +79,10 @@ export async function fetchChannelMessagesToClean(pluginData: GuildPluginData<Ut
         break;
       }
       if (message.createdTimestamp < timestampCutoff) continue;
-      if (opts.matchContent && !(await pluginData.state.regexRunner.exec(opts.matchContent, contentString).catch(allowTimeout))) {
+      if (
+        opts.matchContent &&
+        !(await pluginData.state.regexRunner.exec(opts.matchContent, contentString).catch(allowTimeout))
+      ) {
         continue;
       }
 

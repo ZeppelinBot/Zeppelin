@@ -37,6 +37,7 @@ const envType = z.object({
     .optional(),
 
   PHISHERMAN_API_KEY: z.string().optional(),
+  FISHFISH_API_KEY: z.string().optional(),
 
   DB_HOST: z.string().optional(),
   DB_PORT: z.preprocess((v) => Number(v), z.number()).optional(),

@@ -18,7 +18,10 @@ export const zCensorConfig = z.strictObject({
   domain_blacklist: z.array(zBoundedCharacters(0, 255)).nullable().default(null),
   blocked_tokens: z.array(zBoundedCharacters(0, 2000)).nullable().default(null),
   blocked_words: z.array(zBoundedCharacters(0, 2000)).nullable().default(null),
-  blocked_regex: z.array(zRegex(z.string().max(1000))).nullable().default(null),
+  blocked_regex: z
+    .array(zRegex(z.string().max(1000)))
+    .nullable()
+    .default(null),
 });
 
 export interface CensorPluginType extends BasePluginType {

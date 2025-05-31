@@ -1,9 +1,9 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 import { messageLink } from "../../../utils.js";
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { utilityCmd } from "../types.js";
-import { resolveMessageMember } from "../../../pluginUtils.js";
 
 export const ContextCmd = utilityCmd({
   trigger: "context",

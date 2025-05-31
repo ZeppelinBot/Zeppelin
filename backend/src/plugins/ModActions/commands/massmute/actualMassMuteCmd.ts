@@ -3,6 +3,7 @@ import { GuildPluginData } from "knub";
 import { LogType } from "../../../../data/LogType.js";
 import { logger } from "../../../../logger.js";
 import { canActOn, deleteContextResponse, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
+import { noop } from "../../../../utils.js";
 import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
@@ -11,7 +12,6 @@ import {
   formatReasonWithMessageLinkForAttachments,
 } from "../../functions/formatReasonForAttachments.js";
 import { ModActionsPluginType } from "../../types.js";
-import { noop } from "../../../../utils.js";
 
 export async function actualMassMuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

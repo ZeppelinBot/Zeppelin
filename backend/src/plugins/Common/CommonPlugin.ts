@@ -1,9 +1,4 @@
-import {
-  Attachment,
-  MessageMentionOptions,
-  SendableChannels,
-  TextBasedChannel
-} from "discord.js";
+import { Attachment, MessageMentionOptions, SendableChannels, TextBasedChannel } from "discord.js";
 import { guildPlugin } from "knub";
 import { GenericCommandSource, sendContextResponse } from "../../pluginUtils.js";
 import { errorMessage, successMessage } from "../../utils.js";
@@ -28,9 +23,7 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
       ) => {
         const emoji = getSuccessEmoji(pluginData);
         const formattedBody = successMessage(body, emoji);
-        const content = allowedMentions
-          ? { content: formattedBody, allowedMentions }
-          : { content: formattedBody };
+        const content = allowedMentions ? { content: formattedBody, allowedMentions } : { content: formattedBody };
         if ("isSendable" in context) {
           return context.send(content);
         }
@@ -46,9 +39,7 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
       ) => {
         const emoji = getErrorEmoji(pluginData);
         const formattedBody = errorMessage(body, emoji);
-        const content = allowedMentions
-          ? { content: formattedBody, allowedMentions }
-          : { content: formattedBody };
+        const content = allowedMentions ? { content: formattedBody, allowedMentions } : { content: formattedBody };
         if ("isSendable" in context) {
           return context.send(content);
         }
@@ -67,9 +58,7 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
           );
         }
         if (!channel.isSendable()) {
-          throw new Error(
-            "Passed attachment storage channel is not sendable",
-          );
+          throw new Error("Passed attachment storage channel is not sendable");
         }
 
         return channel.send({

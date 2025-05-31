@@ -28,12 +28,15 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
       }
 
       const plugin = pluginNameToPlugin.get(pluginName)!;
-      const configManager = new PluginConfigManager({}, {
-        configSchema: plugin.configSchema,
-        defaultOverrides: plugin.defaultOverrides ?? [],
-        levels: {},
-        customOverrideCriteriaFunctions: plugin.customOverrideCriteriaFunctions,
-      });
+      const configManager = new PluginConfigManager(
+        {},
+        {
+          configSchema: plugin.configSchema,
+          defaultOverrides: plugin.defaultOverrides ?? [],
+          levels: {},
+          customOverrideCriteriaFunctions: plugin.customOverrideCriteriaFunctions,
+        },
+      );
 
       try {
         await configManager.init();

@@ -1,4 +1,10 @@
-import { escapeCodeBlock, InteractionEditReplyOptions, InteractionReplyOptions, MessageCreateOptions, MessageEditOptions } from "discord.js";
+import {
+  escapeCodeBlock,
+  InteractionEditReplyOptions,
+  InteractionReplyOptions,
+  MessageCreateOptions,
+  MessageEditOptions,
+} from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes.js";

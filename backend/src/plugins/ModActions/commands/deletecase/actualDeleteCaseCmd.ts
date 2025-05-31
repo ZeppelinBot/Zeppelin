@@ -48,12 +48,7 @@ export async function actualDeleteCaseCmd(
         content: "Delete the following case? Answer 'Yes' to continue, 'No' to cancel.",
       });
 
-      const reply = await helpers.waitForReply(
-        pluginData.client,
-        channel,
-        author.id,
-        15 * SECONDS,
-      );
+      const reply = await helpers.waitForReply(pluginData.client, channel, author.id, 15 * SECONDS);
       const normalizedReply = (reply?.content || "").toLowerCase().trim();
       if (normalizedReply !== "yes" && normalizedReply !== "y") {
         sendContextResponse(context, "Cancelled. Case was not deleted.");

@@ -41,7 +41,7 @@ export const CasesUserMsgCmd = modActionsMsgCmd({
       pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;
     }
-    
+
     const member = await resolveMessageMember(msg);
 
     return actualCasesCmd(

@@ -34,7 +34,7 @@ export async function cleanAction(
       .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
     return;
   }
-  
+
   const targetChannel = await pluginData.guild.channels.fetch(targetChannelId);
   if (!targetChannel?.isTextBased()) {
     await interaction
@@ -62,7 +62,11 @@ export async function cleanAction(
 
   if (fetchMessagesResult.messages.length > 0) {
     await utility.cleanMessages(targetChannel, fetchMessagesResult.messages, interaction.user);
-    interaction.editReply(`Cleaned ${fetchMessagesResult.messages.length} ${fetchMessagesResult.messages.length === 1 ? "message" : "messages"}`);
+    interaction.editReply(
+      `Cleaned ${fetchMessagesResult.messages.length} ${
+        fetchMessagesResult.messages.length === 1 ? "message" : "messages"
+      }`,
+    );
   } else {
     interaction.editReply("No messages to clean");
   }

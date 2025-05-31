@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { Queue } from "../../Queue.js";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";

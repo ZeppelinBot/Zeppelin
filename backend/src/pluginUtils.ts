@@ -3,7 +3,6 @@
  */
 
 import {
-  BaseChannel,
   BitField,
   BitFieldResolvable,
   ChatInputCommandInteraction,
@@ -19,15 +18,21 @@ import {
   MessageFlagsString,
   ModalSubmitInteraction,
   PermissionsBitField,
-  SendableChannels,
   TextBasedChannel,
-  User,
 } from "discord.js";
-import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers, PluginConfigManager } from "knub";
+import {
+  AnyPluginData,
+  BasePluginData,
+  CommandContext,
+  ExtendedMatchParams,
+  GuildPluginData,
+  helpers,
+  PluginConfigManager,
+} from "knub";
+import z from "zod/v4";
 import { isStaff } from "./staff.js";
 import { TZeppelinKnub } from "./types.js";
 import { Tail } from "./utils/typeUtils.js";
-import z from "zod/v4";
 
 const { getMemberLevel } = helpers;
 
@@ -66,18 +71,14 @@ export type GenericCommandSource = Message | CommandInteraction | ModalSubmitInt
 export function isContextInteraction(
   context: GenericCommandSource,
 ): context is CommandInteraction | ModalSubmitInteraction {
-  return (context instanceof CommandInteraction || context instanceof ModalSubmitInteraction);
+  return context instanceof CommandInteraction || context instanceof ModalSubmitInteraction;
 }
 
-export function isContextMessage(
-  context: GenericCommandSource,
-): context is Message {
-  return (context instanceof Message);
+export function isContextMessage(context: GenericCommandSource): context is Message {
+  return context instanceof Message;
 }
 
-export async function getContextChannel(
-  context: GenericCommandSource,
-): Promise<TextBasedChannel | null> {
+export async function getContextChannel(context: GenericCommandSource): Promise<TextBasedChannel | null> {
   if (isContextInteraction(context)) {
     return context.channel;
   }
@@ -87,9 +88,7 @@ export async function getContextChannel(
   throw new Error("Unknown context type");
 }
 
-export function getContextChannelId(
-  context: GenericCommandSource,
-): string | null {
+export function getContextChannelId(context: GenericCommandSource): string | null {
   return context.channelId;
 }
 
@@ -104,13 +103,10 @@ export async function fetchContextChannel(context: GenericCommandSource) {
   return (await context.guild.channels.fetch(channelId))!;
 }
 
-function flagsWithEphemeral<
-  TFlags extends string,
-  TType extends number | bigint
->(flags: BitFieldResolvable<TFlags, any>, ephemeral: boolean): BitFieldResolvable<
-  TFlags | Extract<MessageFlagsString, "Ephemeral">,
-  TType | MessageFlags.Ephemeral
-> {
+function flagsWithEphemeral<TFlags extends string, TType extends number | bigint>(
+  flags: BitFieldResolvable<TFlags, any>,
+  ephemeral: boolean,
+): BitFieldResolvable<TFlags | Extract<MessageFlagsString, "Ephemeral">, TType | MessageFlags.Ephemeral> {
   if (!ephemeral) {
     return flags;
   }
@@ -150,7 +146,7 @@ export async function sendContextResponse(
   if (!contextChannel?.isSendable()) {
     throw new Error("Context channel does not exist or is not sendable");
   }
-  
+
   return contextChannel.send(content);
 }
 
@@ -167,7 +163,10 @@ export async function deleteContextResponse(response: ContextResponse): Promise<
   await response.delete();
 }
 
-export async function getConfigForContext<TPluginData extends BasePluginData<any>>(config: PluginConfigManager<TPluginData>, context: GenericCommandSource): Promise<z.output<TPluginData["_pluginType"]["configSchema"]>> {
+export async function getConfigForContext<TPluginData extends BasePluginData<any>>(
+  config: PluginConfigManager<TPluginData>,
+  context: GenericCommandSource,
+): Promise<z.output<TPluginData["_pluginType"]["configSchema"]>> {
   if (context instanceof ChatInputCommandInteraction) {
     // TODO: Support for modal interactions (here and Knub)
     return config.getForInteraction(context);

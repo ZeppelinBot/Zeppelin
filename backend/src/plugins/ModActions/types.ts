@@ -30,16 +30,28 @@ export const zModActionsConfig = z.strictObject({
   message_on_ban: z.boolean().default(false),
   message_channel: z.nullable(z.string()).default(null),
   warn_message: z.nullable(z.string()).default("You have received a warning on the {guildName} server: {reason}"),
-  kick_message: z.nullable(z.string()).default("You have been kicked from the {guildName} server. Reason given: {reason}"),
-  ban_message: z.nullable(z.string()).default("You have been banned from the {guildName} server. Reason given: {reason}"),
-  tempban_message: z.nullable(z.string()).default("You have been banned from the {guildName} server for {banTime}. Reason given: {reason}"),
+  kick_message: z
+    .nullable(z.string())
+    .default("You have been kicked from the {guildName} server. Reason given: {reason}"),
+  ban_message: z
+    .nullable(z.string())
+    .default("You have been banned from the {guildName} server. Reason given: {reason}"),
+  tempban_message: z
+    .nullable(z.string())
+    .default("You have been banned from the {guildName} server for {banTime}. Reason given: {reason}"),
   alert_on_rejoin: z.boolean().default(false),
   alert_channel: z.nullable(z.string()).default(null),
   warn_notify_enabled: z.boolean().default(false),
   warn_notify_threshold: z.number().default(5),
-  warn_notify_message: z.string().default("The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?"),
+  warn_notify_message: z
+    .string()
+    .default(
+      "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
+    ),
   ban_delete_message_days: z.number().default(1),
-  attachment_link_reaction: z.nullable(z.union([z.literal("none"), z.literal("warn"), z.literal("restrict")])).default("warn"),
+  attachment_link_reaction: z
+    .nullable(z.union([z.literal("none"), z.literal("warn"), z.literal("restrict")]))
+    .default("warn"),
   can_note: z.boolean().default(false),
   can_warn: z.boolean().default(false),
   can_mute: z.boolean().default(false),

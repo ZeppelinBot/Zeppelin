@@ -3,7 +3,14 @@ import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { LogType } from "../../../../data/LogType.js";
 import { humanizeDurationShort } from "../../../../humanizeDuration.js";
-import { canActOn, deleteContextResponse, editContextResponse, getConfigForContext, getContextChannel, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
+import {
+  canActOn,
+  deleteContextResponse,
+  editContextResponse,
+  getConfigForContext,
+  isContextInteraction,
+  sendContextResponse,
+} from "../../../../pluginUtils.js";
 import { DAYS, MINUTES, SECONDS, noop } from "../../../../utils.js";
 import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../../../Logs/LogsPlugin.js";

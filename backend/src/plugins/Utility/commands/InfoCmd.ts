@@ -1,6 +1,7 @@
 import { Snowflake } from "discord.js";
 import { getChannelId, getRoleId } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 import { isValidSnowflake, noop, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils.js";
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { resolveMessageTarget } from "../../../utils/resolveMessageTarget.js";
@@ -15,7 +16,6 @@ import { getServerInfoEmbed } from "../functions/getServerInfoEmbed.js";
 import { getSnowflakeInfoEmbed } from "../functions/getSnowflakeInfoEmbed.js";
 import { getUserInfoEmbed } from "../functions/getUserInfoEmbed.js";
 import { utilityCmd } from "../types.js";
-import { resolveMessageMember } from "../../../pluginUtils.js";
 
 export const InfoCmd = utilityCmd({
   trigger: "info",

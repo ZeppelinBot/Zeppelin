@@ -1,8 +1,8 @@
+import fs from "node:fs";
 import { z } from "zod/v4";
 import { availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { zZeppelinGuildConfig } from "./types.js";
 import { deepPartial } from "./utils/zodDeepPartial.js";
-import fs from "node:fs";
 
 const basePluginOverrideCriteriaSchema = z.strictObject({
   channel: z

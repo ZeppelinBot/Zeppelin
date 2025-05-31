@@ -1,4 +1,4 @@
-import { ChannelType, PermissionsBitField, Snowflake } from "discord.js";
+import { PermissionsBitField, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType.js";
