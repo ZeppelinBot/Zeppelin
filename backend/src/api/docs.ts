@@ -123,7 +123,12 @@ export function initDocs(router: express.Router) {
     }
 
     const { configSchema, ...info } = pluginInfo.docs;
-    const formattedConfigSchema = formatZodConfigSchema(configSchema);
+    let formattedConfigSchema: string;
+    try {
+      formattedConfigSchema = JSON.stringify(z.toJSONSchema(configSchema), null, 2);
+    } catch (err) {
+      formattedConfigSchema = "";
+    }
 
     const messageCommands = (pluginInfo.plugin.messageCommands || []).map((cmd) => ({
       trigger: cmd.trigger,
@@ -134,7 +139,7 @@ export function initDocs(router: express.Router) {
       config: cmd.config,
     }));
 
-    const defaultOptions = (pluginInfo.plugin as any) /* TODO */.defaultOptions || {};
+    const defaultOptions = pluginInfo.docs.configSchema.safeParse({}).data ?? {};
 
     res.json({
       name: pluginInfo.plugin.name,
