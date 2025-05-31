@@ -3,14 +3,14 @@ import { GuildPluginData } from "knub";
 import z from "zod/v4";
 import { canActOn } from "../../../pluginUtils.js";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
-import { resolveMember, zSnowflake } from "../../../utils.js";
+import { resolveMember, zBoundedCharacters, zSnowflake } from "../../../utils.js";
 import { ActionError } from "../ActionError.js";
 import { catchTemplateError } from "../catchTemplateError.js";
 import { CustomEventsPluginType, TCustomEvent } from "../types.js";
 
 export const zMoveToVoiceChannelAction = z.strictObject({
   type: z.literal("move_to_vc"),
-  target: zSnowflake,
+  target: zBoundedCharacters(0, 100),
   channel: zSnowflake,
 });
 export type TMoveToVoiceChannelAction = z.infer<typeof zMoveToVoiceChannelAction>;

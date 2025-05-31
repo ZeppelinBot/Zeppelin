@@ -2,7 +2,7 @@ import { GuildPluginData } from "knub";
 import z from "zod/v4";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter.js";
-import { zBoundedCharacters, zSnowflake } from "../../../utils.js";
+import { zBoundedCharacters } from "../../../utils.js";
 import { CasesPlugin } from "../../Cases/CasesPlugin.js";
 import { ActionError } from "../ActionError.js";
 import { catchTemplateError } from "../catchTemplateError.js";
@@ -11,8 +11,8 @@ import { CustomEventsPluginType, TCustomEvent } from "../types.js";
 export const zCreateCaseAction = z.strictObject({
   type: z.literal("create_case"),
   case_type: zBoundedCharacters(0, 32),
-  mod: zSnowflake,
-  target: zSnowflake,
+  mod: zBoundedCharacters(0, 100),
+  target: zBoundedCharacters(0, 100),
   reason: zBoundedCharacters(0, 4000),
 });
 export type TCreateCaseAction = z.infer<typeof zCreateCaseAction>;
