@@ -6,7 +6,7 @@ import { automodAction } from "../helpers.js";
 
 export const SetSlowmodeAction = automodAction({
   configSchema: z.strictObject({
-    channels: z.array(zSnowflake),
+    channels: z.array(zSnowflake).nullable().default([]),
     duration: zDelayString.nullable().default("10s"),
   }),
 
