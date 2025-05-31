@@ -28,11 +28,12 @@ const MIN_BATCH_TIME = 250;
 const MAX_BATCH_TIME = 5000;
 
 // A bit of a workaround so we can pass LogType keys to z.enum()
+const zMessageContentWithDefault = zMessageContent.default("");
 const logTypes = keys(LogType);
 const logTypeProps = logTypes.reduce((map, type) => {
   map[type] = zMessageContent.default(DefaultLogMessages[type] || "");
   return map;
-}, {} as Record<keyof typeof LogType, typeof zMessageContent>);
+}, {} as Record<keyof typeof LogType, typeof zMessageContentWithDefault>);
 const zLogFormats = z.strictObject(logTypeProps);
 
 const zLogChannel = z.strictObject({
@@ -58,7 +59,7 @@ export type TLogChannelMap = z.infer<typeof zLogChannelMap>;
 
 export const zLogsConfig = z.strictObject({
   channels: zLogChannelMap.default({}),
-  format: zLogFormats,
+  format: zLogFormats.prefault({}),
   // Legacy/deprecated, if below is false mentions wont actually ping. In case you really want the old behavior, set below to true
   ping_user: z.boolean().default(true),
   allow_user_mentions: z.boolean().default(false),
