@@ -266,7 +266,7 @@ export const zEmbedInput = z.object({
 
 export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEmbed>, T>;
 
-export const zStrictMessageContent = z.object({
+export const zStrictMessageContent = z.strictObject({
   content: z.string().optional(),
   tts: z.boolean().optional(),
   embeds: z.array(zEmbedInput).optional(),

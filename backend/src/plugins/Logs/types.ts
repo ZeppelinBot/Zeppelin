@@ -6,7 +6,7 @@ import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { LogType } from "../../data/LogType.js";
-import { keys, zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils.js";
+import { keys, zBoundedCharacters, zEmbedInput, zMessageContent, zRegex, zSnowflake, zStrictMessageContent } from "../../utils.js";
 import { MessageBuffer } from "../../utils/MessageBuffer.js";
 import {
   TemplateSafeCase,
@@ -27,11 +27,19 @@ const DEFAULT_BATCH_TIME = 1000;
 const MIN_BATCH_TIME = 250;
 const MAX_BATCH_TIME = 5000;
 
+const zStrictLogMessageContent = zStrictMessageContent.extend({
+  embed: zEmbedInput.optional(),
+});
+const zLogMessageContent = z.union([
+  zBoundedCharacters(0, 2000),
+  zStrictLogMessageContent,
+]);
+
 // A bit of a workaround so we can pass LogType keys to z.enum()
-const zMessageContentWithDefault = zMessageContent.default("");
+const zMessageContentWithDefault = zLogMessageContent.default("");
 const logTypes = keys(LogType);
 const logTypeProps = logTypes.reduce((map, type) => {
-  map[type] = zMessageContent.default(DefaultLogMessages[type] || "");
+  map[type] = zLogMessageContent.default(DefaultLogMessages[type] || "");
   return map;
 }, {} as Record<keyof typeof LogType, typeof zMessageContentWithDefault>);
 const zLogFormats = z.strictObject(logTypeProps);
