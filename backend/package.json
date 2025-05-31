@@ -75,7 +75,6 @@
     "utf-8-validate": "^5.0.5",
     "uuid": "^9.0.0",
     "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
-    "zlib-sync": "^0.1.7",
     "zod": "^3.25.17"
   },
   "devDependencies": {
