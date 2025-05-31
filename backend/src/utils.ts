@@ -184,16 +184,13 @@ export function inputPatternToRegExp(pattern: string) {
 }
 
 export function zRegex<T extends ZodString>(zStr: T) {
-  return zStr.transform((str, ctx) => {
+  return zStr.refine((str) => {
     try {
-      return inputPatternToRegExp(str);
+      inputPatternToRegExp(str);
+      return true;
     } catch (err) {
       if (err instanceof InvalidRegexError) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Invalid regex",
-        });
-        return z.NEVER;
+        return false;
       }
       throw err;
     }

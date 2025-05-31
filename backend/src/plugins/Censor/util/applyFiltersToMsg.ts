@@ -7,6 +7,7 @@ import { ISavedMessageEmbedData, SavedMessage } from "../../../data/entities/Sav
 import {
   getInviteCodesInString,
   getUrlsInString,
+  inputPatternToRegExp,
   isGuildInvite,
   resolveInvite,
   resolveMember,
@@ -146,7 +147,8 @@ export async function applyFiltersToMsg(
   }
 
   // Filter regex
-  for (const regex of config.blocked_regex || []) {
+  for (const pattern of config.blocked_regex || []) {
+    const regex = inputPatternToRegExp(pattern);
     // We're testing both the original content and content + attachments/embeds here so regexes that use ^ and $ still match the regular content properly
     const matches =
       (await pluginData.state.regexRunner.exec(regex, savedMessage.data.content).catch(allowTimeout)) ||

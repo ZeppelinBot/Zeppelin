@@ -2,7 +2,7 @@ import { escapeInlineCode } from "discord.js";
 import z from "zod/v4";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { getFishFishDomain } from "../../../data/FishFish.js";
-import { getUrlsInString, zRegex } from "../../../utils.js";
+import { getUrlsInString, inputPatternToRegExp, zRegex } from "../../../utils.js";
 import { mergeRegexes } from "../../../utils/mergeRegexes.js";
 import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex.js";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
@@ -73,7 +73,7 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
 
         if (trigger.exclude_regex) {
           if (!regexCache.has(trigger.exclude_regex)) {
-            const toCache = mergeRegexes(trigger.exclude_regex, "i");
+            const toCache = mergeRegexes(trigger.exclude_regex.map(pattern => inputPatternToRegExp(pattern)), "i");
             regexCache.set(trigger.exclude_regex, toCache);
           }
           const regexes = regexCache.get(trigger.exclude_regex)!;
@@ -88,7 +88,7 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
 
         if (trigger.include_regex) {
           if (!regexCache.has(trigger.include_regex)) {
-            const toCache = mergeRegexes(trigger.include_regex, "i");
+            const toCache = mergeRegexes(trigger.include_regex.map(pattern => inputPatternToRegExp(pattern)), "i");
             regexCache.set(trigger.include_regex, toCache);
           }
           const regexes = regexCache.get(trigger.include_regex)!;
