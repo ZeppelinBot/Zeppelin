@@ -348,7 +348,7 @@ connect().then(async () => {
 
             return loaded;
           } catch (err) {
-            logger.error(`Error while loading config "${key}": ${err.message}`);
+            logger.error(`Error while loading config "${key}"`);
             return {};
           }
         }
