@@ -172,10 +172,8 @@ function errorHandler(err) {
   // tslint:enable:no-console
 }
 
-if (process.env.NODE_ENV === "production") {
-  process.on("uncaughtException", errorHandler);
-  process.on("unhandledRejection", errorHandler);
-}
+process.on("uncaughtException", errorHandler);
+process.on("unhandledRejection", errorHandler);
 
 // Verify required Node.js version
 const REQUIRED_NODE_VERSION = "16.9.0";
