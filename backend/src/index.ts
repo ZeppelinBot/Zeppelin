@@ -342,8 +342,8 @@ connect().then(async () => {
                 deprecatedKeys.push("error_emoji");
               }
 
-              logger.warn(`Deprecated config properties found in "${key}": ${deprecatedKeys.join(", ")}`);
-              logger.warn(`You can now configure those emojis in the "common" plugin config\n${exampleConfig}`);
+              // logger.warn(`Deprecated config properties found in "${key}": ${deprecatedKeys.join(", ")}`);
+              // logger.warn(`You can now configure those emojis in the "common" plugin config\n${exampleConfig}`);
             }
 
             // Remove deprecated properties some may still have in their config
