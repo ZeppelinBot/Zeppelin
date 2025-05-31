@@ -8,7 +8,8 @@ export async function applyAllRoleButtons(pluginData: GuildPluginData<RoleButton
   const config = pluginData.config.get();
   for (const [configName, configItem] of Object.entries(config.buttons)) {
     // Use the hash of the config to quickly check if we need to update buttons
-    const hash = createHash("md5").update(JSON.stringify(configItem)).digest("hex");
+    const configItemToHash = { ...configItem, name: configName }; // Add name property for backwards compatibility
+    const hash = createHash("md5").update(JSON.stringify(configItemToHash)).digest("hex");
     const savedButtonsItem = savedRoleButtons.find((bt) => bt.name === configName);
     if (savedButtonsItem?.hash === hash) {
       // No changes
