@@ -17,7 +17,8 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       # - ./docker/production/data/mysql:/var/lib/mysql
-    #command: --authentication-policy=mysql_native_password
+    command:
+      - "--skip-log-bin"
     healthcheck:
       test: "/usr/bin/mysql --host=127.0.0.1 --user=root --password=\"${STANDALONE_MYSQL_ROOT_PASSWORD}\" --execute \"SHOW DATABASES;\""
       interval: 1s
