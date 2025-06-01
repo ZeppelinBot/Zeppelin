@@ -1,9 +1,11 @@
-@import "tailwindcss";
+@import "./reset.css";
+@import "./base.css";
+@import "./splash.css";
 
+@import "tailwindcss";
 @import "vue-material-design-icons/styles.css";
 
 @import "./content.css";
-
 @import "./docs.css";
 
 /* Reset some icon default styles for more predictable alignment */

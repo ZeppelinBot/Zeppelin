@@ -1,21 +1,6 @@
-import { defineConfig, Plugin } from "vite";
+import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import tailwind from "@tailwindcss/vite";
-
-function htmlImport(): Plugin {
-  return {
-    name: "html-import",
-    transform(code, id) {
-      if (id.endsWith(".html")) {
-        return {
-          code: `export default ${JSON.stringify(code)};`,
-          map: null,
-        };
-      }
-      return null;
-    },
-  };
-}
 
 export default defineConfig((configEnv) => {
   return {
@@ -34,7 +19,6 @@ export default defineConfig((configEnv) => {
         },
       }),
       tailwind(),
-      htmlImport(),
     ],
   };
 });

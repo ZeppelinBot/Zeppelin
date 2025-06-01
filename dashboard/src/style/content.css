@@ -66,15 +66,14 @@
   }
 }
 
-@screen lg {
+@media (width >= theme(--breakpoint-lg)) {
   .main-content {
     & h1 {
       @apply text-5xl;
     }
   }
 }
-
-@screen xl {
+@media (width >= theme(--breakpoint-xl)) {
   .main-content {
     & a:not([class]),
     & a[class=""] {

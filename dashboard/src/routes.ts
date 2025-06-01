@@ -1,9 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { authGuard, authRedirectGuard, loginCallbackGuard } from "./auth";
+import Splash from "./components/Splash.vue";
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
+    { path: "/", component: Splash },
+
     { path: "/login", components: {}, beforeEnter: authRedirectGuard },
     { path: "/login-callback", component: {}, beforeEnter: loginCallbackGuard },
 
