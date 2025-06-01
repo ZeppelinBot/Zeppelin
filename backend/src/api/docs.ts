@@ -4,6 +4,7 @@ import { availableGuildPlugins } from "../plugins/availablePlugins.js";
 import { ZeppelinGuildPluginInfo } from "../types.js";
 import { indentLines } from "../utils.js";
 import { notFound } from "./responses.js";
+import { $ZodPipeDef } from "zod/v4/core";
 
 function isZodObject(schema: z.ZodType): schema is z.ZodObject<any> {
   return schema.def.type === "object";
@@ -45,7 +46,7 @@ function formatZodConfigSchema(schema: z.ZodType) {
   if (isZodObject(schema)) {
     return (
       `{\n` +
-      Object.entries(schema._def.shape())
+      Object.entries(schema.def.shape)
         .map(([k, value]) => indentLines(`${k}: ${formatZodConfigSchema(value as z.ZodType)}`, 2))
         .join("\n") +
       "\n}"
@@ -61,7 +62,7 @@ function formatZodConfigSchema(schema: z.ZodType) {
     return `Array<${formatZodConfigSchema(schema.def.element)}>`;
   }
   if (isZodUnion(schema)) {
-    return schema._def.options.map((t) => formatZodConfigSchema(t)).join(" | ");
+    return schema.def.options.map((t) => formatZodConfigSchema(t)).join(" | ");
   }
   if (isZodNullable(schema)) {
     return `Nullable<${formatZodConfigSchema(schema.def.innerType)}>`;
@@ -89,6 +90,9 @@ function formatZodConfigSchema(schema: z.ZodType) {
   }
   if (schema.def.type === "never") {
     return "never";
+  }
+  if (schema.def.type === "pipe") {
+    return formatZodConfigSchema((schema.def as $ZodPipeDef).in as z.ZodType);
   }
   return "unknown";
 }
@@ -123,12 +127,7 @@ export function initDocs(router: express.Router) {
     }
 
     const { configSchema, ...info } = pluginInfo.docs;
-    let formattedConfigSchema: string;
-    try {
-      formattedConfigSchema = JSON.stringify(z.toJSONSchema(configSchema), null, 2);
-    } catch (err) {
-      formattedConfigSchema = "";
-    }
+    const formattedConfigSchema = formatZodConfigSchema(configSchema);
 
     const messageCommands = (pluginInfo.plugin.messageCommands || []).map((cmd) => ({
       trigger: cmd.trigger,
