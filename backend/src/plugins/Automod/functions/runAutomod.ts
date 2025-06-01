@@ -164,6 +164,18 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
             );
         }
       }
+
+      // Log all automod rules by default
+      if (rule.actions.log == null) {
+        availableActions.log.apply({
+          ruleName,
+          pluginData,
+          contexts,
+          actionConfig: true,
+          matchResult,
+          prettyName,
+        });
+      }
     }
 
     if (profilingEnabled()) {
