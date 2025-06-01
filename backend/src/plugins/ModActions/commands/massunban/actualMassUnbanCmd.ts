@@ -112,7 +112,9 @@ export async function actualMassUnbanCmd(
   }
 }
 
-enum UnbanFailReasons {
-  NOT_BANNED = "Not banned",
-  UNBAN_FAILED = "Unban failed",
-}
+const UnbanFailReasons = {
+  NOT_BANNED: "Not banned",
+  UNBAN_FAILED: "Unban failed",
+} as const;
+
+type UnbanFailReasons = typeof UnbanFailReasons[keyof typeof UnbanFailReasons];

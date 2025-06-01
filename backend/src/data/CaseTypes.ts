@@ -1,14 +1,16 @@
-export enum CaseTypes {
-  Ban = 1,
-  Unban,
-  Note,
-  Warn,
-  Kick,
-  Mute,
-  Unmute,
-  Deleted,
-  Softban,
-}
+export const CaseTypes = {
+  Ban: 1,
+  Unban: 2,
+  Note: 3,
+  Warn: 4,
+  Kick: 5,
+  Mute: 6,
+  Unmute: 7,
+  Deleted: 8,
+  Softban: 9,
+} as const;
+
+export type CaseTypes = typeof CaseTypes[keyof typeof CaseTypes];
 
 export const CaseNameToType = {
   ban: CaseTypes.Ban,

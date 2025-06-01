@@ -7,6 +7,7 @@ import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 import { caseAbbreviations } from "../caseAbbreviations.js";
 import { CasesPluginType } from "../types.js";
 import { getCaseIcon } from "./getCaseIcon.js";
+import type { CaseTypes } from "../../../data/CaseTypes.js";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 const INCLUDE_MORE_NOTES_THRESHOLD = 20;
@@ -52,7 +53,7 @@ export async function getCaseSummary(
     ? moment.utc().to(timestamp)
     : timestampWithTz.format(timeAndDate.getDateFormat("date"));
 
-  const icon = getCaseIcon(pluginData, theCase.type);
+  const icon = getCaseIcon(pluginData, theCase.type as CaseTypes);
 
   let caseTitle = `\`#${theCase.case_number}\``;
   if (withLinks && theCase.log_message_id) {

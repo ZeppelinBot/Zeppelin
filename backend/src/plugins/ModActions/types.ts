@@ -102,11 +102,13 @@ export interface ModActionsPluginType extends BasePluginType {
   };
 }
 
-export enum IgnoredEventType {
-  Ban = 1,
-  Unban,
-  Kick,
-}
+export const IgnoredEventType = {
+  Ban: 1,
+  Unban: 2,
+  Kick: 3,
+} as const;
+
+export type IgnoredEventType = typeof IgnoredEventType[keyof typeof IgnoredEventType];
 
 export interface IIgnoredEvent {
   type: IgnoredEventType;

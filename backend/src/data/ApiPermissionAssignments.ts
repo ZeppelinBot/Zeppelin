@@ -6,10 +6,12 @@ import { AuditLogEventTypes } from "./apiAuditLogTypes.js";
 import { dataSource } from "./dataSource.js";
 import { ApiPermissionAssignment } from "./entities/ApiPermissionAssignment.js";
 
-export enum ApiPermissionTypes {
-  User = "USER",
-  Role = "ROLE",
-}
+export const ApiPermissionTypes = {
+  User: "USER",
+  Role: "ROLE",
+} as const;
+
+export type ApiPermissionTypes = (typeof ApiPermissionTypes)[keyof typeof ApiPermissionTypes];
 
 export class ApiPermissionAssignments extends BaseRepository {
   private apiPermissions: Repository<ApiPermissionAssignment>;

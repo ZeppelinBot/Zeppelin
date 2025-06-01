@@ -68,7 +68,7 @@ export async function getCaseEmbed(
     embed.title += " (hidden)";
   }
 
-  embed.color = getCaseColor(pluginData, theCase.type);
+  embed.color = getCaseColor(pluginData, theCase.type as CaseTypes);
 
   if (theCase.notes.length) {
     for (const note of theCase.notes) {

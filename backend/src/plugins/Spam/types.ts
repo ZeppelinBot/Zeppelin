@@ -30,17 +30,19 @@ export const zSpamConfig = z.strictObject({
   max_voice_moves: zBaseSingleSpamConfig.nullable().default(null),
 });
 
-export enum RecentActionType {
-  Message = 1,
-  Mention,
-  Link,
-  Attachment,
-  Emoji,
-  Newline,
-  Censor,
-  Character,
-  VoiceChannelMove,
-}
+export const RecentActionType = {
+  Message: 1,
+  Mention: 2,
+  Link: 3,
+  Attachment: 4,
+  Emoji: 5,
+  Newline: 6,
+  Censor: 7,
+  Character: 8,
+  VoiceChannelMove: 9,
+} as const;
+
+export type RecentActionType = typeof RecentActionType[keyof typeof RecentActionType];
 
 export interface IRecentAction<T> {
   type: RecentActionType;

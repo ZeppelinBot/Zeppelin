@@ -15,23 +15,27 @@ export interface ContextMenuPluginType extends BasePluginType {
   };
 }
 
-export const enum ModMenuActionType {
-  PAGE = "page",
-  NOTE = "note",
-  WARN = "warn",
-  CLEAN = "clean",
-  MUTE = "mute",
-  BAN = "ban",
-}
+export const ModMenuActionType = {
+  PAGE: "page",
+  NOTE: "note",
+  WARN: "warn",
+  CLEAN: "clean",
+  MUTE: "mute",
+  BAN: "ban",
+} as const;
 
-export const enum ModMenuNavigationType {
-  FIRST = "first",
-  PREV = "prev",
-  NEXT = "next",
-  LAST = "last",
-  INFO = "info",
-  CASES = "cases",
-}
+export type ModMenuActionType = typeof ModMenuActionType[keyof typeof ModMenuActionType];
+
+export const ModMenuNavigationType = {
+  FIRST: "first",
+  PREV: "prev",
+  NEXT: "next",
+  LAST: "last",
+  INFO: "info",
+  CASES: "cases",
+} as const;
+
+export type ModMenuNavigationType = typeof ModMenuNavigationType[keyof typeof ModMenuNavigationType];
 
 export interface ModMenuActionOpts {
   action: ModMenuActionType;

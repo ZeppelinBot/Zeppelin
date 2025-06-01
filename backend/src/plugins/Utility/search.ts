@@ -36,10 +36,12 @@ const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
 const SEARCH_EXPORT_LIMIT = 1_000_000;
 
-export enum SearchType {
-  MemberSearch,
-  BanSearch,
-}
+export const SearchType = {
+  MemberSearch: 0,
+  BanSearch: 1,
+} as const;
+
+export type SearchType = typeof SearchType[keyof typeof SearchType];
 
 class SearchError extends Error {}
 
@@ -72,13 +74,13 @@ function getOptimizedRegExpRunner(pluginData: GuildPluginData<UtilityPluginType>
 export async function displaySearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams,
-  searchType: SearchType.MemberSearch,
+  searchType: (typeof SearchType)["MemberSearch"],
   msg: OmitPartialGroupDMChannel<Message>,
 );
 export async function displaySearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: BanSearchParams,
-  searchType: SearchType.BanSearch,
+  searchType: (typeof SearchType)["BanSearch"],
   msg: OmitPartialGroupDMChannel<Message>,
 );
 export async function displaySearch(
@@ -239,13 +241,13 @@ export async function displaySearch(
 export async function archiveSearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams,
-  searchType: SearchType.MemberSearch,
+  searchType: (typeof SearchType)["MemberSearch"],
   msg: OmitPartialGroupDMChannel<Message>,
 );
 export async function archiveSearch(
   pluginData: GuildPluginData<UtilityPluginType>,
   args: BanSearchParams,
-  searchType: SearchType.BanSearch,
+  searchType: (typeof SearchType)["BanSearch"],
   msg: OmitPartialGroupDMChannel<Message>,
 );
 export async function archiveSearch(
