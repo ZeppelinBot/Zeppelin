@@ -49,7 +49,7 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
       storeAttachmentsAsMessage: async (attachments: Attachment[], backupChannel?: TextBasedChannel | null) => {
         const attachmentChannelId = pluginData.config.get().attachment_storing_channel;
         const channel = attachmentChannelId
-          ? (pluginData.guild.channels.cache.get(attachmentChannelId) as TextBasedChannel) ?? backupChannel
+          ? ((pluginData.guild.channels.cache.get(attachmentChannelId) as TextBasedChannel) ?? backupChannel)
           : backupChannel;
 
         if (!channel) {

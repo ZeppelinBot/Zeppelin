@@ -15,7 +15,8 @@ export async function getOrFetchGuildMember(guild: Guild, memberId: string): Pro
   if (!getOrFetchGuildMemberPromises.has(key)) {
     getOrFetchGuildMemberPromises.set(
       key,
-      guild.members.fetch(memberId)
+      guild.members
+        .fetch(memberId)
         .catch(() => undefined)
         .finally(() => {
           getOrFetchGuildMemberPromises.delete(key);

@@ -52,7 +52,7 @@ export const ForceUnmuteSlashCmd = modActionsSlashCmd({
       ppId = interaction.user.id;
     }
 
-    const convertedTime = options.time ? convertDelayStringToMS(options.time) ?? undefined : undefined;
+    const convertedTime = options.time ? (convertDelayStringToMS(options.time) ?? undefined) : undefined;
     if (options.time && !convertedTime) {
       pluginData.state.common.sendErrorMessage(interaction, `Could not convert ${options.time} to a delay`);
       return;

@@ -15,7 +15,8 @@ export async function getOrFetchUser(bot: Client, userId: string): Promise<User 
   if (!getOrFetchUserPromises.has(userId)) {
     getOrFetchUserPromises.set(
       userId,
-      bot.users.fetch(userId)
+      bot.users
+        .fetch(userId)
         .catch(() => undefined)
         .finally(() => {
           getOrFetchUserPromises.delete(userId);
