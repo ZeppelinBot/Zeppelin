@@ -19,7 +19,7 @@ const configSchema = z.strictObject({
   only_full_words: z.boolean().default(true),
   normalize: z.boolean().default(false),
   loose_matching: z.boolean().default(false),
-  loose_matching_threshold: z.number().int().default(4),
+  loose_matching_threshold: z.number().int().default(1),
   strip_markdown: z.boolean().default(false),
   match_messages: z.boolean().default(true),
   match_embeds: z.boolean().default(false),
