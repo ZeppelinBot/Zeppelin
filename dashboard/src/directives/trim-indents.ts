@@ -1,7 +1,7 @@
-import Vue from "vue";
+import { Directive } from "vue";
 
-Vue.directive("trim-indents", {
-  bind(el, binding) {
+export const trimIndents: Directive = {
+  beforeMount(el, binding) {
     const withoutStartEndWhitespace = el.innerHTML.replace(/(^\n+|\n+$)/g, "");
 
     const mode = binding.value != null ? binding.value : "start";
@@ -22,4 +22,4 @@ Vue.directive("trim-indents", {
       .map((line) => line.slice(spacesToTrim))
       .join("\n");
   },
-});
+};

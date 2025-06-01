@@ -81,31 +81,32 @@
     <h3>Summary Example</h3>
     <p>
       Employing what we have learnt so far, we can write a configuration that:
-        <ul>
-          <li>Alerts members of their warns in a channel, instead of DMs.</li>
-          <li>Alerts members of kicks and bans in their DMs.</li>
-          <li>Makes use of multi-line strings to prepare a tidy message.</li>
-          <li>Includes the remaining ban time if a ban was temporary.</li>
-        </ul>
-      <CodeBlock code-lang="yaml" trim="start">
-        plugins:
-          mod_actions:
-            config:
-              dm_on_warn: false
-              message_on_warn: true
-              message_channel: "PRETEND-CHANNEL-ID"
-
-              dm_on_kick: true
-
-              dm_on_ban: true
-              tempban_message: |-
-                Dear {user.username},
-
-                As a result of {reason}, you have been banned from {guildName}
-                for {banTime}. We welcome you back provided you do not do this
-                again.
-      </CodeBlock>
     </p>
+
+    <ul>
+      <li>Alerts members of their warns in a channel, instead of DMs.</li>
+      <li>Alerts members of kicks and bans in their DMs.</li>
+      <li>Makes use of multi-line strings to prepare a tidy message.</li>
+      <li>Includes the remaining ban time if a ban was temporary.</li>
+    </ul>
+    <CodeBlock code-lang="yaml" trim="start">
+      plugins:
+        mod_actions:
+          config:
+            dm_on_warn: false
+            message_on_warn: true
+            message_channel: "PRETEND-CHANNEL-ID"
+
+            dm_on_kick: true
+
+            dm_on_ban: true
+            tempban_message: |-
+              Dear {user.username},
+
+              As a result of {reason}, you have been banned from {guildName}
+              for {banTime}. We welcome you back provided you do not do this
+              again.
+    </CodeBlock>
 
     <h2>Alerts</h2>
     <p>
