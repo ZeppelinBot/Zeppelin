@@ -2,7 +2,7 @@ import { ZeppelinPluginDocs } from "../../types.js";
 import { zCommonConfig } from "./types.js";
 
 export const commonPluginDocs: ZeppelinPluginDocs = {
-  type: "internal",
+  type: "stable",
   configSchema: zCommonConfig,
 
   prettyName: "Common",
