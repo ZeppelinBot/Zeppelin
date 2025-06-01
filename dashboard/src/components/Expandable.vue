@@ -20,7 +20,7 @@
 </template>
 
 <style scoped>
-  @import "../style/components.pcss";
+  @reference "../style/app.css";
 
   .expandable {
     --animation-time: 400ms;

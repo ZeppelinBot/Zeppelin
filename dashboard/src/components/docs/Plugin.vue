@@ -9,7 +9,7 @@
     <MarkdownBlock :content="data.info.description" class="content"></MarkdownBlock>
 
     <div v-if="data.info.type === 'legacy'">
-      <div class="px-3 py-2 mb-4 rounded bg-gray-800 shadow-md inline-block flex">
+      <div class="px-3 py-2 mb-4 rounded bg-gray-800 shadow-md flex">
         <div class="flex-none mr-2">
           <alert class="inline-icon mr-1 text-yellow-300" />
         </div>
@@ -163,6 +163,8 @@
 </template>
 
 <style scoped>
+  @reference "../../style/app.css";
+
   .command.target {
     @apply mt-5 mb-3;
     @apply pt-2 pb-2 pl-4 pr-4;
@@ -174,7 +176,6 @@
 </style>
 
 <script lang="ts">
-  import Vue from "vue";
   import {mapState} from "vuex";
   import yaml from "js-yaml";
   import CodeBlock from "./CodeBlock.vue";

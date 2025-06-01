@@ -1,13 +1,10 @@
-@import "~tailwindcss/base.css";
-@import "~tailwindcss/components.css";
-@import "~tailwindcss/utilities.css";
+@import "tailwindcss";
 
-@import "~vue-material-design-icons/styles.css";
+@import "vue-material-design-icons/styles.css";
 
-@import "components.pcss";
-@import "content.pcss";
+@import "./content.css";
 
-@import "docs.pcss";
+@import "./docs.css";
 
 /* Reset some icon default styles for more predictable alignment */
 .material-design-icon > .material-design-icon__svg {

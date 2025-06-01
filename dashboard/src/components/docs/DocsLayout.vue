@@ -5,7 +5,7 @@
     <!-- Top bar -->
     <nav class="flex items-stretch pl-4 pr-2 py-1 border border-gray-700 rounded bg-gray-800 shadow-xl">
       <div class="flex-initial flex items-center">
-        <img class="flex-auto w-10 mr-5" :src="logoUrl" alt="" aria-hidden="true">
+        <img class="flex-auto w-10 mr-5" src="/img/logo.png" alt="" aria-hidden="true">
 
         <router-link to="/docs">
           <h1 class="flex-auto font-semibold">Zeppelin Documentation</h1>
@@ -27,9 +27,9 @@
     <a class="sr-only-when-not-focused text-center block py-2" href="#main-anchor">Skip to main content</a>
 
     <!-- Content wrapper -->
-    <div class="flex flex-wrap items-start mt-8">
+    <div class="flex flex-wrap lg:flex-nowrap items-start mt-8 gap-8">
       <!-- Sidebar -->
-      <nav class="docs-sidebar px-4 pt-2 pb-3 mr-8 mb-4 border border-gray-700 rounded bg-gray-800 shadow-md flex-full lg:flex-none lg:block" v-bind:class="{ closed: !mobileMenuOpen }">
+      <nav class="docs-sidebar px-4 pt-2 pb-3 border border-gray-700 rounded bg-gray-800 shadow-md flex-full lg:flex-none lg:block" v-bind:class="{ closed: !mobileMenuOpen }">
         <div role="none" v-for="(group, index) in menu">
           <h1 class="font-bold" :aria-owns="'menu-group-' + index" :class="{'mt-4': typeof index === 'number' && index !== 0}">{{ group.label }}</h1>
           <ul v-bind:id="'menu-group-' + index" role="group" class="list-none pl-2">
@@ -41,7 +41,7 @@
       </nav>
 
       <!-- Content -->
-      <main class="docs-content main-content flex-flexible overflow-x-hidden">
+      <main class="docs-content main-content flex-auto overflow-x-hidden">
         <a id="main-anchor" ref="main-anchor" tabindex="-1" class="sr-only"></a>
         <router-view :key="$route.fullPath"></router-view>
       </main>
@@ -53,7 +53,6 @@
   import {mapState} from "vuex";
   import Menu from 'vue-material-design-icons/Menu.vue';
   import Title from "../Title.vue";
-  import logoUrl from "../../img/logo.png";
 
   type TMenuItem = {
     to: string;
@@ -132,12 +131,12 @@
     data() {
       return {
         mobileMenuOpen: false,
-        logoUrl,
       };
     },
 
     methods: {
       toggleMobileMenu() {
+        console.log('hi');
         this.mobileMenuOpen = !this.mobileMenuOpen;
       },
 

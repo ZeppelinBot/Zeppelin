@@ -5,5 +5,12 @@
 
   "service": "devenv",
   "remoteUser": "ubuntu",
-  "workspaceFolder": "/workspace/zeppelin"
+  "workspaceFolder": "/workspace/zeppelin",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Vue.volar"
+      ]
+    }
+  }
 }

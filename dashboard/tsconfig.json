@@ -15,7 +15,7 @@
     "esModuleInterop": true,
     "allowJs": true
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "./ts-vue-shim.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.vue"],
   "references": [
     {
       "path": "../shared/tsconfig.json"

@@ -1,6 +1,13 @@
-const fastify = require("fastify")({ logger: true });
-const fastifyStatic = require("@fastify/static");
-const path = require("path");
+import Fastify from "fastify";
+import fastifyStatic from "@fastify/static";
+import path from "node:path";
+
+const fastify = Fastify({ logger: true });
+
+fastify.get("/env.js", (req, reply) => {
+  reply.header("Content-Type", "application/javascript; charset=utf8");
+  reply.send(`window.API_URL = ${JSON.stringify(process.env.API_URL)}`);
+});
 
 fastify.register(fastifyStatic, {
   root: path.join(__dirname, "dist"),
@@ -8,7 +15,7 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.get("*", (req, reply) => {
-  reply.sendFile("index.html");
+  reply.header("Content-Type", "text/html; charset=utf8").send(indexContent);
 });
 
 fastify.listen({ port: 3002, host: '0.0.0.0' }, (err, address) => {

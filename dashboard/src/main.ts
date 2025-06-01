@@ -1,5 +1,5 @@
-import "./style/initial.pcss";
-const splashHtml = require("./splash.html");
+import "./style/initial.css";
+import splashHtml from "./splash.html";
 
 if (window.location.pathname !== "/") {
   import("./init-vue");
