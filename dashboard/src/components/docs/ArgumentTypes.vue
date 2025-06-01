@@ -104,8 +104,8 @@
 </template>
 
 <script>
-  import CodeBlock from "./CodeBlock";
-  import Expandable from "../Expandable";
+  import CodeBlock from "./CodeBlock.vue";
+  import Expandable from "../Expandable.vue";
 
   export default {
     components: {

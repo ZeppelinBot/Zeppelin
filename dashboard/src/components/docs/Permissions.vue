@@ -81,7 +81,7 @@
 </template>
 
 <script>
-  import CodeBlock from "./CodeBlock";
+  import CodeBlock from "./CodeBlock.vue";
 
   export default {
     components: { CodeBlock },

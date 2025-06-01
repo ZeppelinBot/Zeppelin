@@ -1,3 +1,5 @@
+@import "./components.css";
+
 .main-content {
   & h1 {
     @apply text-3xl;
@@ -25,7 +27,12 @@
 
   & a:not([class]),
   & a[class=""] {
-    @apply link;
+    @apply text-blue-400;
+    @apply underline;
+
+    &:hover {
+      @apply text-blue-200;
+    }
   }
 
   & ul:not([class]) {
@@ -47,7 +54,11 @@
   }
 
   & code:not([class]) {
-    @apply inline-code;
+    @apply inline-block;
+    @apply bg-gray-800;
+    @apply px-1;
+    @apply rounded;
+    @apply text-sm;
   }
 
   & .expandable:not(.wide) {
@@ -55,15 +66,14 @@
   }
 }
 
-@screen lg {
+@media (width >= theme(--breakpoint-lg)) {
   .main-content {
     & h1 {
       @apply text-5xl;
     }
   }
 }
-
-@screen xl {
+@media (width >= theme(--breakpoint-xl)) {
   .main-content {
     & a:not([class]),
     & a[class=""] {

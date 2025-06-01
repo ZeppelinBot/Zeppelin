@@ -1,9 +1,22 @@
-const fastify = require("fastify")({ logger: true });
-const fastifyStatic = require("@fastify/static");
-const path = require("path");
+import Fastify from "fastify";
+import fastifyStatic from "@fastify/static";
+import path from "node:path";
+
+const fastify = Fastify({
+  // We already get logs from nginx, so disable here
+  logger: false,
+});
+
+fastify.addHook("preHandler", (req, reply, done) => {
+  if (req.url === "/env.js") {
+    reply.header("Content-Type", "application/javascript; charset=utf8");
+    reply.send(`window.API_URL = ${JSON.stringify(process.env.API_URL)};`);
+  }
+  done();
+});
 
 fastify.register(fastifyStatic, {
-  root: path.join(__dirname, "dist"),
+  root: path.join(import.meta.dirname, "dist"),
   wildcard: false,
 });
 

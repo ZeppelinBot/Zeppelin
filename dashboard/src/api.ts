@@ -1,5 +1,4 @@
 import { RootStore } from "./store";
-const apiUrl = process.env.API_URL;
 
 type QueryParamObject = { [key: string]: string | null };
 
@@ -28,7 +27,7 @@ function buildQueryString(params: QueryParamObject) {
 }
 
 export function request(resource, fetchOpts: RequestInit = {}) {
-  return fetch(`${apiUrl}/${resource}`, fetchOpts).then(async (res) => {
+  return fetch(`${window.API_URL}/${resource}`, fetchOpts).then(async (res) => {
     if (!res.ok) {
       if (res.status === 401) {
         RootStore.dispatch("auth/expiredLogin");
@@ -74,7 +73,7 @@ type FormPostOpts = {
 export function formPost(resource: string, body: Record<any, any> = {}, opts: FormPostOpts = {}) {
   body["X-Api-Key"] = RootStore.state.auth.apiKey;
   const form = document.createElement("form");
-  form.action = `${apiUrl}/${resource}`;
+  form.action = `${window.API_URL}/${resource}`;
   form.method = "POST";
   form.enctype = "multipart/form-data";
   if (opts.target != null) {

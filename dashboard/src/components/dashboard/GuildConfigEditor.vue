@@ -25,7 +25,7 @@
                lang="yaml"
                theme="tomorrow_night"
                ref="aceEditor"
-               v-options="{
+               :options="{
                   useSoftTabs: true,
                   tabSize: 2
                 }"

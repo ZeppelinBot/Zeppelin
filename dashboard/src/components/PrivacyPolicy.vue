@@ -87,6 +87,6 @@
 </template>
 
 <script type="ts">
-  import "../style/privacy-policy.pcss";
+  import "../style/privacy-policy.css";
   export default {};
 </script>

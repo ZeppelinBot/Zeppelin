@@ -27,5 +27,8 @@
     "shared",
     "backend",
     "dashboard"
-  ]
+  ],
+  "dependencies": {
+    "dotenv": "^16.5.0"
+  }
 }
