@@ -33,14 +33,10 @@ services:
       - "${STANDALONE_WEB_PORT:?Missing STANDALONE_WEB_PORT}:443"
 
   migrate:
+    image: dragory/zeppelin
     depends_on:
       mysql:
         condition: service_healthy
-    build: &build
-      context: .
-      args:
-        # Used at compile-time by dashboard
-        API_URL:
     environment: &env
       - NODE_ENV=production
       - DB_HOST=mysql
@@ -55,10 +51,10 @@ services:
     command: ["npm", "run", "migrate-prod"]
 
   api:
+    image: dragory/zeppelin
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build: *build
     restart: on-failure
     environment: *env
     env_file:
@@ -67,10 +63,10 @@ services:
     command: ["npm", "run", "start-api-prod"]
 
   bot:
+    image: dragory/zeppelin
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build: *build
     restart: on-failure
     environment: *env
     env_file:
@@ -79,10 +75,10 @@ services:
     command: ["npm", "run", "start-bot-prod"]
   
   dashboard:
+    image: dragory/zeppelin
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build: *build
     restart: on-failure
     environment: *env
     env_file:
