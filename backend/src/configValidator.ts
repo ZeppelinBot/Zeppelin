@@ -1,5 +1,5 @@
 import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
-import { ZodError } from "zod/v4";
+import { z, ZodError } from "zod/v4";
 import { availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { zZeppelinGuildConfig } from "./types.js";
 import { formatZodIssue } from "./utils/formatZodIssue.js";
@@ -42,7 +42,7 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
         await configManager.init();
       } catch (err) {
         if (err instanceof ZodError) {
-          return `${pluginName}: ${err.issues.map(formatZodIssue).join("\n")}`;
+          return `${pluginName}:\n${z.prettifyError(err)}`;
         }
         if (err instanceof ConfigValidationError) {
           return `${pluginName}: ${err.message}`;

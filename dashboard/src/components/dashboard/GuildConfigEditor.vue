@@ -5,7 +5,7 @@
   <div v-else>
     <div v-if="errors.length" class="bg-gray-800 py-2 px-3 rounded shadow-md mb-4">
       <div class="font-semibold">Errors:</div>
-      <div v-for="error in errors">{{ error }}</div>
+      <pre v-for="error in errors">{{ error }}</pre>
     </div>
 
     <div class="flex items-center flex-wrap">
