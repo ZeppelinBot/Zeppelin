@@ -1,6 +1,4 @@
-import { Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { sendErrorMessage } from "../../../pluginUtils.js";
 import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
 import { ActionError } from "../ActionError.js";
 import { addRoleAction } from "../actions/addRoleAction.js";
@@ -39,7 +37,7 @@ export async function runEvent(
   } catch (e) {
     if (e instanceof ActionError) {
       if (event.trigger.type === "command") {
-        sendErrorMessage(pluginData, (eventData.msg as Message).channel, e.message);
+        void pluginData.state.common.sendErrorMessage(eventData.msg, e.message);
       } else {
         // TODO: Where to log action errors from other kinds of triggers?
       }

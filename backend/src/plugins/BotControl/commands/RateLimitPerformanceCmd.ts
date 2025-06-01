@@ -1,6 +1,6 @@
 import moment from "moment-timezone";
 import { GuildArchives } from "../../../data/GuildArchives.js";
-import { getBaseUrl, sendSuccessMessage } from "../../../pluginUtils.js";
+import { getBaseUrl } from "../../../pluginUtils.js";
 import { getRateLimitStats } from "../../../rateLimitStats.js";
 import { botControlCmd } from "../types.js";
 
@@ -13,7 +13,7 @@ export const RateLimitPerformanceCmd = botControlCmd({
   async run({ pluginData, message: msg }) {
     const logItems = getRateLimitStats();
     if (logItems.length === 0) {
-      sendSuccessMessage(pluginData, msg.channel, `No rate limits hit`);
+      void msg.channel.send(`No rate limits hit`);
       return;
     }
 

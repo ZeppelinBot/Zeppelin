@@ -1,16 +1,26 @@
-import { ContextMenuCommandInteraction, TextChannel } from "discord.js";
+import {
+  ActionRowBuilder,
+  Message,
+  MessageContextMenuCommandInteraction,
+  ModalBuilder,
+  ModalSubmitInteraction,
+  TextInputBuilder,
+  TextInputStyle,
+} from "discord.js";
 import { GuildPluginData } from "knub";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
+import { logger } from "../../../logger.js";
 import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin.js";
-import { LogsPlugin } from "../../Logs/LogsPlugin.js";
-import { ContextMenuPluginType } from "../types.js";
+import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd.js";
+import { ContextMenuPluginType, ModMenuActionType } from "../types.js";
 
 export async function cleanAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   amount: number,
-  interaction: ContextMenuCommandInteraction,
+  target: string,
+  targetMessage: Message,
+  targetChannelId: string,
+  interaction: ModalSubmitInteraction,
 ) {
-  await interaction.deferReply({ ephemeral: true });
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -18,33 +28,80 @@ export async function cleanAction(
   });
   const utility = pluginData.getPlugin(UtilityPlugin);
 
-  if (!userCfg.can_use || !(await utility.hasPermission(executingMember, interaction.channelId, "can_clean"))) {
-    await interaction.followUp({ content: "Cannot clean: insufficient permissions" });
+  if (!userCfg.can_use || !(await utility.hasPermission(executingMember, targetChannelId, "can_clean"))) {
+    await interaction
+      .editReply({ content: "Cannot clean: insufficient permissions", embeds: [], components: [] })
+      .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
     return;
   }
 
-  const targetMessage = interaction.channel
-    ? await interaction.channel.messages.fetch(interaction.targetId)
-    : await (pluginData.guild.channels.resolve(interaction.channelId) as TextChannel).messages.fetch(
-        interaction.targetId,
-      );
-
-  const targetUserOnly = false;
-  const deletePins = false;
-  const user = undefined;
-
-  try {
-    await interaction.followUp(`Cleaning... Amount: ${amount}, User Only: ${targetUserOnly}, Pins: ${deletePins}`);
-    utility.clean({ count: amount, user, channel: targetMessage.channel.id, "delete-pins": deletePins }, targetMessage);
-  } catch (e) {
-    await interaction.followUp({ ephemeral: true, content: "Plugin error, please check your BOT_ALERTs" });
-
-    if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      pluginData.getPlugin(LogsPlugin).logBotAlert({
-        body: `Failed to clean in <#${interaction.channelId}> in ContextMenu action \`clean\`:_ ${e}`,
-      });
-    } else {
-      throw e;
-    }
+  const targetChannel = await pluginData.guild.channels.fetch(targetChannelId);
+  if (!targetChannel?.isTextBased()) {
+    await interaction
+      .editReply({ content: "Cannot clean: target channel is not a text channel", embeds: [], components: [] })
+      .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
+    return;
   }
+
+  await interaction
+    .editReply({
+      content: `Cleaning ${amount} messages from ${target}...`,
+      embeds: [],
+      components: [],
+    })
+    .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
+
+  const fetchMessagesResult = await utility.fetchChannelMessagesToClean(targetChannel, {
+    count: amount,
+    beforeId: targetMessage.id,
+  });
+  if ("error" in fetchMessagesResult) {
+    interaction.editReply(fetchMessagesResult.error);
+    return;
+  }
+
+  if (fetchMessagesResult.messages.length > 0) {
+    await utility.cleanMessages(targetChannel, fetchMessagesResult.messages, interaction.user);
+    interaction.editReply(
+      `Cleaned ${fetchMessagesResult.messages.length} ${
+        fetchMessagesResult.messages.length === 1 ? "message" : "messages"
+      }`,
+    );
+  } else {
+    interaction.editReply("No messages to clean");
+  }
+}
+
+export async function launchCleanActionModal(
+  pluginData: GuildPluginData<ContextMenuPluginType>,
+  interaction: MessageContextMenuCommandInteraction,
+  target: string,
+) {
+  const modalId = `${ModMenuActionType.CLEAN}:${interaction.id}`;
+  const modal = new ModalBuilder().setCustomId(modalId).setTitle("Clean");
+  const amountIn = new TextInputBuilder().setCustomId("amount").setLabel("Amount").setStyle(TextInputStyle.Short);
+  const amountRow = new ActionRowBuilder<TextInputBuilder>().addComponents(amountIn);
+  modal.addComponents(amountRow);
+
+  await interaction.showModal(modal);
+  await interaction
+    .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
+    .then(async (submitted) => {
+      await submitted.deferReply({ ephemeral: true });
+
+      const amount = submitted.fields.getTextInputValue("amount");
+      if (isNaN(Number(amount))) {
+        interaction.editReply({ content: `Error: Amount '${amount}' is invalid`, embeds: [], components: [] });
+        return;
+      }
+
+      await cleanAction(
+        pluginData,
+        Number(amount),
+        target,
+        interaction.targetMessage,
+        interaction.channelId,
+        submitted,
+      );
+    });
 }

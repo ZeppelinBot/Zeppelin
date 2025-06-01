@@ -1,12 +1,13 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
-import z from "zod";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
+import z from "zod/v4";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildTags } from "../../data/GuildTags.js";
-import { zEmbedInput } from "../../utils.js";
+import { zBoundedCharacters, zStrictMessageContent } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
-export const zTag = z.union([z.string(), zEmbedInput]);
+export const zTag = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]);
 export type TTag = z.infer<typeof zTag>;
 
 export const zTagCategory = z
@@ -32,33 +33,34 @@ export type TTagCategory = z.infer<typeof zTagCategory>;
 
 export const zTagsConfig = z
   .strictObject({
-    prefix: z.string(),
-    delete_with_command: z.boolean(),
+    prefix: z.string().default("!!"),
+    delete_with_command: z.boolean().default(true),
 
-    user_tag_cooldown: z.union([z.string(), z.number()]).nullable(), // Per user, per tag
-    global_tag_cooldown: z.union([z.string(), z.number()]).nullable(), // Any user, per tag
-    user_cooldown: z.union([z.string(), z.number()]).nullable(), // Per user
-    allow_mentions: z.boolean(), // Per user
-    global_cooldown: z.union([z.string(), z.number()]).nullable(), // Any tag use
-    auto_delete_command: z.boolean(), // Any tag
+    user_tag_cooldown: z.union([z.string(), z.number()]).nullable().default(null), // Per user, per tag
+    global_tag_cooldown: z.union([z.string(), z.number()]).nullable().default(null), // Any user, per tag
+    user_cooldown: z.union([z.string(), z.number()]).nullable().default(null), // Per user
+    allow_mentions: z.boolean().default(false), // Per user
+    global_cooldown: z.union([z.string(), z.number()]).nullable().default(null), // Any tag use
+    auto_delete_command: z.boolean().default(false), // Any tag
 
-    categories: z.record(z.string(), zTagCategory),
+    categories: z.record(z.string(), zTagCategory).default({}),
 
-    can_create: z.boolean(),
-    can_use: z.boolean(),
-    can_list: z.boolean(),
+    can_create: z.boolean().default(false),
+    can_use: z.boolean().default(false),
+    can_list: z.boolean().default(false),
   })
   .refine((parsed) => !(parsed.auto_delete_command && parsed.delete_with_command), {
     message: "Cannot have both (category specific) delete_with_command and auto_delete_command enabled",
   });
 
 export interface TagsPluginType extends BasePluginType {
-  config: z.infer<typeof zTagsConfig>;
+  configSchema: typeof zTagsConfig;
   state: {
     archives: GuildArchives;
     tags: GuildTags;
     savedMessages: GuildSavedMessages;
     logs: GuildLogs;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
 
     onMessageCreateFn;
 

@@ -1,17 +1,17 @@
 import { Snowflake, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import z from "zod";
+import z from "zod/v4";
 import { canActOn } from "../../../pluginUtils.js";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
-import { resolveMember, zSnowflake } from "../../../utils.js";
+import { resolveMember, zBoundedCharacters } from "../../../utils.js";
 import { ActionError } from "../ActionError.js";
 import { catchTemplateError } from "../catchTemplateError.js";
 import { CustomEventsPluginType, TCustomEvent } from "../types.js";
 
 export const zMoveToVoiceChannelAction = z.strictObject({
   type: z.literal("move_to_vc"),
-  target: zSnowflake,
-  channel: zSnowflake,
+  target: zBoundedCharacters(0, 100),
+  channel: zBoundedCharacters(0, 100),
 });
 export type TMoveToVoiceChannelAction = z.infer<typeof zMoveToVoiceChannelAction>;
 

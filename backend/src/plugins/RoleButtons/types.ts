@@ -1,8 +1,9 @@
 import { ButtonStyle } from "discord.js";
-import { BasePluginType } from "knub";
-import z from "zod";
+import { BasePluginType, pluginUtils } from "knub";
+import z from "zod/v4";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons.js";
 import { zBoundedCharacters, zBoundedRecord, zMessageContent, zSnowflake } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { TooManyComponentsError } from "./functions/TooManyComponentsError.js";
 import { createButtonComponents } from "./functions/createButtonComponents.js";
 
@@ -33,22 +34,6 @@ export type TRoleButtonOption = z.infer<typeof zRoleButtonOption>;
 
 const zRoleButtonsConfigItem = z
   .strictObject({
-    // Typed as "never" because you are not expected to supply this directly.
-    // The transform instead picks it up from the property key and the output type is a string.
-    name: z
-      .never()
-      .optional()
-      .transform((_, ctx) => {
-        const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
-        if (!ruleName) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Role buttons must have names",
-          });
-          return z.NEVER;
-        }
-        return ruleName;
-      }),
     message: z.union([
       z.strictObject({
         channel_id: zSnowflake,
@@ -65,7 +50,7 @@ const zRoleButtonsConfigItem = z
   .refine(
     (parsed) => {
       try {
-        createButtonComponents(parsed);
+        createButtonComponents(parsed, "test"); // We can use any configName here
       } catch (err) {
         if (err instanceof TooManyComponentsError) {
           return false;
@@ -82,8 +67,8 @@ export type TRoleButtonsConfigItem = z.infer<typeof zRoleButtonsConfigItem>;
 
 export const zRoleButtonsConfig = z
   .strictObject({
-    buttons: zBoundedRecord(z.record(zBoundedCharacters(1, 16), zRoleButtonsConfigItem), 0, 100),
-    can_reset: z.boolean(),
+    buttons: zBoundedRecord(z.record(zBoundedCharacters(1, 16), zRoleButtonsConfigItem), 0, 100).default({}),
+    can_reset: z.boolean().default(false),
   })
   .refine(
     (parsed) => {
@@ -106,8 +91,9 @@ export const zRoleButtonsConfig = z
   );
 
 export interface RoleButtonsPluginType extends BasePluginType {
-  config: z.infer<typeof zRoleButtonsConfig>;
+  configSchema: typeof zRoleButtonsConfig;
   state: {
     roleButtons: GuildRoleButtons;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }

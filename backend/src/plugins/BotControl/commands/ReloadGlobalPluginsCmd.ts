@@ -1,4 +1,4 @@
-import { isStaffPreFilter, sendErrorMessage } from "../../../pluginUtils.js";
+import { isStaffPreFilter } from "../../../pluginUtils.js";
 import { getActiveReload, setActiveReload } from "../activeReload.js";
 import { botControlCmd } from "../types.js";
 
@@ -14,7 +14,7 @@ export const ReloadGlobalPluginsCmd = botControlCmd({
 
     const guildId = "guild" in message.channel ? message.channel.guild.id : null;
     if (!guildId) {
-      sendErrorMessage(pluginData, message.channel, "This command can only be used in a server");
+      void message.channel.send("This command can only be used in a server");
       return;
     }
 

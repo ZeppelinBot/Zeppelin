@@ -1,4 +1,4 @@
-import { ZodIssue } from "zod";
+import { ZodIssue } from "zod/v4";
 
 export function formatZodIssue(issue: ZodIssue): string {
   const path = issue.path.join("/");

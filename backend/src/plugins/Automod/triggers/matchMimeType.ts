@@ -1,5 +1,5 @@
 import { escapeInlineCode } from "discord.js";
-import z from "zod";
+import z from "zod/v4";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils.js";
 import { automodTrigger } from "../helpers.js";
 
@@ -8,30 +8,12 @@ interface MatchResultType {
   mode: "blacklist" | "whitelist";
 }
 
-const configSchema = z
-  .strictObject({
-    mime_type_blacklist: z.array(z.string().max(255)).max(255).default([]),
-    blacklist_enabled: z.boolean().default(false),
-    mime_type_whitelist: z.array(z.string().max(255)).max(255).default([]),
-    whitelist_enabled: z.boolean().default(false),
-  })
-  .transform((parsed, ctx) => {
-    if (parsed.blacklist_enabled && parsed.whitelist_enabled) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Cannot have both blacklist and whitelist enabled",
-      });
-      return z.NEVER;
-    }
-    if (!parsed.blacklist_enabled && !parsed.whitelist_enabled) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Must have either blacklist or whitelist enabled",
-      });
-      return z.NEVER;
-    }
-    return parsed;
-  });
+const configSchema = z.strictObject({
+  whitelist_enabled: z.boolean().default(false),
+  mime_type_whitelist: z.array(z.string().max(32)).max(255).default([]),
+  blacklist_enabled: z.boolean().default(false),
+  mime_type_blacklist: z.array(z.string().max(32)).max(255).default([]),
+});
 
 export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
   configSchema,

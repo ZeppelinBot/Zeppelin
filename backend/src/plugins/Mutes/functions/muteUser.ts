@@ -1,5 +1,4 @@
 import { Snowflake } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import { CaseTypes } from "../../../data/CaseTypes.js";
@@ -8,6 +7,7 @@ import { MuteTypes } from "../../../data/MuteTypes.js";
 import { Case } from "../../../data/entities/Case.js";
 import { Mute } from "../../../data/entities/Mute.js";
 import { registerExpiringMute } from "../../../data/loops/expiringMutesLoop.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin.js";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import {
@@ -35,6 +35,7 @@ export async function muteUser(
   userId: string,
   muteTime?: number,
   reason?: string,
+  reasonWithAttachments?: string,
   muteOptions: MuteOptions = {},
   removeRolesOnMuteOverride: boolean | string[] | null = null,
   restoreRolesOnMuteOverride: boolean | string[] | null = null,
@@ -196,7 +197,7 @@ export async function muteUser(
         template,
         new TemplateSafeValueContainer({
           guildName: pluginData.guild.name,
-          reason: reason || "None",
+          reason: reasonWithAttachments || "None",
           time: timeUntilUnmuteStr,
           moderator: muteOptions.caseArgs?.modId
             ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
@@ -245,10 +246,12 @@ export async function muteUser(
   if (theCase) {
     // Update old case
     const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmuteStr : "indefinite"}`];
-    const reasons = reason ? [reason] : [];
+    const reasons = reason ? [reason] : [""]; // Empty string so that there is a case update even without reason
+
     if (muteOptions.caseArgs?.extraNotes) {
       reasons.push(...muteOptions.caseArgs.extraNotes);
     }
+
     for (const noteReason of reasons) {
       await casesPlugin.createCaseNote({
         caseId: existingMute!.case_id,

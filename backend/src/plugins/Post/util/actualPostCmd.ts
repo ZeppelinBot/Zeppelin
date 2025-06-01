@@ -1,9 +1,8 @@
 import { GuildTextBasedChannel, Message } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { DBDateFormat, MINUTES, StrictMessageContent, errorMessage, renderUsername } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
@@ -28,23 +27,29 @@ export async function actualPostCmd(
     "repeat-times"?: number;
   } = {},
 ) {
-  if (!targetChannel.isTextBased()) {
-    msg.channel.send(errorMessage("Specified channel is not a text-based channel"));
+  if (!targetChannel.isSendable()) {
+    msg.reply(errorMessage("Specified channel is not a sendable channel"));
     return;
   }
 
   if (content == null && msg.attachments.size === 0) {
-    msg.channel.send(errorMessage("Message content or attachment required"));
+    msg.reply(errorMessage("Message content or attachment required"));
     return;
   }
 
   if (opts.repeat) {
     if (opts.repeat < MIN_REPEAT_TIME) {
-      sendErrorMessage(pluginData, msg.channel, `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`);
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`,
+      );
       return;
     }
     if (opts.repeat > MAX_REPEAT_TIME) {
-      sendErrorMessage(pluginData, msg.channel, `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`);
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`,
+      );
       return;
     }
   }
@@ -55,7 +60,7 @@ export async function actualPostCmd(
     // Schedule the post to be posted later
     postAt = await parseScheduleTime(pluginData, msg.author.id, opts.schedule);
     if (!postAt) {
-      sendErrorMessage(pluginData, msg.channel, "Invalid schedule time");
+      void pluginData.state.common.sendErrorMessage(msg, "Invalid schedule time");
       return;
     }
   } else if (opts.repeat) {
@@ -72,17 +77,16 @@ export async function actualPostCmd(
 
     // Invalid time
     if (!repeatUntil) {
-      sendErrorMessage(pluginData, msg.channel, "Invalid time specified for -repeat-until");
+      void pluginData.state.common.sendErrorMessage(msg, "Invalid time specified for -repeat-until");
       return;
     }
     if (repeatUntil.isBefore(moment.utc())) {
-      sendErrorMessage(pluginData, msg.channel, "You can't set -repeat-until in the past");
+      void pluginData.state.common.sendErrorMessage(msg, "You can't set -repeat-until in the past");
       return;
     }
     if (repeatUntil.isAfter(MAX_REPEAT_UNTIL)) {
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
+      void pluginData.state.common.sendErrorMessage(
+        msg,
         "Unfortunately, -repeat-until can only be at most 100 years into the future. Maybe 99 years would be enough?",
       );
       return;
@@ -90,18 +94,24 @@ export async function actualPostCmd(
   } else if (opts["repeat-times"]) {
     repeatTimes = opts["repeat-times"];
     if (repeatTimes <= 0) {
-      sendErrorMessage(pluginData, msg.channel, "-repeat-times must be 1 or more");
+      void pluginData.state.common.sendErrorMessage(msg, "-repeat-times must be 1 or more");
       return;
     }
   }
 
   if (repeatUntil && repeatTimes) {
-    sendErrorMessage(pluginData, msg.channel, "You can only use one of -repeat-until or -repeat-times at once");
+    void pluginData.state.common.sendErrorMessage(
+      msg,
+      "You can only use one of -repeat-until or -repeat-times at once",
+    );
     return;
   }
 
   if (opts.repeat && !repeatUntil && !repeatTimes) {
-    sendErrorMessage(pluginData, msg.channel, "You must specify -repeat-until or -repeat-times for repeated messages");
+    void pluginData.state.common.sendErrorMessage(
+      msg,
+      "You must specify -repeat-until or -repeat-times for repeated messages",
+    );
     return;
   }
 
@@ -116,7 +126,7 @@ export async function actualPostCmd(
   // Save schedule/repeat information in DB
   if (postAt) {
     if (postAt < moment.utc()) {
-      sendErrorMessage(pluginData, msg.channel, "Post can't be scheduled to be posted in the past");
+      void pluginData.state.common.sendErrorMessage(msg, "Post can't be scheduled to be posted in the past");
       return;
     }
 
@@ -192,6 +202,6 @@ export async function actualPostCmd(
   }
 
   if (targetChannel.id !== msg.channel.id || opts.schedule || opts.repeat) {
-    sendSuccessMessage(pluginData, msg.channel, successMessage);
+    void pluginData.state.common.sendSuccessMessage(msg, successMessage);
   }
 }

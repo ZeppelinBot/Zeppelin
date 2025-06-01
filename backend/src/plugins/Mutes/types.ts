@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { EventEmitter } from "events";
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
-import z from "zod";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
+import z from "zod/v4";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
@@ -10,25 +10,29 @@ import { Case } from "../../data/entities/Case.js";
 import { Mute } from "../../data/entities/Mute.js";
 import { UserNotificationMethod, UserNotificationResult, zSnowflake } from "../../utils.js";
 import { CaseArgs } from "../Cases/types.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zMutesConfig = z.strictObject({
-  mute_role: zSnowflake.nullable(),
-  move_to_voice_channel: zSnowflake.nullable(),
-  kick_from_voice_channel: z.boolean(),
+  mute_role: zSnowflake.nullable().default(null),
+  move_to_voice_channel: zSnowflake.nullable().default(null),
+  kick_from_voice_channel: z.boolean().default(false),
 
-  dm_on_mute: z.boolean(),
-  dm_on_update: z.boolean(),
-  message_on_mute: z.boolean(),
-  message_on_update: z.boolean(),
-  message_channel: z.string().nullable(),
-  mute_message: z.string().nullable(),
-  timed_mute_message: z.string().nullable(),
-  update_mute_message: z.string().nullable(),
+  dm_on_mute: z.boolean().default(false),
+  dm_on_update: z.boolean().default(false),
+  message_on_mute: z.boolean().default(false),
+  message_on_update: z.boolean().default(false),
+  message_channel: z.string().nullable().default(null),
+  mute_message: z.string().nullable().default("You have been muted on the {guildName} server. Reason given: {reason}"),
+  timed_mute_message: z
+    .string()
+    .nullable()
+    .default("You have been muted on the {guildName} server for {time}. Reason given: {reason}"),
+  update_mute_message: z.string().nullable().default("Your mute on the {guildName} server has been updated to {time}."),
   remove_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
   restore_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
 
-  can_view_list: z.boolean(),
-  can_cleanup: z.boolean(),
+  can_view_list: z.boolean().default(false),
+  can_cleanup: z.boolean().default(false),
 });
 
 export interface MutesEvents {
@@ -42,7 +46,7 @@ export interface MutesEventEmitter extends EventEmitter {
 }
 
 export interface MutesPluginType extends BasePluginType {
-  config: z.infer<typeof zMutesConfig>;
+  configSchema: typeof zMutesConfig;
   state: {
     mutes: GuildMutes;
     cases: GuildCases;
@@ -53,6 +57,8 @@ export interface MutesPluginType extends BasePluginType {
     unregisterTimeoutMuteToRenewListener: () => void;
 
     events: MutesEventEmitter;
+
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

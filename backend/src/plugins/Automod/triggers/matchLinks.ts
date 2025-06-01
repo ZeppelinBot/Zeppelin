@@ -1,11 +1,10 @@
 import { escapeInlineCode } from "discord.js";
-import z from "zod";
+import z from "zod/v4";
 import { allowTimeout } from "../../../RegExpRunner.js";
-import { phishermanDomainIsSafe } from "../../../data/Phisherman.js";
-import { getUrlsInString, zRegex } from "../../../utils.js";
+import { getFishFishDomain } from "../../../data/FishFish.js";
+import { getUrlsInString, inputPatternToRegExp, zRegex } from "../../../utils.js";
 import { mergeRegexes } from "../../../utils/mergeRegexes.js";
 import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex.js";
-import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin.js";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage.js";
 import { automodTrigger } from "../helpers.js";
@@ -40,6 +39,7 @@ const configSchema = z.strictObject({
       include_verified: z.boolean().optional(),
     })
     .optional(),
+  include_malicious: z.boolean().default(false),
   only_real_links: z.boolean().default(true),
   match_messages: z.boolean().default(true),
   match_embeds: z.boolean().default(true),
@@ -73,7 +73,7 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
 
         if (trigger.exclude_regex) {
           if (!regexCache.has(trigger.exclude_regex)) {
-            const toCache = mergeRegexes(trigger.exclude_regex, "i");
+            const toCache = mergeRegexes(trigger.exclude_regex.map(pattern => inputPatternToRegExp(pattern)), "i");
             regexCache.set(trigger.exclude_regex, toCache);
           }
           const regexes = regexCache.get(trigger.exclude_regex)!;
@@ -88,7 +88,7 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
 
         if (trigger.include_regex) {
           if (!regexCache.has(trigger.include_regex)) {
-            const toCache = mergeRegexes(trigger.include_regex, "i");
+            const toCache = mergeRegexes(trigger.include_regex.map(pattern => inputPatternToRegExp(pattern)), "i");
             regexCache.set(trigger.include_regex, toCache);
           }
           const regexes = regexCache.get(trigger.include_regex)!;
@@ -155,22 +155,18 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
           }
         }
 
-        if (trigger.phisherman) {
-          const phishermanResult = await pluginData.getPlugin(PhishermanPlugin).getDomainInfo(normalizedHostname);
-          if (phishermanResult != null && !phishermanDomainIsSafe(phishermanResult)) {
-            if (
-              (trigger.phisherman.include_suspected && !phishermanResult.verifiedPhish) ||
-              (trigger.phisherman.include_verified && phishermanResult.verifiedPhish)
-            ) {
-              const suspectedVerified = phishermanResult.verifiedPhish ? "verified" : "suspected";
-              return {
-                extra: {
-                  type,
-                  link: link.input,
-                  details: `using Phisherman (${suspectedVerified})`,
-                },
-              };
-            }
+        const includeMalicious =
+          trigger.include_malicious || trigger.phisherman?.include_suspected || trigger.phisherman?.include_verified;
+        if (includeMalicious) {
+          const domainInfo = getFishFishDomain(normalizedHostname);
+          if (domainInfo && domainInfo.category !== "safe") {
+            return {
+              extra: {
+                type,
+                link: link.input,
+                details: `(known ${domainInfo.category} domain)`,
+              },
+            };
           }
         }
       }

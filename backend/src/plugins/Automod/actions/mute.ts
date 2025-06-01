@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import {
   convertDelayStringToMS,
@@ -56,6 +56,7 @@ export const MuteAction = automodAction({
         await mutes.muteUser(
           userId,
           duration,
+          reason,
           reason,
           { contactMethods, caseArgs, isAutomodAction: true },
           rolesToRemove,

@@ -2,7 +2,6 @@ import { APIEmbed, ChannelType } from "discord.js";
 import { GuildPluginData } from "knub";
 import {
   EmbedWith,
-  GroupDMInvite,
   formatNumber,
   inviteHasCounts,
   isGroupDMInvite,
@@ -100,9 +99,8 @@ export async function getInviteInfoEmbed(
       fields: [],
     };
 
-    invite = invite as GroupDMInvite;
     embed.author = {
-      name: invite.channel!.name ? `Group DM invite:  ${invite.channel!.name}` : `Group DM invite`,
+      name: invite.channel.name ? `Group DM invite:  ${invite.channel.name}` : `Group DM invite`,
       url: `https://discord.gg/${invite.code}`,
     }; // FIXME pending invite re-think
 

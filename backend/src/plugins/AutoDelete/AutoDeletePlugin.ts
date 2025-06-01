@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
@@ -8,19 +8,11 @@ import { onMessageCreate } from "./util/onMessageCreate.js";
 import { onMessageDelete } from "./util/onMessageDelete.js";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk.js";
 
-const defaultOptions: PluginOptions<AutoDeletePluginType> = {
-  config: {
-    enabled: false,
-    delay: "5s",
-  },
-};
-
 export const AutoDeletePlugin = guildPlugin<AutoDeletePluginType>()({
   name: "auto_delete",
 
   dependencies: () => [TimeAndDatePlugin, LogsPlugin],
-  configParser: (input) => zAutoDeleteConfig.parse(input),
-  defaultOptions,
+  configSchema: zAutoDeleteConfig,
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;

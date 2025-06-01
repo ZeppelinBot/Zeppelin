@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts">
-import { ApiPermissions, hasPermission } from "@zeppelinbot/shared";
+import { ApiPermissions, hasPermission } from "@zeppelinbot/shared/apiPermissions.js";
 import PermissionTree from "./PermissionTree.vue";
 import { mapState } from "vuex";
 import {
@@ -175,7 +175,7 @@ export default {
           expiresAt: null,
         });
 
-        this.$set(perm, "permissions", new Set(perm.permissions));
+        perm.permissions = new Set(perm.permissions);
       },
 
       onTreeUpdate(targetPermissions) {

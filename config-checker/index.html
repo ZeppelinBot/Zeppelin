@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="darkreader-lock">
+    <link rel="stylesheet" href="/src/style.css">
+    <title>Zeppelin config checker</title>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="section" style="flex: 1 1 auto">
+        <div class="title">
+          <h1>Config</h1>
+        </div>
+        <div class="content">
+          <div class="editor-wrap">
+            <div id="editor"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" style="flex: 0 0 min(300px, 40vh)">
+        <div class="title">
+          <h1>Errors</h1>
+        </div>
+        <div class="content">
+          <div class="errors-wrap">
+            <div id="errors"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

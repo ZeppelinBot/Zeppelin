@@ -6,26 +6,27 @@ import { applyRoleButtons } from "./applyRoleButtons.js";
 export async function applyAllRoleButtons(pluginData: GuildPluginData<RoleButtonsPluginType>) {
   const savedRoleButtons = await pluginData.state.roleButtons.getSavedRoleButtons();
   const config = pluginData.config.get();
-  for (const buttons of Object.values(config.buttons)) {
+  for (const [configName, configItem] of Object.entries(config.buttons)) {
     // Use the hash of the config to quickly check if we need to update buttons
-    const hash = createHash("md5").update(JSON.stringify(buttons)).digest("hex");
-    const savedButtonsItem = savedRoleButtons.find((bt) => bt.name === buttons.name);
+    const configItemToHash = { ...configItem, name: configName }; // Add name property for backwards compatibility
+    const hash = createHash("md5").update(JSON.stringify(configItemToHash)).digest("hex");
+    const savedButtonsItem = savedRoleButtons.find((bt) => bt.name === configName);
     if (savedButtonsItem?.hash === hash) {
       // No changes
       continue;
     }
 
     if (savedButtonsItem) {
-      await pluginData.state.roleButtons.deleteRoleButtonItem(buttons.name);
+      await pluginData.state.roleButtons.deleteRoleButtonItem(configName);
     }
 
-    const applyResult = await applyRoleButtons(pluginData, buttons, savedButtonsItem ?? null);
+    const applyResult = await applyRoleButtons(pluginData, configItem, configName, savedButtonsItem ?? null);
     if (!applyResult) {
       return;
     }
 
     await pluginData.state.roleButtons.saveRoleButtonItem(
-      buttons.name,
+      configName,
       applyResult.channel_id,
       applyResult.message_id,
       hash,

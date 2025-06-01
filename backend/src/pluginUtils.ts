@@ -3,18 +3,35 @@
  */
 
 import {
+  BitField,
+  BitFieldResolvable,
+  ChatInputCommandInteraction,
+  CommandInteraction,
   GuildMember,
+  InteractionEditReplyOptions,
+  InteractionReplyOptions,
+  InteractionResponse,
   Message,
   MessageCreateOptions,
-  MessageMentionOptions,
+  MessageEditOptions,
+  MessageFlags,
+  MessageFlagsString,
+  ModalSubmitInteraction,
   PermissionsBitField,
   TextBasedChannel,
 } from "discord.js";
-import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
-import { logger } from "./logger.js";
+import {
+  AnyPluginData,
+  BasePluginData,
+  CommandContext,
+  ExtendedMatchParams,
+  GuildPluginData,
+  helpers,
+  PluginConfigManager,
+} from "knub";
+import z from "zod/v4";
 import { isStaff } from "./staff.js";
 import { TZeppelinKnub } from "./types.js";
-import { errorMessage, successMessage } from "./utils.js";
 import { Tail } from "./utils/typeUtils.js";
 
 const { getMemberLevel } = helpers;
@@ -49,46 +66,118 @@ export async function hasPermission(
   return helpers.hasPermission(config, permission);
 }
 
-export async function sendSuccessMessage(
-  pluginData: AnyPluginData<any>,
-  channel: TextBasedChannel,
-  body: string,
-  allowedMentions?: MessageMentionOptions,
-): Promise<Message | undefined> {
-  const emoji = pluginData.fullConfig.success_emoji || undefined;
-  const formattedBody = successMessage(body, emoji);
-  const content: MessageCreateOptions = allowedMentions
-    ? { content: formattedBody, allowedMentions }
-    : { content: formattedBody };
+export type GenericCommandSource = Message | CommandInteraction | ModalSubmitInteraction;
 
-  return channel
-    .send({ ...content }) // Force line break
-    .catch((err) => {
-      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
-      logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
-      return undefined;
-    });
+export function isContextInteraction(
+  context: GenericCommandSource,
+): context is CommandInteraction | ModalSubmitInteraction {
+  return context instanceof CommandInteraction || context instanceof ModalSubmitInteraction;
 }
 
-export async function sendErrorMessage(
-  pluginData: AnyPluginData<any>,
-  channel: TextBasedChannel,
-  body: string,
-  allowedMentions?: MessageMentionOptions,
-): Promise<Message | undefined> {
-  const emoji = pluginData.fullConfig.error_emoji || undefined;
-  const formattedBody = errorMessage(body, emoji);
-  const content: MessageCreateOptions = allowedMentions
-    ? { content: formattedBody, allowedMentions }
-    : { content: formattedBody };
+export function isContextMessage(context: GenericCommandSource): context is Message {
+  return context instanceof Message;
+}
 
-  return channel
-    .send({ ...content }) // Force line break
-    .catch((err) => {
-      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
-      logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
-      return undefined;
+export async function getContextChannel(context: GenericCommandSource): Promise<TextBasedChannel | null> {
+  if (isContextInteraction(context)) {
+    return context.channel;
+  }
+  if (context instanceof Message) {
+    return context.channel;
+  }
+  throw new Error("Unknown context type");
+}
+
+export function getContextChannelId(context: GenericCommandSource): string | null {
+  return context.channelId;
+}
+
+export async function fetchContextChannel(context: GenericCommandSource) {
+  if (!context.guild) {
+    throw new Error("Missing context guild");
+  }
+  const channelId = getContextChannelId(context);
+  if (!channelId) {
+    throw new Error("Missing context channel ID");
+  }
+  return (await context.guild.channels.fetch(channelId))!;
+}
+
+function flagsWithEphemeral<TFlags extends string, TType extends number | bigint>(
+  flags: BitFieldResolvable<TFlags, any>,
+  ephemeral: boolean,
+): BitFieldResolvable<TFlags | Extract<MessageFlagsString, "Ephemeral">, TType | MessageFlags.Ephemeral> {
+  if (!ephemeral) {
+    return flags;
+  }
+  return new BitField(flags).add(MessageFlags.Ephemeral) as any;
+}
+
+export type ContextResponseOptions = MessageCreateOptions & InteractionReplyOptions & InteractionEditReplyOptions;
+export type ContextResponse = Message | InteractionResponse;
+
+export async function sendContextResponse(
+  context: GenericCommandSource,
+  content: string | ContextResponseOptions,
+  ephemeral = false,
+): Promise<Message> {
+  if (isContextInteraction(context)) {
+    const options = { ...(typeof content === "string" ? { content: content } : content), fetchReply: true };
+
+    if (context.replied) {
+      return context.followUp({
+        ...options,
+        flags: flagsWithEphemeral(options.flags, ephemeral),
+      });
+    }
+    if (context.deferred) {
+      return context.editReply(options);
+    }
+
+    const replyResult = await context.reply({
+      ...options,
+      flags: flagsWithEphemeral(options.flags, ephemeral),
+      withResponse: true,
     });
+    return replyResult.resource!.message!;
+  }
+
+  const contextChannel = await fetchContextChannel(context);
+  if (!contextChannel?.isSendable()) {
+    throw new Error("Context channel does not exist or is not sendable");
+  }
+
+  return contextChannel.send(content);
+}
+
+export type ContextResponseEditOptions = MessageEditOptions & InteractionEditReplyOptions;
+
+export function editContextResponse(
+  response: ContextResponse,
+  content: string | ContextResponseEditOptions,
+): Promise<ContextResponse> {
+  return response.edit(content);
+}
+
+export async function deleteContextResponse(response: ContextResponse): Promise<void> {
+  await response.delete();
+}
+
+export async function getConfigForContext<TPluginData extends BasePluginData<any>>(
+  config: PluginConfigManager<TPluginData>,
+  context: GenericCommandSource,
+): Promise<z.output<TPluginData["_pluginType"]["configSchema"]>> {
+  if (context instanceof ChatInputCommandInteraction) {
+    // TODO: Support for modal interactions (here and Knub)
+    return config.getForInteraction(context);
+  }
+  const channel = await getContextChannel(context);
+  const member = isContextMessage(context) && context.inGuild() ? await resolveMessageMember(context) : null;
+
+  return config.getMatchingConfig({
+    channel,
+    member,
+  });
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {
@@ -136,4 +225,6 @@ export function makePublicFn<TPluginData extends BasePluginData<any>, T extends 
   };
 }
 
-// ???
+export function resolveMessageMember(message: Message<true>) {
+  return Promise.resolve(message.member || message.guild.members.fetch(message.author.id));
+}

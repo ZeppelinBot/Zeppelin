@@ -1,8 +1,9 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes.js";
 import { SECONDS } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { SlowmodeClearCmd } from "./commands/SlowmodeClearCmd.js";
 import { SlowmodeDisableCmd } from "./commands/SlowmodeDisableCmd.js";
@@ -15,25 +16,6 @@ import { onMessageCreate } from "./util/onMessageCreate.js";
 
 const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * SECONDS;
 
-const defaultOptions: PluginOptions<SlowmodePluginType> = {
-  config: {
-    use_native_slowmode: true,
-
-    can_manage: false,
-    is_affected: true,
-  },
-
-  overrides: [
-    {
-      level: ">=50",
-      config: {
-        can_manage: true,
-        is_affected: false,
-      },
-    },
-  ],
-};
-
 export const SlowmodePlugin = guildPlugin<SlowmodePluginType>()({
   name: "slowmode",
 
@@ -42,8 +24,16 @@ export const SlowmodePlugin = guildPlugin<SlowmodePluginType>()({
     LogsPlugin,
   ],
 
-  configParser: (input) => zSlowmodeConfig.parse(input),
-  defaultOptions,
+  configSchema: zSlowmodeConfig,
+  defaultOverrides: [
+    {
+      level: ">=50",
+      config: {
+        can_manage: true,
+        is_affected: false,
+      },
+    },
+  ],
 
   // prettier-ignore
   messageCommands: [
@@ -61,6 +51,10 @@ export const SlowmodePlugin = guildPlugin<SlowmodePluginType>()({
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
     state.channelSlowmodeCache = new Map();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

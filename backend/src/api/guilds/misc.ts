@@ -1,6 +1,6 @@
 import { ApiPermissions } from "@zeppelinbot/shared/apiPermissions.js";
 import express, { Request, Response } from "express";
-import jsYaml from "js-yaml";
+import { YAMLException } from "js-yaml";
 import moment from "moment-timezone";
 import { Queue } from "../../Queue.js";
 import { validateGuildConfig } from "../../configValidator.js";
@@ -14,8 +14,6 @@ import { loadYamlSafely } from "../../utils/loadYamlSafely.js";
 import { ObjectAliasError } from "../../utils/validateNoObjectAliases.js";
 import { hasGuildPermission, requireGuildPermission } from "../permissions.js";
 import { clientError, ok, serverError, unauthorized } from "../responses.js";
-
-const YAMLException = jsYaml.YAMLException;
 
 const apiPermissionAssignments = new ApiPermissionAssignments();
 const auditLog = new ApiAuditLog();

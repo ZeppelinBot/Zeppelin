@@ -1,5 +1,4 @@
-import { CooldownManager, PluginOptions, guildPlugin } from "knub";
-import DefaultLogMessages from "../../data/DefaultLogMessages.json" assert { type: "json" };
+import { CooldownManager, guildPlugin } from "knub";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
@@ -115,17 +114,12 @@ function getCasesPlugin(): Promise<any> {
   return import("../Cases/CasesPlugin.js") as Promise<any>;
 }
 
-const defaultOptions: PluginOptions<LogsPluginType> = {
-  config: {
-    channels: {},
-    format: DefaultLogMessages,
-    ping_user: true,
-    allow_user_mentions: false,
-    timestamp_format: "[<t:]X[>]",
-    include_embed_timestamp: true,
-  },
+export const LogsPlugin = guildPlugin<LogsPluginType>()({
+  name: "logs",
 
-  overrides: [
+  dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getCasesPlugin()).CasesPlugin],
+  configSchema: zLogsConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -134,14 +128,6 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
       },
     },
   ],
-};
-
-export const LogsPlugin = guildPlugin<LogsPluginType>()({
-  name: "logs",
-
-  dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getCasesPlugin()).CasesPlugin],
-  configParser: (input) => zLogsConfig.parse(input),
-  defaultOptions,
 
   events: [
     LogsGuildMemberAddEvt,

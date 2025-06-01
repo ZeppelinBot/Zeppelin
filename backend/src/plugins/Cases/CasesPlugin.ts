@@ -20,23 +20,11 @@ function getLogsPlugin(): Promise<any> {
   return import("../Logs/LogsPlugin.js") as Promise<any>;
 }
 
-const defaultOptions = {
-  config: {
-    log_automatic_actions: true,
-    case_log_channel: null,
-    show_relative_times: true,
-    relative_time_cutoff: "7d",
-    case_colors: null,
-    case_icons: null,
-  },
-};
-
 export const CasesPlugin = guildPlugin<CasesPluginType>()({
   name: "cases",
 
   dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getLogsPlugin()).LogsPlugin],
-  configParser: (input) => zCasesConfig.parse(input),
-  defaultOptions,
+  configSchema: zCasesConfig,
 
   public(pluginData) {
     return {

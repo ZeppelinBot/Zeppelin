@@ -1,15 +1,9 @@
 import { Guild } from "discord.js";
-import { BasePluginType, GlobalPluginData, globalPlugin, globalPluginEventListener } from "knub";
-import z from "zod";
+import { GlobalPluginData, globalPlugin, globalPluginEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { Configs } from "../../data/Configs.js";
 import { env } from "../../env.js";
-
-interface GuildAccessMonitorPluginType extends BasePluginType {
-  state: {
-    allowedGuilds: AllowedGuilds;
-  };
-}
+import { GuildAccessMonitorPluginType, zGuildAccessMonitorConfig } from "./types.js";
 
 async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginType>, guild: Guild) {
   if (!(await pluginData.state.allowedGuilds.isAllowed(guild.id))) {
@@ -24,7 +18,7 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
  */
 export const GuildAccessMonitorPlugin = globalPlugin<GuildAccessMonitorPluginType>()({
   name: "guild_access_monitor",
-  configParser: (input) => z.strictObject({}).parse(input),
+  configSchema: zGuildAccessMonitorConfig,
 
   events: [
     globalPluginEventListener<GuildAccessMonitorPluginType>()({

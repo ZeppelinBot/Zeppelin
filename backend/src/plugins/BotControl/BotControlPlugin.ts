@@ -4,7 +4,6 @@ import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments.js";
 import { Configs } from "../../data/Configs.js";
 import { GuildArchives } from "../../data/GuildArchives.js";
-import { sendSuccessMessage } from "../../pluginUtils.js";
 import { getActiveReload, resetActiveReload } from "./activeReload.js";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd.js";
 import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd.js";
@@ -24,21 +23,9 @@ import { RestPerformanceCmd } from "./commands/RestPerformanceCmd.js";
 import { ServersCmd } from "./commands/ServersCmd.js";
 import { BotControlPluginType, zBotControlConfig } from "./types.js";
 
-const defaultOptions = {
-  config: {
-    can_use: false,
-    can_eligible: false,
-    can_performance: false,
-    can_add_server_from_invite: false,
-    can_list_dashboard_perms: false,
-    update_cmd: null,
-  },
-};
-
 export const BotControlPlugin = globalPlugin<BotControlPluginType>()({
   name: "bot_control",
-  configParser: (input) => zBotControlConfig.parse(input),
-  defaultOptions,
+  configSchema: zBotControlConfig,
 
   // prettier-ignore
   messageCommands: [
@@ -77,7 +64,7 @@ export const BotControlPlugin = globalPlugin<BotControlPluginType>()({
       if (guild) {
         const channel = guild.channels.cache.get(channelId as Snowflake);
         if (channel instanceof TextChannel) {
-          sendSuccessMessage(pluginData, channel, "Global plugins reloaded!");
+          void channel.send("Global plugins reloaded!");
         }
       }
     }

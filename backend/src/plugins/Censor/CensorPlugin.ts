@@ -1,4 +1,4 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { PluginOverride, guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners.js";
@@ -7,46 +7,26 @@ import { CensorPluginType, zCensorConfig } from "./types.js";
 import { onMessageCreate } from "./util/onMessageCreate.js";
 import { onMessageUpdate } from "./util/onMessageUpdate.js";
 
-const defaultOptions: PluginOptions<CensorPluginType> = {
-  config: {
-    filter_zalgo: false,
-    filter_invites: false,
-    invite_guild_whitelist: null,
-    invite_guild_blacklist: null,
-    invite_code_whitelist: null,
-    invite_code_blacklist: null,
-    allow_group_dm_invites: false,
-
-    filter_domains: false,
-    domain_whitelist: null,
-    domain_blacklist: null,
-
-    blocked_tokens: null,
-    blocked_words: null,
-    blocked_regex: null,
-  },
-
-  overrides: [
-    {
-      level: ">=50",
-      config: {
-        filter_zalgo: false,
-        filter_invites: false,
-        filter_domains: false,
-        blocked_tokens: null,
-        blocked_words: null,
-        blocked_regex: null,
-      },
+const defaultOverrides: Array<PluginOverride<CensorPluginType>> = [
+  {
+    level: ">=50",
+    config: {
+      filter_zalgo: false,
+      filter_invites: false,
+      filter_domains: false,
+      blocked_tokens: null,
+      blocked_words: null,
+      blocked_regex: null,
     },
-  ],
-};
+  },
+];
 
 export const CensorPlugin = guildPlugin<CensorPluginType>()({
   name: "censor",
 
   dependencies: () => [LogsPlugin],
-  configParser: (input) => zCensorConfig.parse(input),
-  defaultOptions,
+  configSchema: zCensorConfig,
+  defaultOverrides,
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;

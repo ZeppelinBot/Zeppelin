@@ -1,5 +1,6 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB.js";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB.js";
 import {
@@ -10,11 +11,11 @@ import {
 } from "./events/SaveMessagesEvts.js";
 import { MessageSaverPluginType, zMessageSaverConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<MessageSaverPluginType> = {
-  config: {
-    can_manage: false,
-  },
-  overrides: [
+export const MessageSaverPlugin = guildPlugin<MessageSaverPluginType>()({
+  name: "message_saver",
+
+  configSchema: zMessageSaverConfig,
+  defaultOverrides: [
     {
       level: ">=100",
       config: {
@@ -22,13 +23,6 @@ const defaultOptions: PluginOptions<MessageSaverPluginType> = {
       },
     },
   ],
-};
-
-export const MessageSaverPlugin = guildPlugin<MessageSaverPluginType>()({
-  name: "message_saver",
-
-  configParser: (input) => zMessageSaverConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [
@@ -47,5 +41,9 @@ export const MessageSaverPlugin = guildPlugin<MessageSaverPluginType>()({
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import { asyncMap, nonNullish, resolveMember, unique, zBoundedCharacters, zSnowflake } from "../../../utils.js";
 import { CaseArgs } from "../../Cases/types.js";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin.js";
@@ -33,7 +33,7 @@ export const KickAction = automodAction({
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const member of membersToKick) {
       if (!member) continue;
-      await modActions.kickMember(member, reason, { contactMethods, caseArgs, isAutomodAction: true });
+      await modActions.kickMember(member, reason, reason, { contactMethods, caseArgs, isAutomodAction: true });
     }
   },
 });

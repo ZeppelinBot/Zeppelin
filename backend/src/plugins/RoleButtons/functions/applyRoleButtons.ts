@@ -8,6 +8,7 @@ import { createButtonComponents } from "./createButtonComponents.js";
 export async function applyRoleButtons(
   pluginData: GuildPluginData<RoleButtonsPluginType>,
   configItem: TRoleButtonsConfigItem,
+  configName: string,
   existingSavedButtons: RoleButtonsItem | null,
 ): Promise<{ channel_id: string; message_id: string } | null> {
   let message: Message;
@@ -32,7 +33,7 @@ export async function applyRoleButtons(
       channel.messages.fetch(configItem.message.message_id).catch(() => null));
     if (!messageCandidate) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
-        body: `Message not found for role_buttons/${configItem.name}`,
+        body: `Message not found for role_buttons/${configName}`,
       });
       return null;
     }
@@ -45,7 +46,7 @@ export async function applyRoleButtons(
         : Boolean(configItem.message.content.content?.trim()) || configItem.message.content.embeds?.length;
     if (!contentIsValid) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
-        body: `Invalid message content for role_buttons/${configItem.name}`,
+        body: `Invalid message content for role_buttons/${configName}`,
       });
       return null;
     }
@@ -58,7 +59,7 @@ export async function applyRoleButtons(
     }
     if (!channel || !channel?.isTextBased()) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
-        body: `Text channel not found for role_buttons/${configItem.name}`,
+        body: `Text channel not found for role_buttons/${configName}`,
       });
       return null;
     }
@@ -89,7 +90,7 @@ export async function applyRoleButtons(
         candidateMessage = await channel.send(configItem.message.content as string | MessageCreateOptions);
       } catch (err) {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
-          body: `Error while posting message for role_buttons/${configItem.name}: ${String(err)}`,
+          body: `Error while posting message for role_buttons/${configName}: ${String(err)}`,
         });
         return null;
       }
@@ -100,16 +101,16 @@ export async function applyRoleButtons(
 
   if (message.author.id !== pluginData.client.user?.id) {
     pluginData.getPlugin(LogsPlugin).logBotAlert({
-      body: `Error applying role buttons for role_buttons/${configItem.name}: target message must be posted by Zeppelin`,
+      body: `Error applying role buttons for role_buttons/${configName}: target message must be posted by Zeppelin`,
     });
     return null;
   }
 
   // Apply role buttons
-  const components = createButtonComponents(configItem);
+  const components = createButtonComponents(configItem, configName);
   await message.edit({ components }).catch((err) => {
     pluginData.getPlugin(LogsPlugin).logBotAlert({
-      body: `Error applying role buttons for role_buttons/${configItem.name}: ${String(err)}`,
+      body: `Error applying role buttons for role_buttons/${configName}: ${String(err)}`,
     });
     return null;
   });

@@ -1,18 +1,20 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
-import z from "zod";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
+import z from "zod/v4";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zLocateUserConfig = z.strictObject({
-  can_where: z.boolean(),
-  can_alert: z.boolean(),
+  can_where: z.boolean().default(false),
+  can_alert: z.boolean().default(false),
 });
 
 export interface LocateUserPluginType extends BasePluginType {
-  config: z.infer<typeof zLocateUserConfig>;
+  configSchema: typeof zLocateUserConfig;
   state: {
     alerts: GuildVCAlerts;
     usersWithAlerts: string[];
     unregisterGuildEventListener: () => void;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

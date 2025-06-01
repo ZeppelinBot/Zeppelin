@@ -7,7 +7,7 @@ import { UsernameSaverPluginType, zUsernameSaverConfig } from "./types.js";
 export const UsernameSaverPlugin = guildPlugin<UsernameSaverPluginType>()({
   name: "username_saver",
 
-  configParser: (input) => zUsernameSaverConfig.parse(input),
+  configSchema: zUsernameSaverConfig,
 
   // prettier-ignore
   events: [

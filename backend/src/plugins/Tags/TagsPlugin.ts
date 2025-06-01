@@ -1,13 +1,14 @@
 import { Snowflake } from "discord.js";
-import humanizeDuration from "humanize-duration";
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import moment from "moment-timezone";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildTags } from "../../data/GuildTags.js";
+import { humanizeDuration } from "../../humanizeDuration.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { convertDelayStringToMS } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
 import { TagCreateCmd } from "./commands/TagCreateCmd.js";
@@ -21,25 +22,12 @@ import { onMessageCreate } from "./util/onMessageCreate.js";
 import { onMessageDelete } from "./util/onMessageDelete.js";
 import { renderTagBody } from "./util/renderTagBody.js";
 
-const defaultOptions: PluginOptions<TagsPluginType> = {
-  config: {
-    prefix: "!!",
-    delete_with_command: true,
+export const TagsPlugin = guildPlugin<TagsPluginType>()({
+  name: "tags",
 
-    user_tag_cooldown: null,
-    global_tag_cooldown: null,
-    user_cooldown: null,
-    allow_mentions: false,
-    global_cooldown: null,
-    auto_delete_command: false,
-
-    categories: {},
-
-    can_create: false,
-    can_use: false,
-    can_list: false,
-  },
-  overrides: [
+  dependencies: () => [LogsPlugin],
+  configSchema: zTagsConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -49,13 +37,6 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
       },
     },
   ],
-};
-
-export const TagsPlugin = guildPlugin<TagsPluginType>()({
-  name: "tags",
-
-  dependencies: () => [LogsPlugin],
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [
@@ -78,8 +59,6 @@ export const TagsPlugin = guildPlugin<TagsPluginType>()({
     };
   },
 
-  configParser: (input) => zTagsConfig.parse(input),
-
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
@@ -89,6 +68,10 @@ export const TagsPlugin = guildPlugin<TagsPluginType>()({
     state.logs = new GuildLogs(guild.id);
 
     state.tagFunctions = {};
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

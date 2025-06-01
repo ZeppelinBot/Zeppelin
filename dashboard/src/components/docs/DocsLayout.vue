@@ -31,7 +31,7 @@
       <!-- Sidebar -->
       <nav class="docs-sidebar px-4 pt-2 pb-3 mr-8 mb-4 border border-gray-700 rounded bg-gray-800 shadow-md flex-full lg:flex-none lg:block" v-bind:class="{ closed: !mobileMenuOpen }">
         <div role="none" v-for="(group, index) in menu">
-          <h1 class="font-bold" :aria-owns="'menu-group-' + index" :class="{'mt-4': index !== 0}">{{ group.label }}</h1>
+          <h1 class="font-bold" :aria-owns="'menu-group-' + index" :class="{'mt-4': typeof index === 'number' && index !== 0}">{{ group.label }}</h1>
           <ul v-bind:id="'menu-group-' + index" role="group" class="list-none pl-2">
             <li role="none" v-for="item in group.items">
               <router-link role="menuitem" :to="item.to" class="text-gray-300 hover:text-gray-500" v-on:click.native="onChooseMenuItem()">{{ item.label }}</router-link>
@@ -156,14 +156,14 @@
           ...menu,
           {
             label: 'Plugins',
-            items: this.plugins.filter(plugin => !plugin.info.legacy).map(plugin => ({
+            items: this.plugins.filter(plugin => plugin.info.type === "stable").map(plugin => ({
               label: plugin.info.prettyName || plugin.name,
               to: `/docs/plugins/${plugin.name}`,
             })),
           },
           {
             label: "Legacy Plugins",
-            items: this.plugins.filter(plugin => plugin.info.legacy).map(plugin => ({
+            items: this.plugins.filter(plugin => plugin.info.type === "legacy").map(plugin => ({
               label: plugin.info.prettyName || plugin.name,
               to: `/docs/plugins/${plugin.name}`,
             })),

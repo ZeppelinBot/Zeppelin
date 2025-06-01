@@ -8,6 +8,7 @@ import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildMutes } from "../../data/GuildMutes.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { CasesPlugin } from "../Cases/CasesPlugin.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
 import { ClearBannedMutesCmd } from "./commands/ClearBannedMutesCmd.js";
@@ -25,27 +26,12 @@ import { renewTimeoutMute } from "./functions/renewTimeoutMute.js";
 import { unmuteUser } from "./functions/unmuteUser.js";
 import { MutesPluginType, zMutesConfig } from "./types.js";
 
-const defaultOptions = {
-  config: {
-    mute_role: null,
-    move_to_voice_channel: null,
-    kick_from_voice_channel: false,
+export const MutesPlugin = guildPlugin<MutesPluginType>()({
+  name: "mutes",
 
-    dm_on_mute: false,
-    dm_on_update: false,
-    message_on_mute: false,
-    message_on_update: false,
-    message_channel: null,
-    mute_message: "You have been muted on the {guildName} server. Reason given: {reason}",
-    timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
-    update_mute_message: "Your mute on the {guildName} server has been updated to {time}.",
-    remove_roles_on_mute: false,
-    restore_roles_on_mute: false,
-
-    can_view_list: false,
-    can_cleanup: false,
-  },
-  overrides: [
+  dependencies: () => [CasesPlugin, LogsPlugin, RoleManagerPlugin],
+  configSchema: zMutesConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -59,14 +45,6 @@ const defaultOptions = {
       },
     },
   ],
-};
-
-export const MutesPlugin = guildPlugin<MutesPluginType>()({
-  name: "mutes",
-
-  dependencies: () => [CasesPlugin, LogsPlugin, RoleManagerPlugin],
-  configParser: (input) => zMutesConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [
@@ -107,6 +85,10 @@ export const MutesPlugin = guildPlugin<MutesPluginType>()({
     state.archives = GuildArchives.getGuildInstance(guild.id);
 
     state.events = new EventEmitter();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

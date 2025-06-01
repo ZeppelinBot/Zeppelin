@@ -12,7 +12,6 @@ import {
   TextChannel,
   ThreadChannel,
 } from "discord.js";
-import { EventEmitter } from "events";
 import { Knub, PluginError, PluginLoadError, PluginNotLoadedError } from "knub";
 import moment from "moment-timezone";
 import { performance } from "perf_hooks";
@@ -22,9 +21,9 @@ import { RecoverablePluginError } from "./RecoverablePluginError.js";
 import { SimpleError } from "./SimpleError.js";
 import { AllowedGuilds } from "./data/AllowedGuilds.js";
 import { Configs } from "./data/Configs.js";
+import { FishFishError, initFishFish } from "./data/FishFish.js";
 import { GuildLogs } from "./data/GuildLogs.js";
 import { LogType } from "./data/LogType.js";
-import { hasPhishermanMasterAPIKey } from "./data/Phisherman.js";
 import { dataSource } from "./data/dataSource.js";
 import { connect } from "./data/db.js";
 import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop.js";
@@ -33,14 +32,13 @@ import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop.js";
 import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop.js";
 import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop.js";
 import { runMemberCacheDeletionLoop } from "./data/loops/memberCacheDeletionLoop.js";
-import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops.js";
 import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop.js";
 import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop.js";
 import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop.js";
 import { consumeQueryStats } from "./data/queryLogger.js";
 import { env } from "./env.js";
 import { logger } from "./logger.js";
-import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins.js";
+import { availableGlobalPlugins, availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { setProfiler } from "./profiler.js";
 import { logRateLimit } from "./rateLimitStats.js";
 import { startUptimeCounter } from "./uptime.js";
@@ -143,6 +141,12 @@ function errorHandler(err) {
     return;
   }
 
+  if (err instanceof FishFishError) {
+    // FishFish errors are not critical, so we just log them
+    console.error(`[FISHFISH] ${err.message}`);
+    return;
+  }
+
   // tslint:disable:no-console
   console.error(err);
 
@@ -166,10 +170,8 @@ function errorHandler(err) {
   // tslint:enable:no-console
 }
 
-if (process.env.NODE_ENV === "production") {
-  process.on("uncaughtException", errorHandler);
-  process.on("unhandledRejection", errorHandler);
-}
+process.on("uncaughtException", errorHandler);
+process.on("unhandledRejection", errorHandler);
 
 // Verify required Node.js version
 const REQUIRED_NODE_VERSION = "16.9.0";
@@ -252,8 +254,8 @@ connect().then(async () => {
       GatewayIntentBits.GuildVoiceStates,
     ],
   });
-  // FIXME: TS doesn't see Client as a child of EventEmitter for some reason
-  (client as unknown as EventEmitter).setMaxListeners(200);
+
+  client.setMaxListeners(200);
 
   const safe429DecayInterval = 5 * SECONDS;
   const safe429MaxCount = 5;
@@ -275,6 +277,10 @@ connect().then(async () => {
   });
 
   client.on("error", (err) => {
+    if (err instanceof PluginLoadError) {
+      errorHandler(err);
+      return;
+    }
     errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
   });
 
@@ -282,8 +288,8 @@ connect().then(async () => {
   const guildConfigs = new Configs();
 
   const bot = new Knub(client, {
-    guildPlugins,
-    globalPlugins,
+    guildPlugins: availableGuildPlugins.map((obj) => obj.plugin),
+    globalPlugins: availableGlobalPlugins.map((obj) => obj.plugin),
 
     options: {
       canLoadGuild(guildId): Promise<boolean> {
@@ -292,7 +298,7 @@ connect().then(async () => {
 
       /**
        * Plugins are enabled if they...
-       * - are base plugins, i.e. always enabled, or
+       * - are marked to be autoloaded, or
        * - are explicitly enabled in the guild config
        * Dependencies are also automatically loaded by Knub.
        */
@@ -302,10 +308,10 @@ connect().then(async () => {
         }
 
         const configuredPlugins = ctx.config.plugins;
-        const basePluginNames = baseGuildPlugins.map((p) => p.name);
+        const autoloadPluginNames = availableGuildPlugins.filter((obj) => obj.autoload).map((obj) => obj.plugin.name);
 
         return Array.from(plugins.keys()).filter((pluginName) => {
-          if (basePluginNames.includes(pluginName)) return true;
+          if (autoloadPluginNames.includes(pluginName)) return true;
           return configuredPlugins[pluginName] && (configuredPlugins[pluginName] as any).enabled !== false;
         });
       },
@@ -323,12 +329,30 @@ connect().then(async () => {
         if (row) {
           try {
             const loaded = loadYamlSafely(row.config);
+
+            if (loaded.success_emoji || loaded.error_emoji) {
+              const deprecatedKeys = [] as string[];
+              const exampleConfig = `plugins:\n  common:\n    config:\n      success_emoji: "👍"\n      error_emoji: "👎"`;
+
+              if (loaded.success_emoji) {
+                deprecatedKeys.push("success_emoji");
+              }
+
+              if (loaded.error_emoji) {
+                deprecatedKeys.push("error_emoji");
+              }
+
+              // logger.warn(`Deprecated config properties found in "${key}": ${deprecatedKeys.join(", ")}`);
+              // logger.warn(`You can now configure those emojis in the "common" plugin config\n${exampleConfig}`);
+            }
+
             // Remove deprecated properties some may still have in their config
             delete loaded.success_emoji;
             delete loaded.error_emoji;
+
             return loaded;
           } catch (err) {
-            logger.error(`Error while loading config "${key}": ${err.message}`);
+            logger.error(`Error while loading config "${key}"`);
             return {};
           }
         }
@@ -385,6 +409,8 @@ connect().then(async () => {
       enableProfiling();
     }
 
+    initFishFish();
+
     runExpiringMutesLoop();
     await sleep(10 * SECONDS);
     runExpiringTempbansLoop();
@@ -402,13 +428,6 @@ connect().then(async () => {
     runExpiredMemberCacheDeletionLoop();
     await sleep(10 * SECONDS);
     runMemberCacheDeletionLoop();
-
-    if (hasPhishermanMasterAPIKey()) {
-      await sleep(10 * SECONDS);
-      runPhishermanCacheCleanupLoop();
-      await sleep(10 * SECONDS);
-      runPhishermanReportingLoop();
-    }
   });
 
   let lowestGlobalRemaining = Infinity;

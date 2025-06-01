@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { isStaffPreFilter } from "../../../pluginUtils.js";
 import { botControlCmd } from "../types.js";
 
 export const LeaveServerCmd = botControlCmd({
@@ -16,7 +16,7 @@ export const LeaveServerCmd = botControlCmd({
 
   async run({ pluginData, message: msg, args }) {
     if (!pluginData.client.guilds.cache.has(args.guildId as Snowflake)) {
-      sendErrorMessage(pluginData, msg.channel, "I am not in that guild");
+      void msg.channel.send("I am not in that guild");
       return;
     }
 
@@ -26,10 +26,10 @@ export const LeaveServerCmd = botControlCmd({
     try {
       await pluginData.client.guilds.cache.get(args.guildId as Snowflake)?.leave();
     } catch (e) {
-      sendErrorMessage(pluginData, msg.channel, `Failed to leave guild: ${e.message}`);
+      void msg.channel.send(`Failed to leave guild: ${e.message}`);
       return;
     }
 
-    sendSuccessMessage(pluginData, msg.channel, `Left guild **${guildName}**`);
+    void msg.channel.send(`Left guild **${guildName}**`);
   },
 });

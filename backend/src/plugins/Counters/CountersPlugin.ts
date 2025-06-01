@@ -1,9 +1,15 @@
 import { EventEmitter } from "events";
-import { PluginOptions, guildPlugin } from "knub";
+import { PluginOverride, guildPlugin } from "knub";
 import { GuildCounters } from "../../data/GuildCounters.js";
-import { CounterTrigger, parseCounterConditionString } from "../../data/entities/CounterTrigger.js";
+import {
+  CounterTrigger,
+  buildCounterConditionString,
+  getReverseCounterComparisonOp,
+  parseCounterConditionString,
+} from "../../data/entities/CounterTrigger.js";
 import { makePublicFn } from "../../pluginUtils.js";
-import { MINUTES, convertDelayStringToMS, values } from "../../utils.js";
+import { MINUTES, convertDelayStringToMS } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { AddCounterCmd } from "./commands/AddCounterCmd.js";
 import { CountersListCmd } from "./commands/CountersListCmd.js";
 import { ResetAllCounterValuesCmd } from "./commands/ResetAllCounterValuesCmd.js";
@@ -22,28 +28,20 @@ import { CountersPluginType, zCountersConfig } from "./types.js";
 
 const DECAY_APPLY_INTERVAL = 5 * MINUTES;
 
-const defaultOptions: PluginOptions<CountersPluginType> = {
-  config: {
-    counters: {},
-    can_view: false,
-    can_edit: false,
-    can_reset_all: false,
+const defaultOverrides: Array<PluginOverride<CountersPluginType>> = [
+  {
+    level: ">=50",
+    config: {
+      can_view: true,
+    },
   },
-  overrides: [
-    {
-      level: ">=50",
-      config: {
-        can_view: true,
-      },
+  {
+    level: ">=100",
+    config: {
+      can_edit: true,
     },
-    {
-      level: ">=100",
-      config: {
-        can_edit: true,
-      },
-    },
-  ],
-};
+  },
+];
 
 /**
  * The Counters plugin keeps track of simple integer values that are tied to a user, channel, both, or neither — "counters".
@@ -58,9 +56,8 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
 export const CountersPlugin = guildPlugin<CountersPluginType>()({
   name: "counters",
 
-  defaultOptions,
-  // TODO: Separate input and output types
-  configParser: (input) => zCountersConfig.parse(input),
+  configSchema: zCountersConfig,
+  defaultOverrides,
 
   public(pluginData) {
     return {
@@ -88,7 +85,7 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
     const { state, guild } = pluginData;
 
     state.counters = new GuildCounters(guild.id);
-    state.events = new EventEmitter();
+    state.events = new EventEmitter() as any;
     state.counterTriggersByCounterId = new Map();
 
     const activeTriggerIds: number[] = [];
@@ -96,20 +93,23 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
     // Initialize and store the IDs of each of the counters internally
     state.counterIds = {};
     const config = pluginData.config.get();
-    for (const counter of Object.values(config.counters)) {
-      const dbCounter = await state.counters.findOrCreateCounter(counter.name, counter.per_channel, counter.per_user);
-      state.counterIds[counter.name] = dbCounter.id;
+    for (const [counterName, counter] of Object.entries(config.counters)) {
+      const dbCounter = await state.counters.findOrCreateCounter(counterName, counter.per_channel, counter.per_user);
+      state.counterIds[counterName] = dbCounter.id;
 
       const thisCounterTriggers: CounterTrigger[] = [];
       state.counterTriggersByCounterId.set(dbCounter.id, thisCounterTriggers);
 
       // Initialize triggers
-      for (const trigger of values(counter.triggers)) {
+      for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
         const parsedCondition = parseCounterConditionString(trigger.condition)!;
-        const parsedReverseCondition = parseCounterConditionString(trigger.reverse_condition)!;
+        const rawReverseCondition =
+          trigger.reverse_condition ||
+          buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
+        const parsedReverseCondition = parseCounterConditionString(rawReverseCondition)!;
         const counterTrigger = await state.counters.initCounterTrigger(
           dbCounter.id,
-          trigger.name,
+          triggerName,
           parsedCondition[0],
           parsedCondition[1],
           parsedReverseCondition[0],
@@ -125,6 +125,10 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
 
     // Mark old/unused triggers to be deleted later
     await state.counters.markUnusedTriggersToBeDeleted(activeTriggerIds);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   async afterLoad(pluginData) {
@@ -162,6 +166,6 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
       }
     }
 
-    state.events.removeAllListeners();
+    (state.events as any).removeAllListeners();
   },
 });

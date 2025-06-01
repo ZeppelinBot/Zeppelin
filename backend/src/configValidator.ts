@@ -1,13 +1,12 @@
-import { ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
-import moment from "moment-timezone";
-import { ZodError } from "zod";
-import { guildPlugins } from "./plugins/availablePlugins.js";
-import { ZeppelinGuildConfig, zZeppelinGuildConfig } from "./types.js";
+import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
+import { z, ZodError } from "zod/v4";
+import { availableGuildPlugins } from "./plugins/availablePlugins.js";
+import { zZeppelinGuildConfig } from "./types.js";
 import { formatZodIssue } from "./utils/formatZodIssue.js";
 
 const pluginNameToPlugin = new Map<string, GuildPluginBlueprint<any, any>>();
-for (const plugin of guildPlugins) {
-  pluginNameToPlugin.set(plugin.name, plugin);
+for (const pluginInfo of availableGuildPlugins) {
+  pluginNameToPlugin.set(pluginInfo.plugin.name, pluginInfo.plugin);
 }
 
 export async function validateGuildConfig(config: any): Promise<string | null> {
@@ -16,14 +15,7 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
     return validationResult.error.issues.map(formatZodIssue).join("\n");
   }
 
-  const guildConfig = config as ZeppelinGuildConfig;
-
-  if (guildConfig.timezone) {
-    const validTimezones = moment.tz.names();
-    if (!validTimezones.includes(guildConfig.timezone)) {
-      return `Invalid timezone: ${guildConfig.timezone}`;
-    }
-  }
+  const guildConfig = config as BaseConfig;
 
   if (guildConfig.plugins) {
     for (const [pluginName, pluginOptions] of Object.entries(guildConfig.plugins)) {
@@ -36,15 +28,21 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
       }
 
       const plugin = pluginNameToPlugin.get(pluginName)!;
-      const configManager = new PluginConfigManager(plugin.defaultOptions || { config: {} }, pluginOptions, {
-        levels: {},
-        parser: plugin.configParser,
-      });
+      const configManager = new PluginConfigManager(
+        pluginOptions,
+        {
+          configSchema: plugin.configSchema,
+          defaultOverrides: plugin.defaultOverrides ?? [],
+          levels: {},
+          customOverrideCriteriaFunctions: plugin.customOverrideCriteriaFunctions,
+        },
+      );
+
       try {
         await configManager.init();
       } catch (err) {
         if (err instanceof ZodError) {
-          return `${pluginName}: ${err.issues.map(formatZodIssue).join("\n")}`;
+          return `${pluginName}:\n${z.prettifyError(err)}`;
         }
         if (err instanceof ConfigValidationError) {
           return `${pluginName}: ${err.message}`;

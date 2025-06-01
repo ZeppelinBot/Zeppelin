@@ -1,19 +1,20 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
-import z from "zod";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
+import z from "zod/v4";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes.js";
 import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zSlowmodeConfig = z.strictObject({
-  use_native_slowmode: z.boolean(),
+  use_native_slowmode: z.boolean().default(true),
 
-  can_manage: z.boolean(),
-  is_affected: z.boolean(),
+  can_manage: z.boolean().default(false),
+  is_affected: z.boolean().default(true),
 });
 
 export interface SlowmodePluginType extends BasePluginType {
-  config: z.infer<typeof zSlowmodeConfig>;
+  configSchema: typeof zSlowmodeConfig;
   state: {
     slowmodes: GuildSlowmodes;
     savedMessages: GuildSavedMessages;
@@ -21,6 +22,7 @@ export interface SlowmodePluginType extends BasePluginType {
     clearInterval: NodeJS.Timeout;
     serverLogs: GuildLogs;
     channelSlowmodeCache: Map<string, SlowmodeChannel | null>;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
 
     onMessageCreateFn;
   };

@@ -4,18 +4,11 @@ import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { VoiceStateUpdateEvt } from "./events/VoiceStateUpdateEvt.js";
 import { CompanionChannelsPluginType, zCompanionChannelsConfig } from "./types.js";
 
-const defaultOptions = {
-  config: {
-    entries: {},
-  },
-};
-
 export const CompanionChannelsPlugin = guildPlugin<CompanionChannelsPluginType>()({
   name: "companion_channels",
 
   dependencies: () => [LogsPlugin],
-  configParser: (input) => zCompanionChannelsConfig.parse(input),
-  defaultOptions,
+  configSchema: zCompanionChannelsConfig,
 
   events: [VoiceStateUpdateEvt],
 

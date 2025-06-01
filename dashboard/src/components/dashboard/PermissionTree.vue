@@ -31,7 +31,7 @@
 </style>
 
 <script lang="ts">
-  import { ApiPermissions, permissionNames } from "@zeppelinbot/shared";
+  import { ApiPermissions, permissionNames } from "@zeppelinbot/shared/apiPermissions.js";
   import { PropType } from "vue";
   import { TPermissionHierarchyWithState } from "./permissionTreeUtils";
 

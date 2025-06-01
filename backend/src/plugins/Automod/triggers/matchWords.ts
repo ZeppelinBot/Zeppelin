@@ -1,5 +1,5 @@
 import escapeStringRegexp from "escape-string-regexp";
-import z from "zod";
+import z from "zod/v4";
 import { normalizeText } from "../../../utils/normalizeText.js";
 import { stripMarkdown } from "../../../utils/stripMarkdown.js";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
@@ -19,7 +19,7 @@ const configSchema = z.strictObject({
   only_full_words: z.boolean().default(true),
   normalize: z.boolean().default(false),
   loose_matching: z.boolean().default(false),
-  loose_matching_threshold: z.number().int().default(4),
+  loose_matching_threshold: z.number().int().default(1),
   strip_markdown: z.boolean().default(false),
   match_messages: z.boolean().default(true),
   match_embeds: z.boolean().default(false),

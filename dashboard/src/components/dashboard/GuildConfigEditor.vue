@@ -5,7 +5,7 @@
   <div v-else>
     <div v-if="errors.length" class="bg-gray-800 py-2 px-3 rounded shadow-md mb-4">
       <div class="font-semibold">Errors:</div>
-      <div v-for="error in errors">{{ error }}</div>
+      <pre v-for="error in errors">{{ error }}</pre>
     </div>
 
     <div class="flex items-center flex-wrap">
@@ -19,13 +19,20 @@
       </div>
     </div>
 
-    <AceEditor class="rounded shadow-lg border border-gray-700 mt-4"
-               v-model="editableConfig"
+    <v-ace-editor class="rounded shadow-lg border border-gray-700 mt-4"
+               v-model:value="editableConfig"
                @init="editorInit"
                lang="yaml"
                theme="tomorrow_night"
-               :height="editorHeight"
-               ref="aceEditor" />
+               ref="aceEditor"
+               v-options="{
+                  useSoftTabs: true,
+                  tabSize: 2
+                }"
+                :style="{
+                  width: editorWidth + 'px',
+                  height: editorHeight + 'px',
+                }" />
   </div>
 </template>
 
@@ -34,14 +41,19 @@
   import {ApiError} from "../../api";
   import { GuildState } from "../../store/types";
 
-  import AceEditor from "vue2-ace-editor";
+  import { VAceEditor } from "vue3-ace-editor";
+
+  import "ace-builds/src-noconflict/ext-language_tools";
+  import 'ace-builds/src-noconflict/ext-searchbox';
+  import "ace-builds/src-noconflict/mode-yaml";
+  import "ace-builds/src-noconflict/theme-tomorrow_night";
 
   let editorKeybindListener;
   let windowResizeListener;
 
   export default {
     components: {
-      AceEditor,
+      VAceEditor,
     },
     async mounted() {
       try {
@@ -101,16 +113,6 @@
     },
     methods: {
       editorInit() {
-        require("brace/ext/language_tools");
-        require('brace/ext/searchbox');
-        require("brace/mode/yaml");
-        require("brace/theme/tomorrow_night");
-
-        this.$refs.aceEditor.editor.setOptions({
-          useSoftTabs: true,
-          tabSize: 2
-        });
-
         // Add Ctrl+S/Cmd+S save shortcut
         const isMac = /mac/i.test(navigator.platform);
         const modKeyPressed = (ev: KeyboardEvent) => (isMac ? ev.metaKey : ev.ctrlKey);
@@ -131,7 +133,7 @@
 
           if (shortcutModifierPressed(ev) && ev.key === "f") {
             ev.preventDefault();
-            this.$refs.aceEditor.editor.execCommand("find");
+            this.$refs.aceEditor.getAceInstance().execCommand("find");
             return;
           }
         };
@@ -171,7 +173,7 @@
         this.editorHeight = newHeight;
 
         this.$nextTick(() => {
-          this.$refs.aceEditor.editor.resize();
+          this.$refs.aceEditor.getAceInstance().resize();
         });
       },
       async save() {

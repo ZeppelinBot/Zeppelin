@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import { getInviteCodesInString, GuildInvite, isGuildInvite, resolveInvite, zSnowflake } from "../../../utils.js";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage.js";

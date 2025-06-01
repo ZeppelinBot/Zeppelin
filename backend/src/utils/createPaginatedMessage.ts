@@ -1,19 +1,10 @@
-import {
-  Client,
-  Message,
-  MessageCreateOptions,
-  MessageEditOptions,
-  MessageReaction,
-  PartialMessageReaction,
-  PartialUser,
-  TextBasedChannel,
-  User,
-} from "discord.js";
+import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
+import { ContextResponseOptions, fetchContextChannel, GenericCommandSource } from "../pluginUtils.js";
 import { MINUTES, noop } from "../utils.js";
 import { Awaitable } from "./typeUtils.js";
 import Timeout = NodeJS.Timeout;
 
-export type LoadPageFn = (page: number) => Awaitable<MessageCreateOptions & MessageEditOptions>;
+export type LoadPageFn = (page: number) => Awaitable<ContextResponseOptions>;
 
 export interface PaginateMessageOpts {
   timeout: number;
@@ -27,12 +18,17 @@ const defaultOpts: PaginateMessageOpts = {
 
 export async function createPaginatedMessage(
   client: Client,
-  channel: TextBasedChannel | User,
+  context: GenericCommandSource,
   totalPages: number,
   loadPageFn: LoadPageFn,
   opts: Partial<PaginateMessageOpts> = {},
 ): Promise<Message> {
   const fullOpts = { ...defaultOpts, ...opts } as PaginateMessageOpts;
+  const channel = await fetchContextChannel(context);
+  if (!channel.isSendable()) {
+    throw new Error("Context channel is not sendable");
+  }
+
   const firstPageContent = await loadPageFn(1);
   const message = await channel.send(firstPageContent);
 

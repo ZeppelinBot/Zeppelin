@@ -1,12 +1,12 @@
 import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
-import z from "zod";
+import z from "zod/v4";
 import { convertDelayStringToMS, isDiscordAPIError, zDelayString, zSnowflake } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { automodAction } from "../helpers.js";
 
 export const SetSlowmodeAction = automodAction({
   configSchema: z.strictObject({
-    channels: z.array(zSnowflake),
+    channels: z.array(zSnowflake).nullable().default([]),
     duration: zDelayString.nullable().default("10s"),
   }),
 

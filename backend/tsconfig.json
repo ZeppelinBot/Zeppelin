@@ -5,7 +5,8 @@
     "module": "NodeNext",
     "baseUrl": "./src",
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "composite": true
   },
   "include": ["src/**/*.ts", "src/**/*.json"],
   "references": [

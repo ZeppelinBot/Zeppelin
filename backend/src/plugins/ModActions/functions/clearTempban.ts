@@ -1,16 +1,15 @@
 import { Snowflake } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { LogType } from "../../../data/LogType.js";
 import { Tempban } from "../../../data/entities/Tempban.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { logger } from "../../../logger.js";
 import { resolveUser } from "../../../utils.js";
 import { CasesPlugin } from "../../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { IgnoredEventType, ModActionsPluginType } from "../types.js";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments.js";
 import { ignoreEvent } from "./ignoreEvent.js";
 import { isBanned } from "./isBanned.js";
 
@@ -21,11 +20,9 @@ export async function clearTempban(pluginData: GuildPluginData<ModActionsPluginT
   }
 
   pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, tempban.user_id);
-  const reason = formatReasonWithAttachments(
-    `Tempban timed out.
-    Tempbanned at: \`${tempban.created_at} UTC\``,
-    [],
-  );
+  const reason = `Tempban timed out.
+    Tempbanned at: \`${tempban.created_at} UTC\``;
+
   try {
     ignoreEvent(pluginData, IgnoredEventType.Unban, tempban.user_id);
     await pluginData.guild.bans.remove(tempban.user_id as Snowflake, reason ?? undefined);

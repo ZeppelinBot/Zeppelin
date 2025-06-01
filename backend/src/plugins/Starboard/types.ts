@@ -1,9 +1,10 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
-import z from "zod";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
+import z from "zod/v4";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages.js";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions.js";
 import { zBoundedRecord, zSnowflake } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 const zStarboardOpts = z.strictObject({
   channel_id: zSnowflake,
@@ -18,17 +19,17 @@ const zStarboardOpts = z.strictObject({
 export type TStarboardOpts = z.infer<typeof zStarboardOpts>;
 
 export const zStarboardConfig = z.strictObject({
-  boards: zBoundedRecord(z.record(z.string(), zStarboardOpts), 0, 100),
-  can_migrate: z.boolean(),
+  boards: zBoundedRecord(z.record(z.string(), zStarboardOpts), 0, 100).default({}),
+  can_migrate: z.boolean().default(false),
 });
 
 export interface StarboardPluginType extends BasePluginType {
-  config: z.infer<typeof zStarboardConfig>;
-
+  configSchema: typeof zStarboardConfig;
   state: {
     savedMessages: GuildSavedMessages;
     starboardMessages: GuildStarboardMessages;
     starboardReactions: GuildStarboardReactions;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
 
     onMessageDeleteFn;
   };

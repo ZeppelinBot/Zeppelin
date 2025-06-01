@@ -1,6 +1,7 @@
 import {
   APIEmbed,
   ChannelType,
+  ChatInputCommandInteraction,
   Client,
   DiscordAPIError,
   EmbedData,
@@ -14,13 +15,17 @@ import {
   GuildTextBasedChannel,
   Invite,
   InviteGuild,
+  InviteType,
   LimitedCollection,
   Message,
   MessageCreateOptions,
   MessageMentionOptions,
   PartialChannelData,
+  PartialGroupDMChannel,
   PartialMessage,
+  PartialUser,
   RoleResolvable,
+  SendableChannels,
   Sticker,
   TextBasedChannel,
   User,
@@ -28,37 +33,31 @@ import {
 import emojiRegex from "emoji-regex";
 import fs from "fs";
 import https from "https";
-import humanizeDuration from "humanize-duration";
 import isEqual from "lodash/isEqual.js";
 import { performance } from "perf_hooks";
-import tlds from "tlds" assert { type: "json" };
+import tlds from "tlds" with { type: "json" };
 import tmp from "tmp";
 import { URL } from "url";
-import { z, ZodEffects, ZodError, ZodRecord, ZodString } from "zod";
+import { z, ZodError, ZodPipe, ZodRecord, ZodString, ZodTransform } from "zod/v4";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage.js";
+import { delayStringMultipliers, humanizeDuration } from "./humanizeDuration.js";
 import { getProfiler } from "./profiler.js";
 import { SimpleCache } from "./SimpleCache.js";
 import { sendDM } from "./utils/sendDM.js";
 import { Brand } from "./utils/typeUtils.js";
 import { waitForButtonConfirm } from "./utils/waitForInteraction.js";
+import { GenericCommandSource } from "./pluginUtils.js";
 
 const fsp = fs.promises;
-
-const delayStringMultipliers = {
-  w: 1000 * 60 * 60 * 24 * 7,
-  d: 1000 * 60 * 60 * 24,
-  h: 1000 * 60 * 60,
-  m: 1000 * 60,
-  s: 1000,
-  x: 1,
-};
 
 export const MS = 1;
 export const SECONDS = 1000 * MS;
 export const MINUTES = 60 * SECONDS;
 export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
-export const WEEKS = 7 * 24 * HOURS;
+export const WEEKS = 7 * DAYS;
+export const YEARS = (365 + 1 / 4 - 1 / 100 + 1 / 400) * DAYS;
+export const MONTHS = YEARS / 12;
 
 export const EMPTY_CHAR = "\u200b";
 
@@ -89,7 +88,7 @@ export function isDiscordAPIError(err: Error | string): err is DiscordAPIError {
 // null | undefined -> undefined
 export function zNullishToUndefined<T extends z.ZodTypeAny>(
   type: T,
-): ZodEffects<T, NonNullable<z.output<T>> | undefined> {
+): ZodPipe<T, ZodTransform<NonNullable<z.output<T>> | undefined>> {
   return type.transform((v) => v ?? undefined);
 }
 
@@ -148,8 +147,7 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
 
 export type GuildInvite = Invite & { guild: InviteGuild | Guild };
 export type GroupDMInvite = Invite & {
-  channel: PartialChannelData;
-  type: typeof ChannelType.GroupDM;
+  channel: PartialGroupDMChannel;
 };
 
 export function zBoundedCharacters(min: number, max: number) {
@@ -186,23 +184,20 @@ export function inputPatternToRegExp(pattern: string) {
 }
 
 export function zRegex<T extends ZodString>(zStr: T) {
-  return zStr.transform((str, ctx) => {
+  return zStr.refine((str) => {
     try {
-      return inputPatternToRegExp(str);
+      inputPatternToRegExp(str);
+      return true;
     } catch (err) {
       if (err instanceof InvalidRegexError) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Invalid regex",
-        });
-        return z.NEVER;
+        return false;
       }
       throw err;
     }
   });
 }
 
-export const zEmbedInput = z.object({
+export const zEmbedInput = z.strictObject({
   title: z.string().optional(),
   description: z.string().optional(),
   url: z.string().optional(),
@@ -267,14 +262,28 @@ export const zEmbedInput = z.object({
       }),
     )
     .nullable(),
+}).meta({
+  id: "embedInput",
 });
 
 export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEmbed>, T>;
 
-export const zStrictMessageContent = z.object({
+export const zStrictMessageContent = z.strictObject({
   content: z.string().optional(),
   tts: z.boolean().optional(),
-  embeds: z.array(zEmbedInput).optional(),
+  embeds: z.union([z.array(zEmbedInput), zEmbedInput]).optional(),
+  embed: zEmbedInput.optional(),
+}).transform((data) => {
+  if (data.embed) {
+    data.embeds = [data.embed];
+    delete data.embed;
+  }
+  if (data.embeds && !Array.isArray(data.embeds)) {
+    data.embeds = [data.embeds];
+  }
+  return data as StrictMessageContent;
+}).meta({
+  id: "strictMessageContent",
 });
 
 export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
@@ -289,7 +298,7 @@ export type MessageContent = string | StrictMessageContent;
 export const zMessageContent = z.union([
   zBoundedCharacters(0, 4000),
   zStrictMessageContent,
-]) as z.ZodType<MessageContent>;
+]);
 
 export function validateAndParseMessageContent(input: unknown): StrictMessageContent {
   if (input == null) {
@@ -380,7 +389,7 @@ export function zBoundedRecord<TRecord extends ZodRecord<any, any>>(
   record: TRecord,
   minKeys: number,
   maxKeys: number,
-): ZodEffects<TRecord> {
+): TRecord {
   return record.refine(
     (data) => {
       const len = Object.keys(data).length;
@@ -407,7 +416,7 @@ const MAX_DELAY_STRING_AMOUNT = 100 * 365 * DAYS;
  * Turns a "delay string" such as "1h30m" to milliseconds
  */
 export function convertDelayStringToMS(str, defaultUnit = "m"): number | null {
-  const regex = /^([0-9]+)\s*([wdhms])?[a-z]*\s*/;
+  const regex = /^([0-9]+)\s*((?:mo?)|[ywdhs])?[a-z]*\s*/;
   let match;
   let ms = 0;
 
@@ -838,7 +847,7 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: TextBasedChannel | User,
+  channel: SendableChannels | User,
   messageText: string,
   allowedMentions?: MessageMentionOptions,
 ) {
@@ -1305,11 +1314,11 @@ export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Stic
 }
 
 export async function confirm(
-  channel: GuildTextBasedChannel,
+  context: GenericCommandSource,
   userId: string,
   content: MessageCreateOptions,
 ): Promise<boolean> {
-  return waitForButtonConfirm(channel, content, { restrictToId: userId });
+  return waitForButtonConfirm(context, content, { restrictToId: userId });
 }
 
 export function messageSummary(msg: SavedMessage) {
@@ -1478,11 +1487,11 @@ export function isFullMessage(msg: Message | PartialMessage): msg is Message {
 }
 
 export function isGuildInvite(invite: Invite): invite is GuildInvite {
-  return invite.guild != null;
+  return invite.type === InviteType.Guild;
 }
 
 export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
-  return invite.guild == null && invite.channel?.type === ChannelType.GroupDM;
+  return invite.type === InviteType.GroupDM;
 }
 
 export function inviteHasCounts(invite: Invite): invite is Invite {

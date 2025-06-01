@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import z from "zod";
+import z from "zod/v4";
 import { verboseChannelMention } from "../../../utils.js";
 import { automodTrigger } from "../helpers.js";
 

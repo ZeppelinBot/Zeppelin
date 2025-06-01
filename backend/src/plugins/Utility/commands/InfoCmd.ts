@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
 import { getChannelId, getRoleId } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage } from "../../../pluginUtils.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 import { isValidSnowflake, noop, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils.js";
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { resolveMessageTarget } from "../../../utils/resolveMessageTarget.js";
@@ -78,7 +78,8 @@ export const InfoCmd = utilityCmd({
     if (userCfg.can_messageinfo) {
       const messageTarget = await resolveMessageTarget(pluginData, value);
       if (messageTarget) {
-        if (canReadChannel(messageTarget.channel, message.member)) {
+        const authorMember = await resolveMessageMember(message);
+        if (canReadChannel(messageTarget.channel, authorMember)) {
           const embed = await getMessageInfoEmbed(pluginData, messageTarget.channel.id, messageTarget.messageId);
           if (embed) {
             message.channel.send({ embeds: [embed] });
@@ -146,9 +147,8 @@ export const InfoCmd = utilityCmd({
     }
 
     // 10. No can do
-    sendErrorMessage(
-      pluginData,
-      message.channel,
+    void pluginData.state.common.sendErrorMessage(
+      message,
       "Could not find anything with that value or you are lacking permission for the snowflake type",
     );
   },

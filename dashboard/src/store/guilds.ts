@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { Module } from "vuex";
 import { get, post } from "../api";
 import { GuildState, LoadStatus, RootState } from "./types";
@@ -89,22 +88,18 @@ export const GuildStore: Module<GuildState, RootState> = {
     },
 
     setConfig(state: GuildState, { guildId, config }) {
-      Vue.set(state.configs, guildId, config);
+      state.configs[guildId] = config;
     },
 
     setGuildPermissionAssignments(state: GuildState, { guildId, permissionAssignments }) {
       if (!state.guildPermissionAssignments) {
-        Vue.set(state, "guildPermissionAssignments", {});
+        state.guildPermissionAssignments = {};
       }
 
-      Vue.set(
-        state.guildPermissionAssignments,
-        guildId,
-        permissionAssignments.map((p) => ({
-          ...p,
-          permissions: new Set(p.permissions),
-        })),
-      );
+      state.guildPermissionAssignments[guildId] = permissionAssignments.map((p) => ({
+        ...p,
+        permissions: new Set(p.permissions),
+      }));
     },
 
     setTargetPermissions(state: GuildState, { guildId, targetId, type, permissions, expiresAt }) {

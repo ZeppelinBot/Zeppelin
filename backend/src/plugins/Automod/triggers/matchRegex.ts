@@ -1,6 +1,6 @@
-import z from "zod";
+import z from "zod/v4";
 import { allowTimeout } from "../../../RegExpRunner.js";
-import { zRegex } from "../../../utils.js";
+import { inputPatternToRegExp, zRegex } from "../../../utils.js";
 import { mergeRegexes } from "../../../utils/mergeRegexes.js";
 import { normalizeText } from "../../../utils/normalizeText.js";
 import { stripMarkdown } from "../../../utils/stripMarkdown.js";
@@ -38,7 +38,7 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
 
     if (!regexCache.has(trigger)) {
       const flags = trigger.case_sensitive ? "" : "i";
-      const toCache = mergeRegexes(trigger.patterns, flags);
+      const toCache = mergeRegexes(trigger.patterns.map(pattern => inputPatternToRegExp(pattern)), flags);
       regexCache.set(trigger, toCache);
     }
     const regexes = regexCache.get(trigger)!;

@@ -8,6 +8,7 @@ import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners.js";
 import { MINUTES, SECONDS } from "../../utils.js";
 import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap.js";
 import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { CountersPlugin } from "../Counters/CountersPlugin.js";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
@@ -33,29 +34,6 @@ import { clearOldRecentActions } from "./functions/clearOldRecentActions.js";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam.js";
 import { AutomodPluginType, zAutomodConfig } from "./types.js";
 
-const defaultOptions = {
-  config: {
-    rules: {},
-    antiraid_levels: ["low", "medium", "high"],
-    can_set_antiraid: false,
-    can_view_antiraid: false,
-  },
-  overrides: [
-    {
-      level: ">=50",
-      config: {
-        can_view_antiraid: true,
-      },
-    },
-    {
-      level: ">=100",
-      config: {
-        can_set_antiraid: true,
-      },
-    },
-  ],
-};
-
 export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
   name: "automod",
 
@@ -70,8 +48,7 @@ export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
     RoleManagerPlugin,
   ],
 
-  defaultOptions,
-  configParser: (input) => zAutomodConfig.parse(input),
+  configSchema: zAutomodConfig,
 
   customOverrideCriteriaFunctions: {
     antiraid_level: (pluginData, matchParams, value) => {
@@ -115,6 +92,10 @@ export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
     state.archives = GuildArchives.getGuildInstance(guild.id);
 
     state.cachedAntiraidLevel = await state.antiraidLevels.get();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   async afterLoad(pluginData) {

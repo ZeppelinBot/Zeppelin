@@ -1,5 +1,4 @@
 import { guildPlugin } from "knub";
-import z from "zod";
 import { GuildMemberCache } from "../../data/GuildMemberCache.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { SECONDS } from "../../utils.js";
@@ -10,14 +9,14 @@ import { updateMemberCacheOnMessage } from "./events/updateMemberCacheOnMessage.
 import { updateMemberCacheOnRoleChange } from "./events/updateMemberCacheOnRoleChange.js";
 import { updateMemberCacheOnVoiceStateUpdate } from "./events/updateMemberCacheOnVoiceStateUpdate.js";
 import { getCachedMemberData } from "./functions/getCachedMemberData.js";
-import { GuildMemberCachePluginType } from "./types.js";
+import { GuildMemberCachePluginType, zGuildMemberCacheConfig } from "./types.js";
 
 const PENDING_SAVE_INTERVAL = 30 * SECONDS;
 
 export const GuildMemberCachePlugin = guildPlugin<GuildMemberCachePluginType>()({
   name: "guild_member_cache",
 
-  configParser: (input) => z.strictObject({}).parse(input),
+  configSchema: zGuildMemberCacheConfig,
 
   events: [
     updateMemberCacheOnMemberUpdate,

@@ -1,6 +1,6 @@
 import { escapeBold } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { canActOn, sendSuccessMessage } from "../../../pluginUtils.js";
+import { canActOn, resolveMessageMember } from "../../../pluginUtils.js";
 import { errorMessage } from "../../../utils.js";
 import { utilityCmd } from "../types.js";
 
@@ -25,7 +25,8 @@ export const NicknameCmd = utilityCmd({
       return;
     }
 
-    if (msg.member.id !== args.member.id && !canActOn(pluginData, msg.member, args.member)) {
+    const authorMember = await resolveMessageMember(msg);
+    if (msg.author.id !== args.member.id && !canActOn(pluginData, authorMember, args.member)) {
       msg.channel.send(errorMessage("Cannot change nickname: insufficient permissions"));
       return;
     }
@@ -45,9 +46,8 @@ export const NicknameCmd = utilityCmd({
       return;
     }
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
       `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
     );
   },

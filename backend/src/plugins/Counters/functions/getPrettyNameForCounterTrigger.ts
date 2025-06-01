@@ -13,5 +13,5 @@ export function getPrettyNameForCounterTrigger(
   }
 
   const trigger = counter.triggers[triggerName];
-  return trigger ? trigger.pretty_name || trigger.name : "Unknown Counter Trigger";
+  return trigger ? trigger.pretty_name || triggerName : "Unknown Counter Trigger";
 }

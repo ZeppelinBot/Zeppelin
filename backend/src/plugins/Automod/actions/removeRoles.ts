@@ -1,5 +1,5 @@
 import { PermissionFlagsBits, Snowflake } from "discord.js";
-import z from "zod";
+import z from "zod/v4";
 import { nonNullish, unique, zSnowflake } from "../../../utils.js";
 import { canAssignRole } from "../../../utils/canAssignRole.js";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions.js";

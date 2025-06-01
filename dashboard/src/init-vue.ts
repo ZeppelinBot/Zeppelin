@@ -1,10 +1,8 @@
 import "./style/app.pcss";
 
-import Vue from "vue";
+import { createApp } from "vue";
 
-import VueHighlightJS from "@highlightjs/vue-plugin";
-import hljs from "highlight.js/lib/core";
-import hljsYaml from "highlight.js/lib/languages/yaml.js";
+import VueHighlightJS from "vue3-highlightjs";
 import "highlight.js/styles/base16/ocean.css";
 
 import { router } from "./routes";
@@ -13,9 +11,15 @@ import { RootStore } from "./store";
 import "./directives/trim-indents";
 
 import App from "./components/App.vue";
+import { trimIndents } from "./directives/trim-indents";
+
+const app = createApp(App);
+
+app.use(router);
+app.use(RootStore);
 
 // Set up a read-only global variable to access specific env vars
-Vue.mixin({
+app.mixin({
   data() {
     return {
       get env() {
@@ -27,14 +31,8 @@ Vue.mixin({
   },
 });
 
-hljs.registerLanguage("yaml", hljsYaml);
-Vue.use(VueHighlightJS, { hljs });
+app.use(VueHighlightJS);
 
-const app = new Vue({
-  router,
-  store: RootStore,
-  el: "#app",
-  render(h) {
-    return h(App);
-  },
-});
+app.directive("trim-indents", trimIndents);
+
+app.mount("#app");

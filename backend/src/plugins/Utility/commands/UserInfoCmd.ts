@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage } from "../../../pluginUtils.js";
 import { getUserInfoEmbed } from "../functions/getUserInfoEmbed.js";
 import { utilityCmd } from "../types.js";
 
@@ -19,7 +18,7 @@ export const UserInfoCmd = utilityCmd({
     const userId = args.user?.id || message.author.id;
     const embed = await getUserInfoEmbed(pluginData, userId, args.compact);
     if (!embed) {
-      sendErrorMessage(pluginData, message.channel, "User not found");
+      void pluginData.state.common.sendErrorMessage(message, "User not found");
       return;
     }
 

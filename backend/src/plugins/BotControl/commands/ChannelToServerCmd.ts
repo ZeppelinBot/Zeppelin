@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { isStaffPreFilter, sendErrorMessage } from "../../../pluginUtils.js";
+import { isStaffPreFilter } from "../../../pluginUtils.js";
 import { botControlCmd } from "../types.js";
 
 export const ChannelToServerCmd = botControlCmd({
@@ -16,7 +16,7 @@ export const ChannelToServerCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const channel = pluginData.client.channels.cache.get(args.channelId);
     if (!channel) {
-      sendErrorMessage(pluginData, msg.channel, "Channel not found in cache!");
+      void msg.channel.send("Channel not found in cache!");
       return;
     }
 

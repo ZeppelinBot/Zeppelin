@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import { zBoundedCharacters } from "../../../utils.js";
 import { CountersPlugin } from "../../Counters/CountersPlugin.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";

@@ -1,6 +1,6 @@
 import { GuildMember, GuildTextBasedChannel, PartialGuildMember, ThreadChannel, User } from "discord.js";
-import { BasePluginType, CooldownManager } from "knub";
-import z from "zod";
+import { BasePluginType, CooldownManager, pluginUtils } from "knub";
+import z from "zod/v4";
 import { Queue } from "../../Queue.js";
 import { RegExpRunner } from "../../RegExpRunner.js";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels.js";
@@ -9,6 +9,7 @@ import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { SavedMessage } from "../../data/entities/SavedMessage.js";
 import { entries, zBoundedRecord, zDelayString } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { CounterEvents } from "../Counters/types.js";
 import { ModActionType, ModActionsEvents } from "../ModActions/types.js";
 import { MutesEvents } from "../Mutes/types.js";
@@ -45,22 +46,6 @@ const zActionsMap = z
 
 const zRule = z.strictObject({
   enabled: z.boolean().default(true),
-  // Typed as "never" because you are not expected to supply this directly.
-  // The transform instead picks it up from the property key and the output type is a string.
-  name: z
-    .never()
-    .optional()
-    .transform((_, ctx) => {
-      const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
-      if (!ruleName) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Automod rules must have names",
-        });
-        return z.NEVER;
-      }
-      return ruleName;
-    }),
   pretty_name: z.string().optional(),
   presets: z.array(z.string().max(100)).max(25).default([]),
   affects_bots: z.boolean().default(false),
@@ -68,21 +53,19 @@ const zRule = z.strictObject({
   cooldown: zDelayString.nullable().default(null),
   allow_further_rules: z.boolean().default(false),
   triggers: z.array(zTriggersMap),
-  actions: zActionsMap.refine((v) => !(v.clean && v.start_thread), {
-    message: "Cannot have both clean and start_thread active at the same time",
-  }),
+  actions: zActionsMap,
 });
 export type TRule = z.infer<typeof zRule>;
 
 export const zAutomodConfig = z.strictObject({
-  rules: zBoundedRecord(z.record(z.string().max(100), zRule), 0, 255),
-  antiraid_levels: z.array(z.string().max(100)).max(10),
-  can_set_antiraid: z.boolean(),
-  can_view_antiraid: z.boolean(),
+  rules: zBoundedRecord(z.record(z.string().max(100), zRule), 0, 255).default({}),
+  antiraid_levels: z.array(z.string().max(100)).max(10).default(["low", "medium", "high"]),
+  can_set_antiraid: z.boolean().default(false),
+  can_view_antiraid: z.boolean().default(false),
 });
 
 export interface AutomodPluginType extends BasePluginType {
-  config: z.output<typeof zAutomodConfig>;
+  configSchema: typeof zAutomodConfig;
 
   customOverrideCriteria: {
     antiraid_level?: string;
@@ -140,6 +123,8 @@ export interface AutomodPluginType extends BasePluginType {
 
     modActionsListeners: Map<keyof ModActionsEvents, any>;
     mutesListeners: Map<keyof MutesEvents, any>;
+
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

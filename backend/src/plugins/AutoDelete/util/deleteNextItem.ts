@@ -1,4 +1,4 @@
-import { ChannelType, PermissionsBitField, Snowflake } from "discord.js";
+import { PermissionsBitField, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType.js";
@@ -17,8 +17,8 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
   scheduleNextDeletion(pluginData);
 
   const channel = pluginData.guild.channels.cache.get(itemToDelete.message.channel_id as Snowflake);
-  if (!channel || channel.type === ChannelType.GuildCategory) {
-    // Channel was deleted, ignore
+  if (!channel || !("messages" in channel)) {
+    // Channel does not exist or does not support messages, ignore
     return;
   }
 

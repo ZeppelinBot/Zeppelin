@@ -1,5 +1,6 @@
-import { PluginOptions, guildPlugin } from "knub";
+import { guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
 import { AddRoleCmd } from "./commands/AddRoleCmd.js";
@@ -8,13 +9,12 @@ import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd.js";
 import { RemoveRoleCmd } from "./commands/RemoveRoleCmd.js";
 import { RolesPluginType, zRolesConfig } from "./types.js";
 
-const defaultOptions: PluginOptions<RolesPluginType> = {
-  config: {
-    can_assign: false,
-    can_mass_assign: false,
-    assignable_roles: [],
-  },
-  overrides: [
+export const RolesPlugin = guildPlugin<RolesPluginType>()({
+  name: "roles",
+
+  dependencies: () => [LogsPlugin, RoleManagerPlugin],
+  configSchema: zRolesConfig,
+  defaultOverrides: [
     {
       level: ">=50",
       config: {
@@ -28,14 +28,6 @@ const defaultOptions: PluginOptions<RolesPluginType> = {
       },
     },
   ],
-};
-
-export const RolesPlugin = guildPlugin<RolesPluginType>()({
-  name: "roles",
-
-  dependencies: () => [LogsPlugin, RoleManagerPlugin],
-  configParser: (input) => zRolesConfig.parse(input),
-  defaultOptions,
 
   // prettier-ignore
   messageCommands: [
@@ -49,5 +41,9 @@ export const RolesPlugin = guildPlugin<RolesPluginType>()({
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

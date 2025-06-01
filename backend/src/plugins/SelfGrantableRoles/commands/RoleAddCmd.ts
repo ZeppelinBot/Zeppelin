@@ -1,6 +1,6 @@
 import { Role, Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { resolveMessageMember } from "../../../pluginUtils.js";
 import { memberRolesLock } from "../../../utils/lockNameHelpers.js";
 import { selfGrantableRolesCmd } from "../types.js";
 import { findMatchingRoles } from "../util/findMatchingRoles.js";
@@ -39,18 +39,21 @@ export const RoleAddCmd = selfGrantableRolesCmd({
       }, new Map());
 
     if (!rolesToAdd.size) {
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
+      void pluginData.state.common.sendErrorMessage(
+        msg,
         `<@!${msg.author.id}> Unknown ${args.roleNames.length === 1 ? "role" : "roles"}`,
-        { users: [msg.author.id] },
+        {
+          users: [msg.author.id],
+        },
       );
       lock.unlock();
       return;
     }
 
+    const authorMember = await resolveMessageMember(msg);
+
     // Grant the roles
-    const newRoleIds = new Set([...rolesToAdd.keys(), ...msg.member.roles.cache.keys()]);
+    const newRoleIds = new Set([...rolesToAdd.keys(), ...authorMember.roles.cache.keys()]);
 
     // Remove extra roles (max_roles) for each entry
     const skipped: Set<Role> = new Set();
@@ -69,7 +72,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
             newRoleIds.delete(roleId);
             rolesToAdd.delete(roleId);
 
-            if (msg.member.roles.cache.has(roleId as Snowflake)) {
+            if (authorMember.roles.cache.has(roleId as Snowflake)) {
               removed.add(pluginData.guild.roles.cache.get(roleId as Snowflake)!);
             } else {
               skipped.add(pluginData.guild.roles.cache.get(roleId as Snowflake)!);
@@ -80,15 +83,16 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     }
 
     try {
-      await msg.member.edit({
+      await authorMember.edit({
         roles: Array.from(newRoleIds) as Snowflake[],
       });
     } catch {
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
+      void pluginData.state.common.sendErrorMessage(
+        msg,
         `<@!${msg.author.id}> Got an error while trying to grant you the roles`,
-        { users: [msg.author.id] },
+        {
+          users: [msg.author.id],
+        },
       );
       return;
     }
@@ -120,7 +124,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
       messageParts.push("couldn't recognize some of the roles");
     }
 
-    sendSuccessMessage(pluginData, msg.channel, `<@!${msg.author.id}> ${messageParts.join("; ")}`, {
+    void pluginData.state.common.sendSuccessMessage(msg, `<@!${msg.author.id}> ${messageParts.join("; ")}`, {
       users: [msg.author.id],
     });
 

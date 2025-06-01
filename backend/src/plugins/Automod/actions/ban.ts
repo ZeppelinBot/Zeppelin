@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import {
   convertDelayStringToMS,
   nonNullish,
@@ -46,6 +46,7 @@ export const BanAction = automodAction({
     for (const userId of userIdsToBan) {
       await modActions.banUserId(
         userId,
+        reason,
         reason,
         {
           contactMethods,

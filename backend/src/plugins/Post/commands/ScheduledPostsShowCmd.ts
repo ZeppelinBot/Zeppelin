@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage } from "../../../pluginUtils.js";
 import { sorter } from "../../../utils.js";
 import { postCmd } from "../types.js";
 import { postMessage } from "../util/postMessage.js";
@@ -17,7 +16,7 @@ export const ScheduledPostsShowCmd = postCmd({
     scheduledPosts.sort(sorter("post_at"));
     const post = scheduledPosts[args.num - 1];
     if (!post) {
-      sendErrorMessage(pluginData, msg.channel, "Scheduled post not found");
+      void pluginData.state.common.sendErrorMessage(msg, "Scheduled post not found");
       return;
     }
 
