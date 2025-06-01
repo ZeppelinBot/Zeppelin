@@ -5,6 +5,7 @@ import { stripMarkdown } from "../../../utils/stripMarkdown.js";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage.js";
 import { automodTrigger } from "../helpers.js";
+import { escapeInlineCode } from "discord.js";
 
 interface MatchResultType {
   word: string;
@@ -83,7 +84,8 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
       for (const regex of regexes) {
         const match = regex.exec(str);
         if (match) {
-          const matchedWord = match.slice(1).find(group => group !== undefined) || "";
+          const matchedWordIndex = match.slice(1).findIndex(group => group !== undefined);
+          const matchedWord = trigger.words[matchedWordIndex];
 
           return {
             extra: {
@@ -100,7 +102,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    const wordInfo = matchResult.extra.word ? ` (matched: "${matchResult.extra.word}")` : "";
-    return `Matched word in ${partialSummary}${wordInfo}`;
+    const wordInfo = matchResult.extra.word ? ` (\`${escapeInlineCode(matchResult.extra.word)}\`)` : "";
+    return `Matched word${wordInfo} in ${partialSummary}`;
   },
 });
