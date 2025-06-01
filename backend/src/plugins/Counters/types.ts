@@ -62,9 +62,9 @@ export const zCounter = z.strictObject({
     })
     .nullable()
     .default(null),
-  can_view: z.boolean().default(false),
-  can_edit: z.boolean().default(false),
-  can_reset_all: z.boolean().default(false),
+  can_view: z.boolean().nullable().default(null),
+  can_edit: z.boolean().nullable().default(null),
+  can_reset_all: z.boolean().nullable().default(null),
 });
 
 export const zCountersConfig = z.strictObject({
