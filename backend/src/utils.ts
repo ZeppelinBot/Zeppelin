@@ -269,14 +269,17 @@ export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEm
 export const zStrictMessageContent = z.strictObject({
   content: z.string().optional(),
   tts: z.boolean().optional(),
-  embeds: z.array(zEmbedInput).optional(),
+  embeds: z.union([z.array(zEmbedInput), zEmbedInput]).optional(),
   embed: zEmbedInput.optional(),
-}).transform((data) => {
+}).refine((data) => {
   if (data.embed) {
     data.embeds = [data.embed];
     delete data.embed;
   }
-  return data as StrictMessageContent;
+  if (data.embeds && !Array.isArray(data.embeds)) {
+    data.embeds = [data.embeds];
+  }
+  return true;
 });
 
 export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
