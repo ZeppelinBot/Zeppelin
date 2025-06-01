@@ -5,8 +5,6 @@ RUN chown node:node /zeppelin
 
 USER node
 
-ARG API_URL
-
 # Install dependencies before copying over any other files
 COPY --chown=node:node package.json package-lock.json /zeppelin
 RUN mkdir /zeppelin/backend
