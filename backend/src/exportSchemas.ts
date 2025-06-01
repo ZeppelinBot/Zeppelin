@@ -47,6 +47,8 @@ const pluginOverrideCriteriaSchema = basePluginOverrideCriteriaSchema.extend({
   get not() {
     return pluginOverrideCriteriaSchema.optional();
   },
+}).meta({
+  id: "overrideCriteria",
 });
 
 const outputPath = process.argv[2];

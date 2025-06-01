@@ -197,7 +197,7 @@ export function zRegex<T extends ZodString>(zStr: T) {
   });
 }
 
-export const zEmbedInput = z.object({
+export const zEmbedInput = z.strictObject({
   title: z.string().optional(),
   description: z.string().optional(),
   url: z.string().optional(),
@@ -262,6 +262,8 @@ export const zEmbedInput = z.object({
       }),
     )
     .nullable(),
+}).meta({
+  id: "embedInput",
 });
 
 export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEmbed>, T>;
@@ -271,7 +273,7 @@ export const zStrictMessageContent = z.strictObject({
   tts: z.boolean().optional(),
   embeds: z.union([z.array(zEmbedInput), zEmbedInput]).optional(),
   embed: zEmbedInput.optional(),
-}).refine((data) => {
+}).transform((data) => {
   if (data.embed) {
     data.embeds = [data.embed];
     delete data.embed;
@@ -279,7 +281,9 @@ export const zStrictMessageContent = z.strictObject({
   if (data.embeds && !Array.isArray(data.embeds)) {
     data.embeds = [data.embeds];
   }
-  return true;
+  return data as StrictMessageContent;
+}).meta({
+  id: "strictMessageContent",
 });
 
 export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
@@ -294,7 +298,7 @@ export type MessageContent = string | StrictMessageContent;
 export const zMessageContent = z.union([
   zBoundedCharacters(0, 4000),
   zStrictMessageContent,
-]) as z.ZodType<MessageContent>;
+]);
 
 export function validateAndParseMessageContent(input: unknown): StrictMessageContent {
   if (input == null) {
