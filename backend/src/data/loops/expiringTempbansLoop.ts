@@ -5,12 +5,11 @@ import { lazyMemoize, MINUTES } from "../../utils.js";
 import { Tempban } from "../entities/Tempban.js";
 import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents.js";
 import { Tempbans } from "../Tempbans.js";
-import Timeout = NodeJS.Timeout;
 
 const LOOP_INTERVAL = 15 * MINUTES;
 const MAX_TRIES_PER_SERVER = 3;
 const getBansRepository = lazyMemoize(() => new Tempbans());
-const timeouts = new Map<string, Timeout>();
+const timeouts = new Map<string, NodeJS.Timeout>();
 
 function tempbanToKey(tempban: Tempban) {
   return `${tempban.guild_id}/${tempban.user_id}`;

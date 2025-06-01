@@ -31,7 +31,6 @@ import { searchCmdSignature } from "./commands/SearchCmd.js";
 import { getUserInfoEmbed } from "./functions/getUserInfoEmbed.js";
 import { refreshMembersIfNeeded } from "./refreshMembers.js";
 import { UtilityPluginType } from "./types.js";
-import Timeout = NodeJS.Timeout;
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -93,7 +92,7 @@ export async function displaySearch(
   let searching = false;
   let currentPage = args.page || 1;
   let stopCollectionFn: () => void;
-  let stopCollectionTimeout: Timeout;
+  let stopCollectionTimeout: NodeJS.Timeout;
 
   const perPage = args.ids ? SEARCH_ID_RESULTS_PER_PAGE : SEARCH_RESULTS_PER_PAGE;
 

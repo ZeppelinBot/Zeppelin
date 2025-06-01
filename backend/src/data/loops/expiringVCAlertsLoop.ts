@@ -5,12 +5,11 @@ import { lazyMemoize, MINUTES } from "../../utils.js";
 import { VCAlert } from "../entities/VCAlert.js";
 import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents.js";
 import { VCAlerts } from "../VCAlerts.js";
-import Timeout = NodeJS.Timeout;
 
 const LOOP_INTERVAL = 15 * MINUTES;
 const MAX_TRIES_PER_SERVER = 3;
 const getVCAlertsRepository = lazyMemoize(() => new VCAlerts());
-const timeouts = new Map<number, Timeout>();
+const timeouts = new Map<number, NodeJS.Timeout>();
 
 function broadcastExpiredVCAlert(alert: VCAlert, tries = 0) {
   console.log(`[EXPIRING VCALERTS LOOP] Broadcasting expired vcalert: ${alert.guild_id}/${alert.user_id}`);

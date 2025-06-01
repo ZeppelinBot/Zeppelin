@@ -81,7 +81,7 @@ export async function muteUser(
         await member.roles.set(newRoles as Snowflake[]);
       }
     } else {
-      newRoles = currentUserRoles.filter((x) => !(<string[]>removeRoles).includes(x));
+      newRoles = currentUserRoles.filter((x) => !removeRoles.includes(x));
       await member.roles.set(newRoles as Snowflake[]);
     }
 
@@ -91,7 +91,7 @@ export async function muteUser(
         rolesToRestore = currentUserRoles;
       }
     } else {
-      rolesToRestore = currentUserRoles.filter((x) => (<string[]>restoreRoles).includes(x));
+      rolesToRestore = currentUserRoles.filter((x) => restoreRoles.includes(x));
     }
 
     if (muteType === MuteTypes.Role) {

@@ -175,7 +175,7 @@ export const ChangePermsAction = automodAction({
       const realKey = legacyPermMap[key] ?? key;
       perms[realKey] = actionConfig.perms[key];
     }
-    const permsArray = <PermissionsString[]>Object.keys(perms).filter((key) => perms[key]);
+    const permsArray = (Object.keys(perms) as PermissionsString[]).filter((key) => perms[key]);
     await role.setPermissions(new PermissionsBitField(permsArray)).catch(noop);
   },
 });

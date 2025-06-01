@@ -6,7 +6,8 @@
     "baseUrl": "./src",
     "rootDir": "./src",
     "outDir": "./dist",
-    "composite": true
+    "composite": true,
+    "erasableSyntaxOnly": true
   },
   "include": ["src/**/*.ts", "src/**/*.json"],
   "references": [

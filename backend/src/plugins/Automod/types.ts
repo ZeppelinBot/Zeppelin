@@ -17,8 +17,6 @@ import { availableActions } from "./actions/availableActions.js";
 import { RecentActionType } from "./constants.js";
 import { availableTriggers } from "./triggers/availableTriggers.js";
 
-import Timeout = NodeJS.Timeout;
-
 export type ZTriggersMapHelper = {
   [TriggerName in keyof typeof availableTriggers]: (typeof availableTriggers)[TriggerName]["configSchema"];
 };
@@ -86,7 +84,7 @@ export interface AutomodPluginType extends BasePluginType {
      * Recent actions are used for spam triggers
      */
     recentActions: RecentAction[];
-    clearRecentActionsInterval: Timeout;
+    clearRecentActionsInterval: NodeJS.Timeout;
 
     /**
      * After a spam trigger is tripped and the rule's action carried out, a unique identifier is placed here so further
@@ -95,10 +93,10 @@ export interface AutomodPluginType extends BasePluginType {
      * Key: rule_name-match_identifier
      */
     recentSpam: RecentSpam[];
-    clearRecentSpamInterval: Timeout;
+    clearRecentSpamInterval: NodeJS.Timeout;
 
     recentNicknameChanges: Map<string, { timestamp: number }>;
-    clearRecentNicknameChangesInterval: Timeout;
+    clearRecentNicknameChangesInterval: NodeJS.Timeout;
 
     ignoredRoleChanges: Set<{
       memberId: string;

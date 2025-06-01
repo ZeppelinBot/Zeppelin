@@ -1,10 +1,9 @@
 import { MessagePayload, User } from "discord.js";
 import { logger } from "../logger.js";
 import { HOURS, createChunkedMessage, isDiscordAPIError } from "../utils.js";
-import Timeout = NodeJS.Timeout;
 
 let dmsDisabled = false;
-let dmsDisabledTimeout: Timeout;
+let dmsDisabledTimeout: NodeJS.Timeout;
 
 function disableDMs(duration) {
   dmsDisabled = true;

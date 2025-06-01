@@ -2,15 +2,18 @@ import { CooldownManager } from "knub";
 import { EventEmitter } from "node:events";
 import { RegExpWorker, TimeoutError } from "regexp-worker";
 import { MINUTES, SECONDS } from "./utils.js";
-import Timeout = NodeJS.Timeout;
 
 const isTimeoutError = (a): a is TimeoutError => {
   return a.message != null && a.elapsedTimeMs != null;
 };
 
 export class RegExpTimeoutError extends Error {
-  constructor(message: string, public elapsedTimeMs: number) {
+  public elapsedTimeMs: number;
+
+  constructor(message: string, elapsedTimeMs: number) {
     super(message);
+
+    this.elapsedTimeMs = elapsedTimeMs;
   }
 }
 
@@ -47,7 +50,7 @@ export interface RegExpRunner {
  */
 export class RegExpRunner extends EventEmitter {
   private _worker: RegExpWorker | null;
-  private readonly _failedTimesInterval: Timeout;
+  private readonly _failedTimesInterval: NodeJS.Timeout;
 
   private cooldown: CooldownManager;
   private failedTimes: Map<string, number>;

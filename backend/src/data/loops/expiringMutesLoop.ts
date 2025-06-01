@@ -5,12 +5,11 @@ import { lazyMemoize, MINUTES, SECONDS } from "../../utils.js";
 import { Mute } from "../entities/Mute.js";
 import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents.js";
 import { Mutes, TIMEOUT_RENEWAL_THRESHOLD } from "../Mutes.js";
-import Timeout = NodeJS.Timeout;
 
 const LOOP_INTERVAL = 15 * MINUTES;
 const MAX_TRIES_PER_SERVER = 3;
 const getMutesRepository = lazyMemoize(() => new Mutes());
-const timeouts = new Map<string, Timeout>();
+const timeouts = new Map<string, NodeJS.Timeout>();
 
 function muteToKey(mute: Mute) {
   return `${mute.guild_id}/${mute.user_id}`;

@@ -1,10 +1,9 @@
 import { Message } from "discord.js";
 import { TStarboardOpts } from "../types.js";
 import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage.js";
-import Timeout = NodeJS.Timeout;
 
 const DEBOUNCE_DELAY = 1000;
-const debouncedUpdates: Record<string, Timeout> = {};
+const debouncedUpdates: Record<string, NodeJS.Timeout> = {};
 
 export async function updateStarboardMessageStarCount(
   starboard: TStarboardOpts,

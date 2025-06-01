@@ -4,7 +4,6 @@ import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { SavedMessage } from "../../data/entities/SavedMessage.js";
 import { MINUTES, zDelayString } from "../../utils.js";
-import Timeout = NodeJS.Timeout;
 
 export const MAX_DELAY = 5 * MINUTES;
 
@@ -26,7 +25,7 @@ export interface AutoDeletePluginType extends BasePluginType {
 
     deletionQueue: IDeletionQueueItem[];
     nextDeletion: number | null;
-    nextDeletionTimeout: Timeout | null;
+    nextDeletionTimeout: NodeJS.Timeout | null;
 
     maxDelayWarningSent: boolean;
 

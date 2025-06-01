@@ -5,12 +5,11 @@ import { lazyMemoize, MINUTES } from "../../utils.js";
 import { Reminder } from "../entities/Reminder.js";
 import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents.js";
 import { Reminders } from "../Reminders.js";
-import Timeout = NodeJS.Timeout;
 
 const LOOP_INTERVAL = 15 * MINUTES;
 const MAX_TRIES_PER_SERVER = 3;
 const getRemindersRepository = lazyMemoize(() => new Reminders());
-const timeouts = new Map<number, Timeout>();
+const timeouts = new Map<number, NodeJS.Timeout>();
 
 function broadcastReminder(reminder: Reminder, tries = 0) {
   if (!hasGuildEventListener(reminder.guild_id, "reminder")) {

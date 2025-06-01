@@ -10,7 +10,6 @@ import {
 } from "../../data/entities/CounterTrigger.js";
 import { zBoundedCharacters, zBoundedRecord, zDelayString } from "../../utils.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
-import Timeout = NodeJS.Timeout;
 
 const MAX_COUNTERS = 5;
 const MAX_TRIGGERS_PER_COUNTER = 5;
@@ -89,7 +88,7 @@ export interface CountersPluginType extends BasePluginType {
   state: {
     counters: GuildCounters;
     counterIds: Record<string, number>;
-    decayTimers: Timeout[];
+    decayTimers: NodeJS.Timeout[];
     events: CounterEventEmitter;
     counterTriggersByCounterId: Map<number, CounterTrigger[]>;
     common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;

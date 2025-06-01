@@ -5,12 +5,11 @@ import { lazyMemoize, MINUTES } from "../../utils.js";
 import { ScheduledPost } from "../entities/ScheduledPost.js";
 import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents.js";
 import { ScheduledPosts } from "../ScheduledPosts.js";
-import Timeout = NodeJS.Timeout;
 
 const LOOP_INTERVAL = 15 * MINUTES;
 const MAX_TRIES_PER_SERVER = 3;
 const getScheduledPostsRepository = lazyMemoize(() => new ScheduledPosts());
-const timeouts = new Map<number, Timeout>();
+const timeouts = new Map<number, NodeJS.Timeout>();
 
 function broadcastScheduledPost(post: ScheduledPost, tries = 0) {
   if (!hasGuildEventListener(post.guild_id, "scheduledPost")) {

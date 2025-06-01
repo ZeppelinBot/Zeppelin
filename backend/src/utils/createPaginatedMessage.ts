@@ -2,7 +2,6 @@ import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, 
 import { ContextResponseOptions, fetchContextChannel, GenericCommandSource } from "../pluginUtils.js";
 import { MINUTES, noop } from "../utils.js";
 import { Awaitable } from "./typeUtils.js";
-import Timeout = NodeJS.Timeout;
 
 export type LoadPageFn = (page: number) => Awaitable<ContextResponseOptions>;
 
@@ -81,7 +80,7 @@ export async function createPaginatedMessage(
 
   // The timeout after which reactions are removed and the pagination stops working
   // is refreshed each time the page is changed
-  let timeout: Timeout;
+  let timeout: NodeJS.Timeout;
   const refreshTimeout = () => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {

@@ -1,12 +1,10 @@
-import Timeout = NodeJS.Timeout;
-
 const CLEAN_INTERVAL = 1000;
 
 export class SimpleCache<T = any> {
   protected readonly retentionTime: number;
   protected readonly maxItems: number;
 
-  protected cleanTimeout: Timeout;
+  protected cleanTimeout: NodeJS.Timeout;
   protected unloaded: boolean;
 
   protected store: Map<string, { remove_at: number; value: T }>;
