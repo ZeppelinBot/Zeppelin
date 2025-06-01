@@ -42,8 +42,6 @@ export async function getCaseSummary(
     reason = reasonChunks[0] + "...";
   }
 
-  reason = disableLinkPreviews(reason);
-
   const timestamp = moment.utc(theCase.created_at, DBDateFormat);
   const relativeTimeCutoff = convertDelayStringToMS(config.relative_time_cutoff)!;
   const useRelativeTime = config.show_relative_times && Date.now() - timestamp.valueOf() < relativeTimeCutoff;
