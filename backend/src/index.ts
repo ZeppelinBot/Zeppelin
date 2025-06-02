@@ -403,6 +403,8 @@ connect().then(async () => {
     logRateLimit(data);
   });
 
+  bot.on("error", errorHandler);
+
   bot.on("loadingFinished", async () => {
     setProfiler(bot.profiler);
     if (process.env.PROFILING === "true") {
