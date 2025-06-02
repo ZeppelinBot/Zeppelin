@@ -15,6 +15,8 @@ const configSchema = z.strictObject({
   exclude_guilds: z.array(zSnowflake).max(255).optional(),
   include_invite_codes: z.array(z.string().max(32)).max(255).optional(),
   exclude_invite_codes: z.array(z.string().max(32)).max(255).optional(),
+  include_custom_invite_codes: z.array(z.string().max(32)).max(255).transform(arr => arr.map(str => str.toLowerCase())).optional(),
+  exclude_custom_invite_codes: z.array(z.string().max(32)).max(255).transform(arr => arr.map(str => str.toLowerCase())).optional(),
   allow_group_dm_invites: z.boolean().default(false),
   match_messages: z.boolean().default(true),
   match_embeds: z.boolean().default(false),
@@ -43,6 +45,12 @@ export const MatchInvitesTrigger = automodTrigger<MatchResultType>()({
           return { extra: { type, code } };
         }
         if (trigger.exclude_invite_codes && !trigger.exclude_invite_codes.includes(code)) {
+          return { extra: { type, code } };
+        }
+        if (trigger.include_custom_invite_codes && trigger.include_custom_invite_codes.includes(code.toLowerCase())) {
+          return { extra: { type, code } };
+        }
+        if (trigger.exclude_custom_invite_codes && !trigger.exclude_custom_invite_codes.includes(code.toLowerCase())) {
           return { extra: { type, code } };
         }
       }
