@@ -27,7 +27,7 @@ async function broadcastExpiredMute(guildId: string, userId: string, tries = 0):
     return;
   }
 
-  // console.log(`[EXPIRING MUTES LOOP] Broadcasting expired mute: ${mute.guild_id}/${mute.user_id}`);
+  console.log(`[EXPIRING MUTES LOOP] Broadcasting expired mute: ${mute.guild_id}/${mute.user_id}`);
   if (!hasGuildEventListener(mute.guild_id, "expiredMute")) {
     // If there are no listeners registered for the server yet, try again in a bit
     if (tries < MAX_TRIES_PER_SERVER) {
@@ -42,7 +42,7 @@ async function broadcastExpiredMute(guildId: string, userId: string, tries = 0):
 }
 
 function broadcastTimeoutMuteToRenew(mute: Mute, tries = 0) {
-  // console.log(`[EXPIRING MUTES LOOP] Broadcasting timeout mute to renew: ${mute.guild_id}/${mute.user_id}`);
+  console.log(`[EXPIRING MUTES LOOP] Broadcasting timeout mute to renew: ${mute.guild_id}/${mute.user_id}`);
   if (!hasGuildEventListener(mute.guild_id, "timeoutMuteToRenew")) {
     // If there are no listeners registered for the server yet, try again in a bit
     if (tries < MAX_TRIES_PER_SERVER) {
