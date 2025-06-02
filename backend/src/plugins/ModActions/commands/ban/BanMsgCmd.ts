@@ -72,6 +72,7 @@ export const BanMsgCmd = modActionsMsgCmd({
       member,
       mod,
       contactMethods,
+      args["delete-days"] ?? undefined,
     );
   },
 });
