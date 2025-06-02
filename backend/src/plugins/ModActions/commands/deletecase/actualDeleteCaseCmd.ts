@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { GuildPluginData, helpers } from "knub";
+import { GuildPluginData } from "knub";
 import { Case } from "../../../../data/entities/Case.js";
-import { getContextChannel, sendContextResponse } from "../../../../pluginUtils.js";
-import { SECONDS, renderUsername } from "../../../../utils.js";
+import { getContextChannel } from "../../../../pluginUtils.js";
+import { confirm, renderUsername } from "../../../../utils.js";
 import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
 import { TimeAndDatePlugin } from "../../../TimeAndDate/TimeAndDatePlugin.js";
@@ -43,15 +43,13 @@ export async function actualDeleteCaseCmd(
 
       const cases = pluginData.getPlugin(CasesPlugin);
       const embedContent = await cases.getCaseEmbed(theCase);
-      sendContextResponse(context, {
+
+      const confirmed = await confirm(context, author.id, {
         ...embedContent,
-        content: "Delete the following case? Answer 'Yes' to continue, 'No' to cancel.",
+        content: "Delete the following case?",
       });
 
-      const reply = await helpers.waitForReply(pluginData.client, channel, author.id, 15 * SECONDS);
-      const normalizedReply = (reply?.content || "").toLowerCase().trim();
-      if (normalizedReply !== "yes" && normalizedReply !== "y") {
-        sendContextResponse(context, "Cancelled. Case was not deleted.");
+      if (!confirmed) {
         cancelled++;
         continue;
       }
