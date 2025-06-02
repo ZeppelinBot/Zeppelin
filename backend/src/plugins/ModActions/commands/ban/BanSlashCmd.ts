@@ -89,6 +89,7 @@ export const BanSlashCmd = modActionsSlashCmd({
       interaction.member as GuildMember,
       mod,
       contactMethods,
+      options["delete-days"] ?? undefined,
     );
   },
 });
