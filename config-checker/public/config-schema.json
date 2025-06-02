@@ -321,7 +321,7 @@
                                   "type": "boolean"
                                 },
                                 "loose_matching_threshold": {
-                                  "default": 4,
+                                  "default": 1,
                                   "type": "integer",
                                   "minimum": -9007199254740991,
                                   "maximum": 9007199254740991
@@ -439,6 +439,22 @@
                                   }
                                 },
                                 "exclude_invite_codes": {
+                                  "maxItems": 255,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "maxLength": 32
+                                  }
+                                },
+                                "include_custom_invite_codes": {
+                                  "maxItems": 255,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "maxLength": 32
+                                  }
+                                },
+                                "exclude_custom_invite_codes": {
                                   "maxItems": 255,
                                   "type": "array",
                                   "items": {
@@ -3060,7 +3076,7 @@
                                         "type": "boolean"
                                       },
                                       "loose_matching_threshold": {
-                                        "default": 4,
+                                        "default": 1,
                                         "type": "integer",
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
@@ -3174,6 +3190,22 @@
                                         }
                                       },
                                       "exclude_invite_codes": {
+                                        "maxItems": 255,
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "maxLength": 32
+                                        }
+                                      },
+                                      "include_custom_invite_codes": {
+                                        "maxItems": 255,
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "maxLength": 32
+                                        }
+                                      },
+                                      "exclude_custom_invite_codes": {
                                         "maxItems": 255,
                                         "type": "array",
                                         "items": {
