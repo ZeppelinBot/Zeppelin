@@ -65,10 +65,13 @@ const permissionNames = keys(PermissionsBitField.Flags) as U.ListOf<keyof typeof
 const legacyPermissionNames = keys(legacyPermMap) as U.ListOf<keyof typeof legacyPermMap>;
 const allPermissionNames = [...permissionNames, ...legacyPermissionNames] as const;
 
-const permissionTypeMap = allPermissionNames.reduce((map, permName) => {
-  map[permName] = z.boolean().nullable();
-  return map;
-}, {} as Record<typeof allPermissionNames[number], z.ZodNullable<z.ZodBoolean>>);
+const permissionTypeMap = allPermissionNames.reduce(
+  (map, permName) => {
+    map[permName] = z.boolean().nullable();
+    return map;
+  },
+  {} as Record<(typeof allPermissionNames)[number], z.ZodNullable<z.ZodBoolean>>,
+);
 const zPermissionsMap = z.strictObject(permissionTypeMap);
 
 export const ChangePermsAction = automodAction({

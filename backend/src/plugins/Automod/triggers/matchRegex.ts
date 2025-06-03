@@ -38,7 +38,10 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
 
     if (!regexCache.has(trigger)) {
       const flags = trigger.case_sensitive ? "" : "i";
-      const toCache = mergeRegexes(trigger.patterns.map(pattern => inputPatternToRegExp(pattern)), flags);
+      const toCache = mergeRegexes(
+        trigger.patterns.map((pattern) => inputPatternToRegExp(pattern)),
+        flags,
+      );
       regexCache.set(trigger, toCache);
     }
     const regexes = regexCache.get(trigger)!;

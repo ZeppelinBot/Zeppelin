@@ -9,7 +9,10 @@ const isTimeoutError = (a): a is TimeoutError => {
 };
 
 export class RegExpTimeoutError extends Error {
-  constructor(message: string, public elapsedTimeMs: number) {
+  constructor(
+    message: string,
+    public elapsedTimeMs: number,
+  ) {
     super(message);
   }
 }

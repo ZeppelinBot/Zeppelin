@@ -77,7 +77,7 @@ export const ForceMuteMsgCmd = modActionsMsgCmd({
       [...msg.attachments.values()],
       mod,
       ppId,
-      "time" in args ? args.time ?? undefined : undefined,
+      "time" in args ? (args.time ?? undefined) : undefined,
       args.reason,
       contactMethods,
     );
