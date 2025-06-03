@@ -265,7 +265,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser | PartialUser): 
     discriminator: user.discriminator || "0000",
     mention: `<@${user.id}>`,
     tag: user.tag || "Unknown#0000",
-    renderedUsername: "Unknown",
+    renderedUsername: user.tag || "Unknown",
   });
 }
 
