@@ -1,4 +1,4 @@
-FROM node:22 AS build
+FROM node:24 AS build
 
 RUN mkdir /zeppelin
 RUN chown node:node /zeppelin
@@ -31,7 +31,7 @@ RUN npm run build
 WORKDIR /zeppelin
 RUN npm prune --omit=dev
 
-FROM node:22-alpine AS main
+FROM node:24-alpine AS main
 
 USER node
 COPY --from=build --chown=node:node /zeppelin /zeppelin
