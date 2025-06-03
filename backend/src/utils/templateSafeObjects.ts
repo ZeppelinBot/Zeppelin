@@ -261,10 +261,10 @@ export function userToTemplateSafeUser(user: User | UnknownUser | PartialUser): 
 
   return new TemplateSafeUser({
     id: user.id,
-    username: "Unknown",
-    discriminator: "0000",
+    username: user.username || "Unknown",
+    discriminator: user.discriminator || "0000",
     mention: `<@${user.id}>`,
-    tag: "Unknown#0000",
+    tag: user.tag || "Unknown#0000",
     renderedUsername: "Unknown",
   });
 }
