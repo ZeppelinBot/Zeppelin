@@ -39,7 +39,8 @@ export const AddCaseSlashCmd = modActionsSlashCmd({
   async run({ interaction, options, pluginData }) {
     await interaction.deferReply({ ephemeral: true });
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
-
+    
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = interaction.member as GuildMember;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
