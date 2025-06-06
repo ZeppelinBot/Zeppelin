@@ -28,10 +28,11 @@ export const AddCaseSlashCmd = modActionsSlashCmd({
       name: "type",
       description: "The type of case to add",
       required: true,
-      choices: Object.keys(CaseTypes).map((type) => ({ name: type, value: type })),
+      choices: Object.keys(CaseTypes)
+        .filter((key) => isNaN(Number(key)))
+        .map((key) => ({ name: key, value: key })),
     }),
     slashOptions.user({ name: "user", description: "The user to add a case to", required: true }),
-
     ...opts,
   ],
 
@@ -39,7 +40,6 @@ export const AddCaseSlashCmd = modActionsSlashCmd({
     await interaction.deferReply({ ephemeral: true });
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
-    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = interaction.member as GuildMember;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
