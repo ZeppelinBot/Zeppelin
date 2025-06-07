@@ -44,6 +44,8 @@ const zRoleButtonsConfigItem = z
         content: zMessageContent,
       }),
     ]),
+    add_message: zMessageContent.optional(),
+    remove_message: zMessageContent.optional(),
     options: z.array(zRoleButtonOption).max(25),
     exclusive: z.boolean().default(false),
   })
