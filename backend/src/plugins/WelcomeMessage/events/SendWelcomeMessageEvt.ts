@@ -1,6 +1,12 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { MessageCreateOptions, PermissionsBitField, Snowflake, TextChannel } from "discord.js";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
-import { createChunkedMessage, verboseChannelMention, verboseUserMention } from "../../../utils.js";
+import {
+  createChunkedMessage,
+  renderRecursively,
+  verboseChannelMention,
+  verboseUserMention
+} from "../../../utils.js";
+import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions.js";
 import { sendDM } from "../../../utils/sendDM.js";
 import {
   guildToTemplateSafeGuild,
@@ -28,17 +34,20 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
 
     pluginData.state.sentWelcomeMessages.add(member.id);
 
-    let formatted;
+    const templateValues = new TemplateSafeValueContainer({
+      member: memberToTemplateSafeMember(member),
+      user: userToTemplateSafeUser(member.user),
+      guild: guildToTemplateSafeGuild(member.guild),
+    });
+
+    const renderMessageText = (str: string) => renderTemplate(str, templateValues);
+
+    let formatted: string | MessageCreateOptions;
 
     try {
-      formatted = await renderTemplate(
-        config.message,
-        new TemplateSafeValueContainer({
-          member: memberToTemplateSafeMember(member),
-          user: userToTemplateSafeUser(member.user),
-          guild: guildToTemplateSafeGuild(member.guild),
-        }),
-      );
+      formatted = typeof config.message === "string"
+        ? await renderMessageText(config.message)
+        : ((await renderRecursively(config.message, renderMessageText)) as MessageCreateOptions);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
@@ -46,7 +55,6 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
         });
         return;
       }
-
       throw e;
     }
 
@@ -65,15 +73,47 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
       const channel = meta.args.member.guild.channels.cache.get(config.send_to_channel as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) return;
 
-      try {
-        await createChunkedMessage(channel, formatted, {
-          parse: ["users"],
+      if (
+        !hasDiscordPermissions(
+          channel.permissionsFor(pluginData.client.user!.id),
+          PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.ViewChannel,
+        )
+      ) {
+        pluginData.getPlugin(LogsPlugin).logBotAlert({
+          body: `Missing permissions to send welcome message in ${verboseChannelMention(channel)}`,
         });
+        return;
+      }
+
+      if (
+        typeof formatted === "object" && formatted.embeds && formatted.embeds.length > 0 &&
+        !hasDiscordPermissions(
+          channel.permissionsFor(pluginData.client.user!.id),
+          PermissionsBitField.Flags.EmbedLinks,
+        )
+      ) {
+        pluginData.getPlugin(LogsPlugin).logBotAlert({
+          body: `Missing permissions to send welcome message **with embeds** in ${verboseChannelMention(channel)}`,
+        });
+        return;
+      }
+
+      try {
+        if (typeof formatted === "string") {
+          await createChunkedMessage(channel, formatted, {
+            parse: ["users"],
+          });
+        } else {
+          await channel.send({
+            ...formatted,
+            allowedMentions: {
+              parse: ["users"],
+            },
+          });
+        }
       } catch {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
-          body: `Failed send a welcome message for ${verboseUserMention(member.user)} to ${verboseChannelMention(
-            channel,
-          )}`,
+          body: `Failed to send welcome message for ${verboseUserMention(member.user)} to ${verboseChannelMention(channel)}`,
         });
       }
     }
