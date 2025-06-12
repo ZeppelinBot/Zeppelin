@@ -1,4 +1,4 @@
-import { EmbedType, Snowflake, StickerFormatType, StickerType } from "discord.js";
+import { EmbedType, Snowflake, StickerFormatType, StickerType, PollQuestionMedia } from "discord.js";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 export interface ISavedMessageAttachmentData {
@@ -65,6 +65,14 @@ export interface ISavedMessageStickerData {
   type: StickerType | null;
 }
 
+export interface ISavedMessagePollData {
+  question: PollQuestionMedia;
+  answers: {
+    id: number;
+    text: string | null;
+  }[];
+}
+
 export interface ISavedMessageData {
   attachments?: ISavedMessageAttachmentData[];
   author: {
@@ -74,6 +82,7 @@ export interface ISavedMessageData {
   content: string;
   embeds?: ISavedMessageEmbedData[];
   stickers?: ISavedMessageStickerData[];
+  poll?: ISavedMessagePollData;
   timestamp: number;
 }
 
