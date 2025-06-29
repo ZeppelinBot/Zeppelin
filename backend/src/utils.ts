@@ -1,7 +1,6 @@
 import {
   APIEmbed,
   ChannelType,
-  ChatInputCommandInteraction,
   Client,
   DiscordAPIError,
   EmbedData,
@@ -20,14 +19,11 @@ import {
   Message,
   MessageCreateOptions,
   MessageMentionOptions,
-  PartialChannelData,
   PartialGroupDMChannel,
   PartialMessage,
-  PartialUser,
   RoleResolvable,
   SendableChannels,
   Sticker,
-  TextBasedChannel,
   User,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
@@ -197,94 +193,99 @@ export function zRegex<T extends ZodString>(zStr: T) {
   });
 }
 
-export const zEmbedInput = z.strictObject({
-  title: z.string().optional(),
-  description: z.string().optional(),
-  url: z.string().optional(),
-  timestamp: z.string().optional(),
-  color: z.number().optional(),
+export const zEmbedInput = z
+  .strictObject({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    url: z.string().optional(),
+    timestamp: z.string().optional(),
+    color: z.number().optional(),
 
-  footer: z.optional(
-    z.object({
-      text: z.string(),
-      icon_url: z.string().optional(),
-    }),
-  ),
-
-  image: z.optional(
-    z.object({
-      url: z.string().optional(),
-      width: z.number().optional(),
-      height: z.number().optional(),
-    }),
-  ),
-
-  thumbnail: z.optional(
-    z.object({
-      url: z.string().optional(),
-      width: z.number().optional(),
-      height: z.number().optional(),
-    }),
-  ),
-
-  video: z.optional(
-    z.object({
-      url: z.string().optional(),
-      width: z.number().optional(),
-      height: z.number().optional(),
-    }),
-  ),
-
-  provider: z.optional(
-    z.object({
-      name: z.string(),
-      url: z.string().optional(),
-    }),
-  ),
-
-  fields: z.optional(
-    z.array(
+    footer: z.optional(
       z.object({
-        name: z.string().optional(),
-        value: z.string().optional(),
-        inline: z.boolean().optional(),
+        text: z.string(),
+        icon_url: z.string().optional(),
       }),
     ),
-  ),
 
-  author: z
-    .optional(
+    image: z.optional(
       z.object({
-        name: z.string(),
         url: z.string().optional(),
         width: z.number().optional(),
         height: z.number().optional(),
       }),
-    )
-    .nullable(),
-}).meta({
-  id: "embedInput",
-});
+    ),
+
+    thumbnail: z.optional(
+      z.object({
+        url: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      }),
+    ),
+
+    video: z.optional(
+      z.object({
+        url: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      }),
+    ),
+
+    provider: z.optional(
+      z.object({
+        name: z.string(),
+        url: z.string().optional(),
+      }),
+    ),
+
+    fields: z.optional(
+      z.array(
+        z.object({
+          name: z.string().optional(),
+          value: z.string().optional(),
+          inline: z.boolean().optional(),
+        }),
+      ),
+    ),
+
+    author: z
+      .optional(
+        z.object({
+          name: z.string(),
+          url: z.string().optional(),
+          width: z.number().optional(),
+          height: z.number().optional(),
+        }),
+      )
+      .nullable(),
+  })
+  .meta({
+    id: "embedInput",
+  });
 
 export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEmbed>, T>;
 
-export const zStrictMessageContent = z.strictObject({
-  content: z.string().optional(),
-  tts: z.boolean().optional(),
-  embeds: z.union([z.array(zEmbedInput), zEmbedInput]).optional(),
-  embed: zEmbedInput.optional(),
-}).transform((data) => {
-  if (data.embed) {
-    data.embeds = [data.embed];
-    delete data.embed;
-  }
-  if (data.embeds && !Array.isArray(data.embeds)) {
-    data.embeds = [data.embeds];
-  }
-  return data as StrictMessageContent;
-}).meta({
-  id: "strictMessageContent",
-});
+export const zStrictMessageContent = z
+  .strictObject({
+    content: z.string().optional(),
+    tts: z.boolean().optional(),
+    embeds: z.union([z.array(zEmbedInput), zEmbedInput]).optional(),
+    embed: zEmbedInput.optional(),
+  })
+  .transform((data) => {
+    if (data.embed) {
+      data.embeds = [data.embed];
+      delete data.embed;
+    }
+    if (data.embeds && !Array.isArray(data.embeds)) {
+      data.embeds = [data.embeds];
+    }
+    return data as StrictMessageContent;
+  })
+  .meta({
+    id: "strictMessageContent",
+  });
 
 export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
 
@@ -295,10 +296,7 @@ export type StrictMessageContent = {
 };
 
 export type MessageContent = string | StrictMessageContent;
-export const zMessageContent = z.union([
-  zBoundedCharacters(0, 4000),
-  zStrictMessageContent,
-]);
+export const zMessageContent = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]);
 
 export function validateAndParseMessageContent(input: unknown): StrictMessageContent {
   if (input == null) {

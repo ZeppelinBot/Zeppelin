@@ -10,15 +10,21 @@ import { zColor } from "../../utils/zColor.js";
 
 const caseKeys = keys(CaseNameToType) as U.ListOf<keyof typeof CaseNameToType>;
 
-const caseColorsTypeMap = caseKeys.reduce((map, key) => {
-  map[key] = zColor;
-  return map;
-}, {} as Record<typeof caseKeys[number], typeof zColor>);
+const caseColorsTypeMap = caseKeys.reduce(
+  (map, key) => {
+    map[key] = zColor;
+    return map;
+  },
+  {} as Record<(typeof caseKeys)[number], typeof zColor>,
+);
 
-const caseIconsTypeMap = caseKeys.reduce((map, key) => {
-  map[key] = zBoundedCharacters(0, 100);
-  return map;
-}, {} as Record<typeof caseKeys[number], z.ZodString>);
+const caseIconsTypeMap = caseKeys.reduce(
+  (map, key) => {
+    map[key] = zBoundedCharacters(0, 100);
+    return map;
+  },
+  {} as Record<(typeof caseKeys)[number], z.ZodString>,
+);
 
 export const zCasesConfig = z.strictObject({
   log_automatic_actions: z.boolean().default(true),

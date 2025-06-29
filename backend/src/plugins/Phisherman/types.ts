@@ -7,5 +7,6 @@ export const zPhishermanConfig = z.strictObject({
 
 export interface PhishermanPluginType extends BasePluginType {
   configSchema: typeof zPhishermanConfig;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   state: {};
 }

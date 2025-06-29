@@ -6,6 +6,6 @@
 
 @media (width < theme(--breakpoint-lg)) {
   .docs-sidebar.closed:not(:focus-within) {
-      @apply sr-only;
+    @apply sr-only;
   }
 }

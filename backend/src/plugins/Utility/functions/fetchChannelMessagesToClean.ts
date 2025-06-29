@@ -55,7 +55,7 @@ export async function fetchChannelMessagesToClean(
     pinIds = new Set((await targetChannel.messages.fetchPinned()).keys());
   }
 
-  let rawMessagesToClean: Array<OmitPartialGroupDMChannel<Message<true>>> = [];
+  const rawMessagesToClean: Array<OmitPartialGroupDMChannel<Message<true>>> = [];
   let beforeId = opts.beforeId;
   let requests = 0;
   while (rawMessagesToClean.length < opts.count) {
