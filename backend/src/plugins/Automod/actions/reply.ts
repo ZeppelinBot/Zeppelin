@@ -31,18 +31,19 @@ export const ReplyAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const contextsWithTextChannels = contexts
-      .filter((c) => c.message?.channel_id)
+      .filter((c) => c.channel?.id ?? c.message?.channel_id)
       .filter((c) => {
-        const channel = pluginData.guild.channels.cache.get(c.message!.channel_id as Snowflake);
+        const channel = pluginData.guild.channels.cache.get(c.channel?.id || c.message!.channel_id as Snowflake);
         return channel?.isTextBased();
       });
 
     const contextsByChannelId = contextsWithTextChannels.reduce((map: Map<string, AutomodContext[]>, context) => {
-      if (!map.has(context.message!.channel_id)) {
-        map.set(context.message!.channel_id, []);
+      const channelId = context.channel?.id ?? context.message!.channel_id
+      if (!map.has(channelId)) {
+        map.set(channelId, []);
       }
 
-      map.get(context.message!.channel_id)!.push(context);
+      map.get(channelId)!.push(context);
       return map;
     }, new Map());
 
