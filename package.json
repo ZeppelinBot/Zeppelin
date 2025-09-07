@@ -26,7 +26,8 @@
   "workspaces": [
     "shared",
     "backend",
-    "dashboard"
+    "dashboard",
+    "portal"
   ],
   "dependencies": {
     "dotenv": "^16.5.0"
