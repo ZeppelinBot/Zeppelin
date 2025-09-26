@@ -35,10 +35,10 @@
   "ROLE_UPDATE": "{timestamp} 🖊 Role **{newRole.name}** (`{newRole.id}`) was edited. Changes:\n{differenceString}",
 
   "MESSAGE_EDIT": "{timestamp} ✏ {userMention(user)} edited their message (`{after.id}`) in {channelMention(channel)}:\n**Before:**{messageSummary(before)}**After:**{messageSummary(after)}",
-  "MESSAGE_DELETE": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+  "MESSAGE_DELETE": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
   "MESSAGE_DELETE_BULK": "{timestamp} 🗑 **{count}** messages by {authorIds} deleted in {channelMention(channel)} ({archiveUrl})",
   "MESSAGE_DELETE_BARE": "{timestamp} 🗑 Message (`{messageId}`) deleted in {channelMention(channel)} (no more info available)",
-  "MESSAGE_DELETE_AUTO": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+  "MESSAGE_DELETE_AUTO": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
 
   "VOICE_CHANNEL_JOIN": "{timestamp} 🎙 🔵 {userMention(member)} joined {channelMention(channel)}",
   "VOICE_CHANNEL_MOVE": "{timestamp} 🎙 ↔ {userMention(member)} moved from {channelMention(oldChannel)} to {channelMention(newChannel)}",

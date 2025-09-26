@@ -119,6 +119,14 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
       }));
     }
 
+    if (msg.reference && (msg.reference.messageId || msg.reference.channelId || msg.reference.guildId)) {
+      data.reference = {
+        messageId: msg.reference.messageId ?? null,
+        channelId: msg.reference.channelId ?? null,
+        guildId: msg.reference.guildId ?? null,
+      };
+    }
+
     return data;
   }
 

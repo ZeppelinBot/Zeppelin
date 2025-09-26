@@ -6,6 +6,7 @@ import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { LogType } from "../../data/LogType.js";
+import { TemplateSafeValueContainer } from "../../templateFormatter.js";
 import { keys, zBoundedCharacters, zEmbedInput, zMessageContent, zRegex, zSnowflake, zStrictMessageContent } from "../../utils.js";
 import { MessageBuffer } from "../../utils/MessageBuffer.js";
 import {
@@ -236,6 +237,8 @@ export const LogTypeData = z.object({
     channel: z.instanceof(TemplateSafeChannel),
     messageDate: z.string(),
     message: z.instanceof(TemplateSafeSavedMessage),
+    replyInfo: z.string(),
+    reply: z.instanceof(TemplateSafeValueContainer).nullable(),
   }),
 
   [LogType.MESSAGE_DELETE_BULK]: z.object({
@@ -486,6 +489,8 @@ export const LogTypeData = z.object({
     user: z.instanceof(TemplateSafeUser),
     channel: z.instanceof(TemplateSafeChannel),
     messageDate: z.string(),
+    replyInfo: z.string(),
+    reply: z.instanceof(TemplateSafeValueContainer).nullable(),
   }),
 
   [LogType.SET_ANTIRAID_USER]: z.object({

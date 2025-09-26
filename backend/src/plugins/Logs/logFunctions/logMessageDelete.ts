@@ -14,6 +14,7 @@ import {
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 import { LogsPluginType } from "../types.js";
 import { log } from "../util/log.js";
+import { getMessageReplyLogInfo } from "../util/getMessageReplyLogInfo.js";
 
 export interface LogMessageDeleteData {
   user: User | UnknownUser;
@@ -21,7 +22,7 @@ export interface LogMessageDeleteData {
   message: SavedMessage;
 }
 
-export function logMessageDelete(pluginData: GuildPluginData<LogsPluginType>, data: LogMessageDeleteData) {
+export async function logMessageDelete(pluginData: GuildPluginData<LogsPluginType>, data: LogMessageDeleteData) {
   // Replace attachment URLs with media URLs
   if (data.message.data.attachments) {
     for (const attachment of data.message.data.attachments as ISavedMessageAttachmentData[]) {
@@ -32,6 +33,8 @@ export function logMessageDelete(pluginData: GuildPluginData<LogsPluginType>, da
   // See comment on FORMAT_NO_TIMESTAMP in types.ts
   const config = pluginData.config.get();
   const timestampFormat = config.timestamp_format ?? undefined;
+
+  const { replyInfo, reply } = await getMessageReplyLogInfo(pluginData, data.message);
 
   return log(
     pluginData,
@@ -44,6 +47,8 @@ export function logMessageDelete(pluginData: GuildPluginData<LogsPluginType>, da
         .getPlugin(TimeAndDatePlugin)
         .inGuildTz(moment.utc(data.message.data.timestamp, "x"))
         .format(timestampFormat),
+      replyInfo,
+      reply,
     }),
     {
       userId: data.user.id,
