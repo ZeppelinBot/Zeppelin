@@ -119,6 +119,8 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
       }));
     }
 
+    data.pinned = msg.pinned;
+
     return data;
   }
 

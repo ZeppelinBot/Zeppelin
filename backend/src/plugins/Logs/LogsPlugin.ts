@@ -82,6 +82,8 @@ import { logMessageDelete } from "./logFunctions/logMessageDelete.js";
 import { logMessageDeleteAuto } from "./logFunctions/logMessageDeleteAuto.js";
 import { logMessageDeleteBare } from "./logFunctions/logMessageDeleteBare.js";
 import { logMessageDeleteBulk } from "./logFunctions/logMessageDeleteBulk.js";
+import { logMessagePin } from "./logFunctions/logMessagePin.js";
+import { logMessageUnpin } from "./logFunctions/logMessageUnpin.js";
 import { logMessageEdit } from "./logFunctions/logMessageEdit.js";
 import { logMessageSpamDetected } from "./logFunctions/logMessageSpamDetected.js";
 import { logOtherSpamDetected } from "./logFunctions/logOtherSpamDetected.js";
@@ -200,6 +202,8 @@ export const LogsPlugin = guildPlugin<LogsPluginType>()({
       logMessageDeleteAuto: makePublicFn(pluginData, logMessageDeleteAuto),
       logMessageDeleteBare: makePublicFn(pluginData, logMessageDeleteBare),
       logMessageDeleteBulk: makePublicFn(pluginData, logMessageDeleteBulk),
+      logMessagePin: makePublicFn(pluginData, logMessagePin),
+      logMessageUnpin: makePublicFn(pluginData, logMessageUnpin),
       logMessageEdit: makePublicFn(pluginData, logMessageEdit),
       logMessageSpamDetected: makePublicFn(pluginData, logMessageSpamDetected),
       logOtherSpamDetected: makePublicFn(pluginData, logOtherSpamDetected),

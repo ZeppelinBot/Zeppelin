@@ -250,6 +250,20 @@ export const LogTypeData = z.object({
     channel: z.instanceof(TemplateSafeChannel),
   }),
 
+  [LogType.MESSAGE_PIN]: z.object({
+    mod: z.instanceof(TemplateSafeUser).or(z.null()),
+    user: z.instanceof(TemplateSafeUser),
+    channel: z.instanceof(TemplateSafeChannel),
+    message: z.instanceof(TemplateSafeSavedMessage),
+  }),
+
+  [LogType.MESSAGE_UNPIN]: z.object({
+    mod: z.instanceof(TemplateSafeUser).or(z.null()),
+    user: z.instanceof(TemplateSafeUser),
+    channel: z.instanceof(TemplateSafeChannel),
+    message: z.instanceof(TemplateSafeSavedMessage),
+  }),
+
   [LogType.VOICE_CHANNEL_JOIN]: z.object({
     member: z.instanceof(TemplateSafeMember),
     channel: z.instanceof(TemplateSafeChannel),

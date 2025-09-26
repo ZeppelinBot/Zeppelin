@@ -188,6 +188,7 @@ export class TemplateSafeSavedMessageData extends TemplateSafeValueContainer {
     discriminator: string;
   }>;
   content: string;
+  pinned?: boolean;
   embeds?: Array<TypedTemplateSafeValueContainer<ISavedMessageEmbedData>>;
   stickers?: Array<TypedTemplateSafeValueContainer<ISavedMessageStickerData>>;
   timestamp: number;
@@ -445,6 +446,7 @@ export function savedMessageToTemplateSafeSavedMessage(savedMessage: SavedMessag
       ),
 
       timestamp: savedMessage.data.timestamp,
+      pinned: savedMessage.data.pinned ?? false,
     }),
   });
 }

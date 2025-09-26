@@ -72,6 +72,7 @@ export interface ISavedMessageData {
     discriminator: string;
   };
   content: string;
+  pinned?: boolean;
   embeds?: ISavedMessageEmbedData[];
   stickers?: ISavedMessageStickerData[];
   timestamp: number;
