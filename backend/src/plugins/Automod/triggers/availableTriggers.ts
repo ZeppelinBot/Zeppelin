@@ -6,6 +6,7 @@ import { BanTrigger } from "./ban.js";
 import { CharacterSpamTrigger } from "./characterSpam.js";
 import { CounterTrigger } from "./counterTrigger.js";
 import { EmojiSpamTrigger } from "./emojiSpam.js";
+import { HasAttachmentsTrigger } from "./hasAttachments.js";
 import { KickTrigger } from "./kick.js";
 import { LineSpamTrigger } from "./lineSpam.js";
 import { LinkSpamTrigger } from "./linkSpam.js";
@@ -41,6 +42,7 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   match_regex: MatchRegexTrigger,
   match_invites: MatchInvitesTrigger,
   match_links: MatchLinksTrigger,
+  has_attachments: HasAttachmentsTrigger,
   match_attachment_type: MatchAttachmentTypeTrigger,
   match_mime_type: MatchMimeTypeTrigger,
   member_join: MemberJoinTrigger,
