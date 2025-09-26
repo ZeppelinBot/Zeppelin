@@ -6,6 +6,12 @@ export const zZeppelinGuildConfig = z.strictObject({
   // From BaseConfig
   prefix: z.string().optional(),
   levels: z.record(zSnowflake, z.number()).optional(),
+  aliases: z
+    .record(
+      z.string(),
+      z.record(z.string(), z.union([z.string().min(1), z.array(z.string().min(1))])),
+    )
+    .optional(),
   plugins: z.record(z.string(), z.unknown()).optional(),
 });
 

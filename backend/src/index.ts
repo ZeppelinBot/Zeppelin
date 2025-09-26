@@ -1,6 +1,7 @@
 // KEEP THIS AS FIRST IMPORT
 // See comment in module for details
 import "./threadsSignalFix.js";
+import "./applyCommandAliases.js";
 
 import {
   Client,
