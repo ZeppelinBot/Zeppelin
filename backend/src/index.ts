@@ -276,9 +276,12 @@ connect().then(async () => {
     }
   });
 
+  let ignorePluginLoadErrors = true;
   client.on("error", (err) => {
     if (err instanceof PluginLoadError) {
-      errorHandler(err);
+      if (!ignorePluginLoadErrors) {
+        errorHandler(err);
+      }
       return;
     }
     errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
@@ -410,6 +413,8 @@ connect().then(async () => {
     if (process.env.PROFILING === "true") {
       enableProfiling();
     }
+
+    ignorePluginLoadErrors = false;
 
     initFishFish();
 
