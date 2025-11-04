@@ -3,7 +3,9 @@ import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";
 import { runAutomod } from "../functions/runAutomod.js";
-import { createChunkedMessage, resolveMember, resolveUser } from "../../../utils.js";
+import { createChunkedMessage } from "../../../utils.js";
+import { getOrFetchGuildMember } from "../../../utils/getOrFetchGuildMember.js";
+import { getOrFetchUser } from "../../../utils/getOrFetchUser.js";
 
 export const DebugAutomodCmd = guildPluginMessageCommand<AutomodPluginType>()({
   trigger: "debug_automod",
@@ -20,8 +22,8 @@ export const DebugAutomodCmd = guildPluginMessageCommand<AutomodPluginType>()({
       return;
     }
 
-    const member = await pluginData.guild.members.fetch(targetMessage.user_id).catch(() => undefined);
-    const user = await pluginData.client.users.fetch(targetMessage.user_id).catch(() => undefined);
+    const member = await getOrFetchGuildMember(pluginData.guild, targetMessage.user_id);
+    const user = await getOrFetchUser(pluginData.client, targetMessage.user_id);
     const context: AutomodContext = {
       timestamp: moment.utc(targetMessage.posted_at).valueOf(),
       message: targetMessage,

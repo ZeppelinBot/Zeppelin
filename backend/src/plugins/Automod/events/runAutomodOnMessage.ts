@@ -7,14 +7,16 @@ import { addRecentActionsFromMessage } from "../functions/addRecentActionsFromMe
 import { clearRecentActionsForMessage } from "../functions/clearRecentActionsForMessage.js";
 import { runAutomod } from "../functions/runAutomod.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";
+import { getOrFetchGuildMember } from "../../../utils/getOrFetchGuildMember.js";
+import { getOrFetchUser } from "../../../utils/getOrFetchUser.js";
 
 export async function runAutomodOnMessage(
   pluginData: GuildPluginData<AutomodPluginType>,
   message: SavedMessage,
   isEdit: boolean,
 ) {
-  const member = pluginData.guild.members.resolve(message.user_id) ?? undefined;
-  const user = pluginData.client.users.resolve(message.user_id) ?? undefined;
+  const member = await getOrFetchGuildMember(pluginData.guild, message.user_id);
+  const user = await getOrFetchUser(pluginData.client, message.user_id);
 
   const context: AutomodContext = {
     timestamp: moment.utc(message.posted_at).valueOf(),
