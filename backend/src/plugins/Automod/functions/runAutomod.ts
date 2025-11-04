@@ -4,13 +4,51 @@ import { performance } from "perf_hooks";
 import { calculateBlocking, profilingEnabled } from "../../../utils/easyProfiler.js";
 import { availableActions } from "../actions/availableActions.js";
 import { CleanAction } from "../actions/clean.js";
-import { AutomodTriggerMatchResult } from "../helpers.js";
+import { AutomodTriggerBlueprint, AutomodTriggerMatchResult } from "../helpers.js";
 import { availableTriggers } from "../triggers/availableTriggers.js";
-import { AutomodContext, AutomodPluginType } from "../types.js";
+import { AutomodContext, AutomodPluginType, TRule } from "../types.js";
 import { applyCooldown } from "./applyCooldown.js";
 import { checkCooldown } from "./checkCooldown.js";
 
-export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
+const ruleFailReason = {
+  disabled: "rule is disabled",
+  cooldown: "rule is on cooldown",
+  doesNotAffectBots: "rule does not affect bots",
+  doesNotAffectSelf: "rule does not affect self",
+  unknownUser: "rule does not affect bots, and user is unknown",
+  noMatch: "no triggers matched",
+};
+
+interface MatchedTriggerResult {
+  name: string;
+  num: number;
+  config: AutomodTriggerBlueprint<any, any>;
+}
+
+interface RuleResultOutcomeSuccess {
+  success: true;
+  matchedTrigger: MatchedTriggerResult;
+}
+
+interface RuleResultOutcomeFailure {
+  success: false;
+  reason: typeof ruleFailReason[keyof typeof ruleFailReason];
+}
+
+type RuleResultOutcome = RuleResultOutcomeSuccess | RuleResultOutcomeFailure;
+
+interface RuleResult {
+  ruleName: string;
+  config: TRule;
+  outcome: RuleResultOutcome;
+}
+
+interface AutomodRunResult {
+  triggered: boolean;
+  rulesChecked: RuleResult[];
+}
+
+export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext, dryRun: boolean = false): Promise<AutomodRunResult> {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
   const user = context.user || (userId && pluginData.client.users!.cache.get(userId as Snowflake));
   const member = context.member || (userId && pluginData.guild.members.cache.get(userId as Snowflake)) || null;
@@ -34,10 +72,25 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
     member,
   });
 
+  const result: AutomodRunResult = {
+    triggered: false,
+    rulesChecked: [],
+  };
+
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     const prettyName = rule.pretty_name;
 
-    if (rule.enabled === false) continue;
+    const ruleResult: RuleResult = {
+      ruleName,
+      config: rule,
+      outcome: { success: false, reason: ruleFailReason.noMatch },
+    };
+    result.rulesChecked.push(ruleResult);
+
+    if (rule.enabled === false) {
+      ruleResult.outcome = { success: false, reason: ruleFailReason.disabled };
+      continue;
+    }
     if (
       !rule.affects_bots &&
       (!user || user.bot) &&
@@ -45,11 +98,20 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
       !context.antiraid &&
       !context.threadChange?.deleted
     ) {
+      if (user) {
+        ruleResult.outcome = { success: false, reason: ruleFailReason.doesNotAffectBots };
+      } else {
+        ruleResult.outcome = { success: false, reason: ruleFailReason.unknownUser };
+      }
       continue;
     }
-    if (!rule.affects_self && userId && userId === pluginData.client.user?.id) continue;
+    if (!rule.affects_self && userId && userId === pluginData.client.user?.id) {
+      ruleResult.outcome = { success: false, reason: ruleFailReason.doesNotAffectSelf };
+      continue;
+    }
 
     if (rule.cooldown && checkCooldown(pluginData, rule, ruleName, context)) {
+      ruleResult.outcome = { success: false, reason: ruleFailReason.cooldown };
       continue;
     }
 
@@ -58,11 +120,13 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
     let matchResult: AutomodTriggerMatchResult<any> | null | undefined;
     let contexts: AutomodContext[] = [];
 
+    let triggerNum = 0;
     triggerLoop: for (const triggerItem of rule.triggers) {
       for (const [triggerName, triggerConfig] of Object.entries(triggerItem)) {
         const triggerStartTime = performance.now();
 
         const trigger = availableTriggers[triggerName];
+        triggerNum++;
 
         let getBlockingTime: ReturnType<typeof calculateBlocking> | null = null;
         if (profilingEnabled()) {
@@ -104,7 +168,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
               matchResult,
               prettyName,
             });
-            return;
+            return result;
           }
 
           matchResult.summary =
@@ -131,12 +195,21 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
         }
 
         if (matchResult) {
+          ruleResult.outcome = {
+            success: true,
+            matchedTrigger: {
+              name: triggerName,
+              num: triggerNum,
+              config: trigger,
+            },
+          };
+
           break triggerLoop;
         }
       }
     }
 
-    if (matchResult) {
+    if (matchResult && !dryRun) {
       for (const [actionName, actionConfig] of Object.entries(rule.actions)) {
         if (actionConfig == null || actionConfig === false) {
           continue;
@@ -188,4 +261,6 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
       break;
     }
   }
+
+  return result;
 }
