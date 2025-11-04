@@ -33,6 +33,7 @@ import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChang
 import { clearOldRecentActions } from "./functions/clearOldRecentActions.js";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam.js";
 import { AutomodPluginType, zAutomodConfig } from "./types.js";
+import { DebugAutomodCmd } from "./commands/DebugAutomodCmd.js";
 
 export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
   name: "automod",
@@ -67,7 +68,7 @@ export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
     // Messages use message events from SavedMessages, see onLoad below
   ],
 
-  messageCommands: [AntiraidClearCmd, SetAntiraidCmd, ViewAntiraidCmd],
+  messageCommands: [AntiraidClearCmd, SetAntiraidCmd, ViewAntiraidCmd, DebugAutomodCmd],
 
   async beforeLoad(pluginData) {
     const { state, guild } = pluginData;

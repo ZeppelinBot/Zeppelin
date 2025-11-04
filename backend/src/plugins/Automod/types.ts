@@ -62,6 +62,7 @@ export const zAutomodConfig = z.strictObject({
   antiraid_levels: z.array(z.string().max(100)).max(10).default(["low", "medium", "high"]),
   can_set_antiraid: z.boolean().default(false),
   can_view_antiraid: z.boolean().default(false),
+  can_debug_automod: z.boolean().default(false),
 });
 
 export interface AutomodPluginType extends BasePluginType {
