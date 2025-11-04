@@ -38,3 +38,10 @@ services:
     volumes:
       - home:/home/ubuntu
       - ./:/workspace/zeppelin
+
+  cftunnel:
+    profiles: [cftunnel]
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}
