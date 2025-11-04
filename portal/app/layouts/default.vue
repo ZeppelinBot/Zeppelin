@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import BasicLink from '~/components/BasicLink.vue';
-
-</script>
-
 <template>
   <div class="layout">
     <div class="grid x64" aria-hidden="true"></div>
@@ -14,11 +9,11 @@ import BasicLink from '~/components/BasicLink.vue';
         <div class="logo">
           <img src="~/assets/logo.svg" />
         </div>
-        <div class="menu">
-          <div class="menu-item">Home</div>
-          <div class="menu-item">Dashboard</div>
-          <div class="menu-item">Documentation</div>
-          <div class="menu-item">Privacy policy</div>
+        <div class="menu" role="menubar" aria-label="Main menu">
+          <MainMenuItem to="/" :active="route.path === '/'">Home</MainMenuItem>
+          <MainMenuItem to="/dashboard" :active="route.path.startsWith('/dashboard')">Dashboard</MainMenuItem>
+          <MainMenuItem to="/documentation" :active="route.path.startsWith('/documentation')">Documentation</MainMenuItem>
+          <MainMenuItem to="/privacy-policy" :active="route.path.startsWith('/privacy-policy')">Privacy policy</MainMenuItem>
         </div>
       </div>
       <div class="content">
@@ -35,13 +30,32 @@ import BasicLink from '~/components/BasicLink.vue';
   </div>
 </template>
 
+<script setup lang="ts">
+import { useRoute } from '#app';
+import BasicLink from '~/components/BasicLink.vue';
+import MainMenuItem from '~/components/MainMenuItem.vue';
+
+const route = useRoute();
+</script>
+
 <style>
 body {
-  background: radial-gradient(circle at center, var(--color-steelblue-700), color-mix(in lab, var(--color-steelblue-700), black 30%));
+  background: radial-gradient(circle at 50% 160px, var(--color-steelblue-700) 0, color-mix(in lab, var(--color-steelblue-700), black 40%) 1200px);
 }
 </style>
 
 <style scoped>
+/**
+ * Breakpoints to use with blueprint grid:
+ * 320px = 5 * 64px
+ * 448px = 7 * 64px
+ * 576px = 9 * 64px
+ * 704px = 11 * 64px
+ * 832px = 13 * 64px
+ * 960px = 15 * 64px
+ * 1088px = 17 * 64px
+ */
+
 .layout {
   position: relative;
   width: 100vw;
@@ -71,13 +85,48 @@ body {
 
 .wrap {
   min-height: 100vh;
-  width: calc(64px * 16 + 64px);
+  width: calc(5 * 64px);
   margin: 0 auto;
   padding: 64px 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 64px;
+}
+@media (min-width: 448px) {
+  .wrap {
+    width: calc(7 * 64px);
+  }
+}
+@media (min-width: 448px) {
+  .wrap {
+    width: calc(7 * 64px);
+  }
+}
+@media (min-width: 576px) {
+  .wrap {
+    width: calc(9 * 64px);
+  }
+}
+@media (min-width: 704px) {
+  .wrap {
+    width: calc(11 * 64px);
+  }
+}
+@media (min-width: 832px) {
+  .wrap {
+    width: calc(13 * 64px);
+  }
+}
+@media (min-width: 960px) {
+  .wrap {
+    width: calc(15 * 64px);
+  }
+}
+@media (min-width: 1088px) {
+  .wrap {
+    width: calc(17 * 64px);
+  }
 }
 
 .header {
@@ -90,7 +139,6 @@ body {
   flex: 0 0 calc(64px * 4);
   margin: -16px 0 -17px;
   padding-left: 2px;
-  /* transform: scaleX(-1); */
 }
 .logo img {
   width: 100%;
@@ -100,11 +148,17 @@ body {
 }
 .menu {
   flex: 1 1 auto;
-  display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 32px;
   font-weight: 450;
+
+  display: none;
+}
+@media (min-width: 832px) {
+  .menu {
+    display: flex;
+  }
 }
 .menu-item {
   padding: 0 16px;

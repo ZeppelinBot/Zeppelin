@@ -16,7 +16,12 @@
 </template>
 
 <script setup lang="ts">
+import { useHead } from '#imports';
 import BasicButton from '~/components/BasicButton.vue';
+
+useHead({
+  title: "Zeppelin - Moderation bot for Discord",
+});
 </script>
 
 <style scoped>
