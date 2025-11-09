@@ -18,7 +18,7 @@ export async function getInviteInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   inviteCode: string,
 ): Promise<APIEmbed | null> {
-  let invite = await resolveInvite(pluginData.client, inviteCode, true);
+  const invite = await resolveInvite(pluginData.client, inviteCode, true);
   if (!invite) {
     return null;
   }

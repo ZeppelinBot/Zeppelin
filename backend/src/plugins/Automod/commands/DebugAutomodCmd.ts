@@ -10,7 +10,7 @@ import { getOrFetchUser } from "../../../utils/getOrFetchUser.js";
 export const DebugAutomodCmd = guildPluginMessageCommand<AutomodPluginType>()({
   trigger: "debug_automod",
   permission: "can_debug_automod",
-  
+
   signature: {
     messageId: ct.string(),
   },

@@ -186,8 +186,8 @@ export async function muteUser(
   const template = existingMute
     ? config.update_mute_message
     : muteTime
-    ? config.timed_mute_message
-    : config.mute_message;
+      ? config.timed_mute_message
+      : config.mute_message;
 
   let muteMessage: string | null = null;
   try {

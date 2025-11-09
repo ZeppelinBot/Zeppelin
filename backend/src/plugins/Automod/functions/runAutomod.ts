@@ -32,7 +32,7 @@ interface RuleResultOutcomeSuccess {
 
 interface RuleResultOutcomeFailure {
   success: false;
-  reason: typeof ruleFailReason[keyof typeof ruleFailReason];
+  reason: (typeof ruleFailReason)[keyof typeof ruleFailReason];
 }
 
 type RuleResultOutcome = RuleResultOutcomeSuccess | RuleResultOutcomeFailure;
@@ -48,7 +48,11 @@ interface AutomodRunResult {
   rulesChecked: RuleResult[];
 }
 
-export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext, dryRun: boolean = false): Promise<AutomodRunResult> {
+export async function runAutomod(
+  pluginData: GuildPluginData<AutomodPluginType>,
+  context: AutomodContext,
+  dryRun = false,
+): Promise<AutomodRunResult> {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
   const user = context.user || (userId && pluginData.client.users!.cache.get(userId as Snowflake));
   const member = context.member || (userId && pluginData.guild.members.cache.get(userId as Snowflake)) || null;

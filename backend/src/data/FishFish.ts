@@ -59,9 +59,12 @@ async function getSessionToken(): Promise<string> {
     }
 
     const timeUntilExpiry = Date.now() - parseResult.data.expires * 1000;
-    setTimeout(() => {
-      sessionTokenPromise = null;
-    }, timeUntilExpiry - 1 * MINUTES); // Subtract a minute to ensure we refresh before expiry
+    setTimeout(
+      () => {
+        sessionTokenPromise = null;
+      },
+      timeUntilExpiry - 1 * MINUTES,
+    ); // Subtract a minute to ensure we refresh before expiry
 
     return parseResult.data.token;
   })();
