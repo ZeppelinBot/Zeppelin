@@ -29,7 +29,7 @@ import {
 import emojiRegex from "emoji-regex";
 import fs from "fs";
 import https from "https";
-import isEqual from "lodash/isEqual.js";
+import { isEqual } from "lodash-es";
 import { performance } from "perf_hooks";
 import tlds from "tlds" with { type: "json" };
 import tmp from "tmp";
