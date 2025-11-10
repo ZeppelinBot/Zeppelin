@@ -60,12 +60,12 @@ Zeppelin's production environment uses Docker. There are a few different ways to
 ## Manual
 1. Build the Zeppelin image: `docker build --tag 'zeppelin' .`
 2. Run the service:
-  * Bot: `docker run zeppelin npm run start-bot`
-  * API: `docker run zeppelin npm run start-api`
-  * Dashboard: `docker run zeppelin npm run start-dashboard`
+  * Bot: `docker run zeppelin pnpm run start-bot`
+  * API: `docker run zeppelin pnpm run start-api`
+  * Dashboard: `docker run zeppelin pnpm run start-dashboard`
 
 If you're using an application platform such as Railway, you can simply point it to Zeppelin's repository and it should pick up the Dockerfile from there.
-For the start command, you can use the same commands as above: `npm run start-bot`, `npm run start-api`, `npm run start-dashboard`.
+For the start command, you can use the same commands as above: `pnpm run start-bot`, `pnpm run start-api`, `pnpm run start-dashboard`.
 Make sure to also run migrations when you update the bot.
 
 ### Environment variables
