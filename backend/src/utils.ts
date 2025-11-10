@@ -1492,7 +1492,7 @@ export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
   return invite.type === InviteType.GroupDM;
 }
 
-export function inviteHasCounts(invite: Invite): invite is Invite {
+export function inviteHasCounts(invite: Invite): invite is Invite & { memberCount: number; presenceCount: number } {
   return invite.memberCount != null;
 }
 

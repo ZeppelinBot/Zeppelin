@@ -15,7 +15,7 @@ export const MigratePinsCmd = starboardCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const config = await pluginData.config.get();
+    const config = pluginData.config.get();
     const starboard = config.boards[args.starboardName];
     if (!starboard) {
       void pluginData.state.common.sendErrorMessage(msg, "Unknown starboard specified");
