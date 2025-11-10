@@ -10,5 +10,4 @@ minimumReleaseAgeExclude:
 
 overrides:
   # Keep in sync with Knub's discord.js version
-  discord.js: "14.19.3"
-  discord-api-types: "0.38.1"
+  discord-api-types: "0.38.30"

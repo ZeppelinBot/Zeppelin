@@ -5,8 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  discord.js: 14.19.3
-  discord-api-types: 0.38.1
+  discord-api-types: 0.38.30
 
 importers:
 
@@ -21,10 +20,10 @@ importers:
         version: 22.18.12
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.59.5
-        version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
+        version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser':
         specifier: ^5.59.5
-        version: 5.62.0(eslint@8.57.1)(typescript@5.8.3)
+        version: 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       eslint:
         specifier: ^8.40.0
         version: 8.57.1
@@ -36,16 +35,16 @@ importers:
         version: 3.6.2
       prettier-plugin-organize-imports:
         specifier: ^3.2.2
-        version: 3.2.4(prettier@3.6.2)(typescript@5.8.3)
+        version: 3.2.4(prettier@3.6.2)(typescript@5.9.3)
       ts-toolbelt:
         specifier: ^9.6.0
         version: 9.6.0
       tsc-watch:
         specifier: ^6.0.4
-        version: 6.3.1(typescript@5.8.3)
+        version: 6.3.1(typescript@5.9.3)
       typescript:
-        specifier: '=5.8.3'
-        version: 5.8.3
+        specifier: '=5.9.3'
+        version: 5.9.3
 
   backend:
     dependencies:
@@ -71,8 +70,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       discord.js:
-        specifier: 14.19.3
-        version: 14.19.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: 14.23.2
+        version: 14.23.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       emoji-regex:
         specifier: ^8.0.0
         version: 8.0.0
@@ -92,8 +91,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       knub:
-        specifier: '=32.0.0-next.25'
-        version: 32.0.0-next.25(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
+        specifier: 32.0.0-next.27
+        version: 32.0.0-next.27(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
       knub-command-manager:
         specifier: ^9.1.0
         version: 9.1.0
@@ -170,8 +169,8 @@ importers:
         specifier: github:dragory/yawn-yaml#string-number-fix-build
         version: https://codeload.github.com/dragory/yawn-yaml/tar.gz/77ab3870ca53c4693002c4a41336e7476e7934ed
       zod:
-        specifier: '=3.25.17'
-        version: 3.25.17
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@types/cors':
         specifier: ^2.8.5
@@ -224,9 +223,6 @@ importers:
       source-map-support:
         specifier: ^0.5.16
         version: 0.5.21
-      zod-to-json-schema:
-        specifier: ^3.22.3
-        version: 3.24.6(zod@3.25.17)
 
   dashboard:
     dependencies:
@@ -1920,11 +1916,11 @@ packages:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
 
-  discord-api-types@0.38.1:
-    resolution: {integrity: sha512-vsjsqjAuxsPhiwbPjTBeGQaDPlizFmSkU0mTzFGMgRxqCDIRBR7iTY74HacpzrDV0QtERHRKQEk1tq7drZUtHg==}
+  discord-api-types@0.38.30:
+    resolution: {integrity: sha512-KhAqlBrg+rVK+Ob7INMF5o63yW4/GUzRatG/AjyVsIO8lgcLyR8qCl2HokIVzWwmzkJYG0CEPXsKMOqau3E8NA==}
 
-  discord.js@14.19.3:
-    resolution: {integrity: sha512-lncTRk0k+8Q5D3nThnODBR8fR8x2fM798o8Vsr40Krx0DjPwpZCuxxTcFMrXMQVOqM1QB9wqWgaXPg3TbmlHqA==}
+  discord.js@14.23.2:
+    resolution: {integrity: sha512-tU2NFr823X3TXEc8KyR/4m296KLxPai4nirN3q9kHCpY4TKj96n9lHZnyLzRNMui8EbL07jg9hgH2PWWfKMGIg==}
     engines: {node: '>=18'}
 
   distributions@2.2.0:
@@ -2917,8 +2913,8 @@ packages:
   knub-command-manager@9.1.0:
     resolution: {integrity: sha512-pEtpWElbBoTRSL8kWSPRrTIuTIdvYGkP/wzOn77cieumC02adfwEt1Cc09HFvVT4ib35nf1y31oul36csaG7Vg==}
 
-  knub@32.0.0-next.25:
-    resolution: {integrity: sha512-5ki+0f3PD7v3mRH2ew4RIy1aXMXvUUqPGyikUjCBR8/5EF277/GNwqxC8pA5CDJi8/e29UeGyx/mqHKBvGoTXw==}
+  knub@32.0.0-next.27:
+    resolution: {integrity: sha512-0yDCLJRqe9aNbBEvG8bjgEzy9o/mkx85o6seVaIlYDzZj+37plLnJ4dxmoFZmLO2NytoV/nlIcFNbxg8abJQ3Q==}
     engines: {node: '>=22'}
 
   labeled-stream-splicer@2.0.2:
@@ -4668,11 +4664,6 @@ packages:
       typeorm-aurora-data-api-driver:
         optional: true
 
-  typescript@5.8.3:
-    resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
@@ -4691,10 +4682,6 @@ packages:
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
-  undici@6.21.1:
-    resolution: {integrity: sha512-q/1rj5D0/zayJB2FraXdaWxbhWiNKDvu8naDT2dl1yTlvJp4BLtOcp2a5BvgGNQpYYJzau7tf1WgKv3b+7mqpQ==}
-    engines: {node: '>=18.17'}
 
   undici@6.21.3:
     resolution: {integrity: sha512-gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==}
@@ -4967,13 +4954,8 @@ packages:
     resolution: {integrity: sha512-AyeEbWOu/TAXdxlV9wmGcR0+yh2j3vYPGOECcIj2S7MkrLyC7ne+oye2BKTItt0ii2PHk4cDy+95+LshzbXnGg==}
     engines: {node: '>=12.20'}
 
-  zod-to-json-schema@3.24.6:
-    resolution: {integrity: sha512-h/z3PKvcTcTetyjl1fkj79MHNEjm+HpD6NXheWjzOekY7kV+lwDYnHw+ivHkijnCSMz1yJaWBD9vu/Fcmk+vEg==}
-    peerDependencies:
-      zod: ^3.24.1
-
-  zod@3.25.17:
-    resolution: {integrity: sha512-8hQzQ/kMOIFbwOgPrm9Sf9rtFHpFUMy4HvN0yEB0spw14aYi0uT5xG5CE2DB9cd51GWNsz+DNO7se1kztHMKnw==}
+  zod@4.1.12:
+    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
 
 snapshots:
 
@@ -5165,7 +5147,7 @@ snapshots:
       '@discordjs/formatters': 0.6.1
       '@discordjs/util': 1.1.1
       '@sapphire/shapeshift': 4.0.0
-      discord-api-types: 0.38.1
+      discord-api-types: 0.38.30
       fast-deep-equal: 3.1.3
       ts-mixer: 6.0.4
       tslib: 2.8.1
@@ -5176,7 +5158,7 @@ snapshots:
 
   '@discordjs/formatters@0.6.1':
     dependencies:
-      discord-api-types: 0.38.1
+      discord-api-types: 0.38.30
 
   '@discordjs/rest@2.6.0':
     dependencies:
@@ -5185,7 +5167,7 @@ snapshots:
       '@sapphire/async-queue': 1.5.5
       '@sapphire/snowflake': 3.5.3
       '@vladfrangu/async_event_emitter': 2.4.7
-      discord-api-types: 0.38.1
+      discord-api-types: 0.38.30
       magic-bytes.js: 1.12.1
       tslib: 2.8.1
       undici: 6.21.3
@@ -5200,7 +5182,7 @@ snapshots:
       '@sapphire/async-queue': 1.5.5
       '@types/ws': 8.18.1
       '@vladfrangu/async_event_emitter': 2.4.7
-      discord-api-types: 0.38.1
+      discord-api-types: 0.38.30
       tslib: 2.8.1
       ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -5676,34 +5658,34 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)':
+  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 5.62.0
-      '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.1)(typescript@5.8.3)
-      '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       debug: 4.4.3
       eslint: 8.57.1
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare-lite: 1.4.0
       semver: 7.7.3
-      tsutils: 3.21.0(typescript@5.8.3)
+      tsutils: 3.21.0(typescript@5.9.3)
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3)':
+  '@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.8.3)
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.9.3)
       debug: 4.4.3
       eslint: 8.57.1
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
@@ -5712,21 +5694,21 @@ snapshots:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
 
-  '@typescript-eslint/type-utils@5.62.0(eslint@8.57.1)(typescript@5.8.3)':
+  '@typescript-eslint/type-utils@5.62.0(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.8.3)
-      '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.9.3)
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       debug: 4.4.3
       eslint: 8.57.1
-      tsutils: 3.21.0(typescript@5.8.3)
+      tsutils: 3.21.0(typescript@5.9.3)
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@5.62.0': {}
 
-  '@typescript-eslint/typescript-estree@5.62.0(typescript@5.8.3)':
+  '@typescript-eslint/typescript-estree@5.62.0(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
@@ -5734,20 +5716,20 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.7.3
-      tsutils: 3.21.0(typescript@5.8.3)
+      tsutils: 3.21.0(typescript@5.9.3)
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@5.62.0(eslint@8.57.1)(typescript@5.8.3)':
+  '@typescript-eslint/utils@5.62.0(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.0(eslint@8.57.1)
       '@types/json-schema': 7.0.15
       '@types/semver': 7.7.1
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.8.3)
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.9.3)
       eslint: 8.57.1
       eslint-scope: 5.1.1
       semver: 7.7.3
@@ -6906,9 +6888,9 @@ snapshots:
     dependencies:
       path-type: 4.0.0
 
-  discord-api-types@0.38.1: {}
+  discord-api-types@0.38.30: {}
 
-  discord.js@14.19.3(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+  discord.js@14.23.2(bufferutil@4.0.9)(utf-8-validate@5.0.10):
     dependencies:
       '@discordjs/builders': 1.13.0
       '@discordjs/collection': 1.5.3
@@ -6917,12 +6899,12 @@ snapshots:
       '@discordjs/util': 1.1.1
       '@discordjs/ws': 1.2.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@sapphire/snowflake': 3.5.3
-      discord-api-types: 0.38.1
+      discord-api-types: 0.38.30
       fast-deep-equal: 3.1.3
       lodash.snakecase: 4.1.1
       magic-bytes.js: 1.12.1
       tslib: 2.8.1
-      undici: 6.21.1
+      undici: 6.21.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -8039,13 +8021,13 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
-  knub@32.0.0-next.25(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10):
+  knub@32.0.0-next.27(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10):
     dependencies:
-      discord-api-types: 0.38.1
-      discord.js: 14.19.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      discord-api-types: 0.38.30
+      discord.js: 14.23.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       knub-command-manager: 9.1.0
       ts-essentials: 10.1.1(typescript@5.9.3)
-      zod: 3.25.17
+      zod: 4.1.12
     transitivePeerDependencies:
       - bufferutil
       - typescript
@@ -8828,10 +8810,10 @@ snapshots:
 
   prepend-http@2.0.0: {}
 
-  prettier-plugin-organize-imports@3.2.4(prettier@3.6.2)(typescript@5.8.3):
+  prettier-plugin-organize-imports@3.2.4(prettier@3.6.2)(typescript@5.9.3):
     dependencies:
       prettier: 3.6.2
-      typescript: 5.8.3
+      typescript: 5.9.3
 
   prettier@3.6.2: {}
 
@@ -9671,13 +9653,13 @@ snapshots:
 
   ts-toolbelt@9.6.0: {}
 
-  tsc-watch@6.3.1(typescript@5.8.3):
+  tsc-watch@6.3.1(typescript@5.9.3):
     dependencies:
       cross-spawn: 7.0.6
       node-cleanup: 2.1.2
       ps-tree: 1.2.0
       string-argv: 0.3.2
-      typescript: 5.8.3
+      typescript: 5.9.3
 
   tsconfig-paths@3.15.0:
     dependencies:
@@ -9690,10 +9672,10 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsutils@3.21.0(typescript@5.8.3):
+  tsutils@3.21.0(typescript@5.9.3):
     dependencies:
       tslib: 1.14.1
-      typescript: 5.8.3
+      typescript: 5.9.3
 
   ttest@3.0.0:
     dependencies:
@@ -9783,8 +9765,6 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  typescript@5.8.3: {}
-
   typescript@5.9.3: {}
 
   uid2@0.0.4: {}
@@ -9800,8 +9780,6 @@ snapshots:
       xtend: 4.0.2
 
   undici-types@6.21.0: {}
-
-  undici@6.21.1: {}
 
   undici@6.21.3: {}
 
@@ -10076,8 +10054,4 @@ snapshots:
 
   yocto-queue@1.2.1: {}
 
-  zod-to-json-schema@3.24.6(zod@3.25.17):
-    dependencies:
-      zod: 3.25.17
-
-  zod@3.25.17: {}
+  zod@4.1.12: {}
