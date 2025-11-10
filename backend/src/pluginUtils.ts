@@ -29,7 +29,7 @@ import {
   helpers,
   PluginConfigManager,
 } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 import { isStaff } from "./staff.js";
 import { TZeppelinKnub } from "./types.js";
 import { Tail } from "./utils/typeUtils.js";

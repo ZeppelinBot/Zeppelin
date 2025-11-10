@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { env } from "../env.js";
 import { HOURS, MINUTES, SECONDS } from "../utils.js";
 

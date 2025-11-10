@@ -1,6 +1,6 @@
 import { PermissionsBitField, PermissionsString } from "discord.js";
 import { U } from "ts-toolbelt";
-import z from "zod/v4";
+import { z } from "zod";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import { isValidSnowflake, keys, noop, zBoundedCharacters } from "../../../utils.js";
 import {

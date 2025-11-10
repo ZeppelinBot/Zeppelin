@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { inputPatternToRegExp, zRegex } from "../../../utils.js";
 import { mergeRegexes } from "../../../utils/mergeRegexes.js";

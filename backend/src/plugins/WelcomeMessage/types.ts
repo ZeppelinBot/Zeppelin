@@ -1,5 +1,5 @@
 import { BasePluginType, guildPluginEventListener } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 import { GuildLogs } from "../../data/GuildLogs.js";
 
 export const zWelcomeMessageConfig = z.strictObject({

@@ -34,7 +34,7 @@ import { performance } from "perf_hooks";
 import tlds from "tlds" with { type: "json" };
 import tmp from "tmp";
 import { URL } from "url";
-import { z, ZodError, ZodPipe, ZodRecord, ZodString, ZodTransform } from "zod/v4";
+import { z, ZodError, ZodPipe, ZodRecord, ZodString, ZodTransform } from "zod";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage.js";
 import { delayStringMultipliers, humanizeDuration } from "./humanizeDuration.js";
 import { getProfiler } from "./profiler.js";

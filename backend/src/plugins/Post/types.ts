@@ -1,5 +1,5 @@
 import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildScheduledPosts } from "../../data/GuildScheduledPosts.js";

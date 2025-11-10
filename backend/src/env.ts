@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { rootDir } from "./paths.js";
 
 const envType = z.object({

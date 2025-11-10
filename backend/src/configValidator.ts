@@ -1,5 +1,5 @@
 import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
-import { z, ZodError } from "zod/v4";
+import { z, ZodError } from "zod";
 import { availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { zZeppelinGuildConfig } from "./types.js";
 import { formatZodIssue } from "./utils/formatZodIssue.js";

@@ -1,5 +1,5 @@
 import express from "express";
-import z from "zod/v4";
+import { z } from "zod";
 import { $ZodPipeDef } from "zod/v4/core";
 import { availableGuildPlugins } from "../plugins/availablePlugins.js";
 import { ZeppelinGuildPluginInfo } from "../types.js";

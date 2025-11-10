@@ -1,5 +1,5 @@
 import { escapeInlineCode } from "discord.js";
-import z from "zod/v4";
+import { z } from "zod";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { getFishFishDomain } from "../../../data/FishFish.js";
 import { getUrlsInString, inputPatternToRegExp, zRegex } from "../../../utils.js";

@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { zBoundedCharacters } from "../../../utils.js";
 import { automodAction } from "../helpers.js";
 

@@ -1,5 +1,5 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 import { RegExpRunner } from "../../RegExpRunner.js";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildCases } from "../../data/GuildCases.js";

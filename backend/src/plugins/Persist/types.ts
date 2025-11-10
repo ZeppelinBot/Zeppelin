@@ -1,5 +1,5 @@
 import { BasePluginType, guildPluginEventListener } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildPersistedData } from "../../data/GuildPersistedData.js";
 import { zSnowflake } from "../../utils.js";

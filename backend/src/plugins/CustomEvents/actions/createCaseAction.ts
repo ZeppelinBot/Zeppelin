@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter.js";
 import { zBoundedCharacters } from "../../../utils.js";

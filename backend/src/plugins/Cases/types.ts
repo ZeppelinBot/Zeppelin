@@ -1,6 +1,6 @@
 import { BasePluginType } from "knub";
 import { U } from "ts-toolbelt";
-import z from "zod/v4";
+import { z } from "zod";
 import { CaseNameToType, CaseTypes } from "../../data/CaseTypes.js";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildCases } from "../../data/GuildCases.js";

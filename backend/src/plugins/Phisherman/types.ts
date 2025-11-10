@@ -1,5 +1,5 @@
 import { BasePluginType } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 
 export const zPhishermanConfig = z.strictObject({
   api_key: z.string().max(255).nullable().default(null),

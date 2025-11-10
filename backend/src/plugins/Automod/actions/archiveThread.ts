@@ -1,5 +1,5 @@
 import { AnyThreadChannel } from "discord.js";
-import z from "zod/v4";
+import { z } from "zod";
 import { noop } from "../../../utils.js";
 import { automodAction } from "../helpers.js";
 

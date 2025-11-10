@@ -1,5 +1,5 @@
 import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones.js";
 import { keys } from "../../utils.js";
 import { zValidTimezone } from "../../utils/zValidTimezone.js";

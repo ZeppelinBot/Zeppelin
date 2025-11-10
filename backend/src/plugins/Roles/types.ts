@@ -1,5 +1,5 @@
 import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
-import z from "zod/v4";
+import { z } from "zod";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 

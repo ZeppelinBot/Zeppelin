@@ -17,7 +17,7 @@
    limitations under the License.
 */
 
-import { z } from "zod/v4";
+import { z } from "zod";
 import { $ZodRecordKey, $ZodType } from "zod/v4/core";
 
 const RESOLVING = Symbol("mapOnSchema/resolving");

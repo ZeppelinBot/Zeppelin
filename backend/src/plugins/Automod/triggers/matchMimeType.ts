@@ -1,5 +1,5 @@
 import { escapeInlineCode } from "discord.js";
-import z from "zod/v4";
+import { z } from "zod";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils.js";
 import { automodTrigger } from "../helpers.js";
 

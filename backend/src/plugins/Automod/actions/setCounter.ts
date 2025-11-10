@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../../data/GuildCounters.js";
 import { zBoundedCharacters } from "../../../utils.js";
 import { CountersPlugin } from "../../Counters/CountersPlugin.js";

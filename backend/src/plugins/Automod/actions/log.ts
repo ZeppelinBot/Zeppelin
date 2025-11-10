@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { isTruthy, unique } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { automodAction } from "../helpers.js";

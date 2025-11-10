@@ -1,5 +1,5 @@
 import escapeStringRegexp from "escape-string-regexp";
-import z from "zod/v4";
+import { z } from "zod";
 import { normalizeText } from "../../../utils/normalizeText.js";
 import { stripMarkdown } from "../../../utils/stripMarkdown.js";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";

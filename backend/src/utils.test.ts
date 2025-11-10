@@ -1,5 +1,5 @@
 import test from "ava";
-import z from "zod/v4";
+import { z } from "zod";
 import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, zAllowedMentions } from "./utils.js";
 import { ErisAllowedMentionFormat } from "./utils/erisAllowedMentionsToDjsMentionOptions.js";
 
