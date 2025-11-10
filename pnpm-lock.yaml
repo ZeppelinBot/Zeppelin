@@ -91,8 +91,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       knub:
-        specifier: 32.0.0-next.27
-        version: 32.0.0-next.27(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
+        specifier: 32.0.0-next.28
+        version: 32.0.0-next.28(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
       knub-command-manager:
         specifier: ^9.1.0
         version: 9.1.0
@@ -2913,8 +2913,8 @@ packages:
   knub-command-manager@9.1.0:
     resolution: {integrity: sha512-pEtpWElbBoTRSL8kWSPRrTIuTIdvYGkP/wzOn77cieumC02adfwEt1Cc09HFvVT4ib35nf1y31oul36csaG7Vg==}
 
-  knub@32.0.0-next.27:
-    resolution: {integrity: sha512-0yDCLJRqe9aNbBEvG8bjgEzy9o/mkx85o6seVaIlYDzZj+37plLnJ4dxmoFZmLO2NytoV/nlIcFNbxg8abJQ3Q==}
+  knub@32.0.0-next.28:
+    resolution: {integrity: sha512-K+9VHtgkwIw4K3k7+Vss3fbfgrDjctBPR6AgR4+Qfq+MklD/QkJgCo2LTwrCiCKRwkmQQAlEkRMbtn/AFLCM8A==}
     engines: {node: '>=22'}
 
   labeled-stream-splicer@2.0.2:
@@ -8021,9 +8021,8 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
-  knub@32.0.0-next.27(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10):
+  knub@32.0.0-next.28(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10):
     dependencies:
-      discord-api-types: 0.38.30
       discord.js: 14.23.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       knub-command-manager: 9.1.0
       ts-essentials: 10.1.1(typescript@5.9.3)
