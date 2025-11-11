@@ -16,7 +16,6 @@ export const DispatchAliasEvt = commandAliasesEvt({
     const newContent = msg.content.replace(matchingAlias.regex, matchingAlias.replacement);
     if (newContent === msg.content) return;
 
-    // Instead of cloning, make a shallow copy preserving the client
     const copiedMessage = Object.create(msg);
     copiedMessage.content = newContent;
 
