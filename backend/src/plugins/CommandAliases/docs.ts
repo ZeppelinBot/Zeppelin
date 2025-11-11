@@ -5,7 +5,7 @@ export const commandAliasesPluginDocs: ZeppelinPluginDocs = {
   type: "stable",
   prettyName: "Command Aliases",
   configSchema: zCommandAliasesConfig,
-  description: "This plugin lets you create shortcuts for existing commands."
+  description: "This plugin lets you create shortcuts for existing commands.",
   usageGuide: `
 For example, you can make \`!b\` work the same as \`!ban\`, or \`!c\` work the same as \`!cases\`.
 
