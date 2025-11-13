@@ -58,7 +58,7 @@ async function getSessionToken(): Promise<string> {
       throw new FishFishError(`Parse error when fetching session token: ${parseResult.error.message}`);
     }
 
-    const timeUntilExpiry = Date.now() - parseResult.data.expires * 1000;
+    const timeUntilExpiry = parseResult.data.expires * 1000 - Date.now();
     setTimeout(
       () => {
         sessionTokenPromise = null;
