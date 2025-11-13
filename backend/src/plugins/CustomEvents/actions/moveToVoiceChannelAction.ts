@@ -1,5 +1,5 @@
 import { Snowflake, VoiceChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { z } from "zod";
 import { canActOn } from "../../../pluginUtils.js";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";

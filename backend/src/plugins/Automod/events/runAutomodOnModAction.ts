@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { resolveMember, resolveUser, UnknownUser } from "../../../utils.js";
 import { ModActionType } from "../../ModActions/types.js";
 import { runAutomod } from "../functions/runAutomod.js";

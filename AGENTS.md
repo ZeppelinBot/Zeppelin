@@ -1,4 +1,4 @@
-The project is called Zeppelin. It's a Discord bot that uses Discord.js. The bot is built on the Knub framework.
+The project is called Zeppelin. It's a Discord bot that uses Discord.js. The bot is built on the Vety framework (formerly called Knub).
 
 This repository is a monorepository that contains these projects:
 1. **Backend**: The shared codebase of the bot and API. Located in `backend`.

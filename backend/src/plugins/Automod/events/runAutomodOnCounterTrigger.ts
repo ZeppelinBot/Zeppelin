@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { resolveMember, resolveUser, UnknownUser } from "../../../utils.js";
 import { CountersPlugin } from "../../Counters/CountersPlugin.js";
 import { runAutomod } from "../functions/runAutomod.js";

@@ -11,7 +11,7 @@ import {
   User,
 } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
+import { ArgsFromSignatureOrArray, GuildPluginData } from "vety";
 import moment from "moment-timezone";
 import { RegExpRunner, allowTimeout } from "../../RegExpRunner.js";
 import { getBaseUrl } from "../../pluginUtils.js";

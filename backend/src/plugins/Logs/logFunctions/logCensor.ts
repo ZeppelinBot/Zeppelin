@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, User } from "discord.js";
-import { GuildPluginData } from "knub";
-import { deactivateMentions, disableCodeBlocks } from "knub/helpers";
+import { GuildPluginData } from "vety";
+import { deactivateMentions, disableCodeBlocks } from "vety/helpers";
 import { LogType } from "../../../data/LogType.js";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";

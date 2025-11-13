@@ -1,5 +1,5 @@
 import { StageChannel, VoiceChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types.js";
 
 const defaultCompanionChannelOpts: Partial<TCompanionChannelOpts> = {

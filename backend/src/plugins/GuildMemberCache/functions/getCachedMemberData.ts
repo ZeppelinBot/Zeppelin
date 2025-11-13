@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { MemberCacheItem } from "../../../data/entities/MemberCacheItem.js";
 import { GuildMemberCachePluginType } from "../types.js";
 

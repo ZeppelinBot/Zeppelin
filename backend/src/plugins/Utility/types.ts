@@ -1,4 +1,4 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "vety";
 import { z } from "zod";
 import { RegExpRunner } from "../../RegExpRunner.js";
 import { GuildArchives } from "../../data/GuildArchives.js";

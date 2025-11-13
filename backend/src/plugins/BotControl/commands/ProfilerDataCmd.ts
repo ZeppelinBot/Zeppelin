@@ -28,7 +28,7 @@ export const ProfilerDataCmd = botControlCmd({
 
     const headerInfoItems = [`sorted by ${sortProps[sortProp]}`];
 
-    const profilerData = pluginData.getKnubInstance().profiler.getData();
+    const profilerData = pluginData.getVetyInstance().profiler.getData();
     let entries = Object.entries(profilerData);
     entries.sort(sorter((entry) => entry[1][sortProp], "DESC"));
 

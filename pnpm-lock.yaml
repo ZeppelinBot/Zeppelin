@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  discord.js: 14.23.2
   discord-api-types: 0.38.30
 
 importers:
@@ -90,9 +91,6 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
-      knub:
-        specifier: 32.0.0-next.28
-        version: 32.0.0-next.28(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
       knub-command-manager:
         specifier: ^9.1.0
         version: 9.1.0
@@ -165,6 +163,9 @@ importers:
       uuid:
         specifier: ^9.0.0
         version: 9.0.1
+      vety:
+        specifier: 1.0.0-rc1
+        version: 1.0.0-rc1(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
       yawn-yaml:
         specifier: github:dragory/yawn-yaml#string-number-fix-build
         version: https://codeload.github.com/dragory/yawn-yaml/tar.gz/77ab3870ca53c4693002c4a41336e7476e7934ed
@@ -2913,10 +2914,6 @@ packages:
   knub-command-manager@9.1.0:
     resolution: {integrity: sha512-pEtpWElbBoTRSL8kWSPRrTIuTIdvYGkP/wzOn77cieumC02adfwEt1Cc09HFvVT4ib35nf1y31oul36csaG7Vg==}
 
-  knub@32.0.0-next.28:
-    resolution: {integrity: sha512-K+9VHtgkwIw4K3k7+Vss3fbfgrDjctBPR6AgR4+Qfq+MklD/QkJgCo2LTwrCiCKRwkmQQAlEkRMbtn/AFLCM8A==}
-    engines: {node: '>=22'}
-
   labeled-stream-splicer@2.0.2:
     resolution: {integrity: sha512-Ca4LSXFFZUjPScRaqOcFxneA0VpKZr4MMYCljyQr4LIewTLb3Y0IUTIsnBBsVubIeEfxeSZpSjSsRM8APEQaAw==}
 
@@ -4787,6 +4784,10 @@ packages:
   verror@1.10.0:
     resolution: {integrity: sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw==}
     engines: {'0': node >=0.6.0}
+
+  vety@1.0.0-rc1:
+    resolution: {integrity: sha512-kbzids6WlcDjwB2lioWvnsJNqM6BuUE5ysq2v9LxsnDpJMwHnpyDHJTkV/VeVKNzAuDl776IMqCTwGV5NmDVng==}
+    engines: {node: '>=22'}
 
   vm-browserify@1.1.2:
     resolution: {integrity: sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==}
@@ -8021,17 +8022,6 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
-  knub@32.0.0-next.28(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10):
-    dependencies:
-      discord.js: 14.23.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      knub-command-manager: 9.1.0
-      ts-essentials: 10.1.1(typescript@5.9.3)
-      zod: 4.1.12
-    transitivePeerDependencies:
-      - bufferutil
-      - typescript
-      - utf-8-validate
-
   labeled-stream-splicer@2.0.2:
     dependencies:
       inherits: 2.0.4
@@ -9878,6 +9868,17 @@ snapshots:
       assert-plus: 1.0.0
       core-util-is: 1.0.2
       extsprintf: 1.3.0
+
+  vety@1.0.0-rc1(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10):
+    dependencies:
+      discord.js: 14.23.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      knub-command-manager: 9.1.0
+      ts-essentials: 10.1.1(typescript@5.9.3)
+      zod: 4.1.12
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
 
   vm-browserify@1.1.2: {}
 

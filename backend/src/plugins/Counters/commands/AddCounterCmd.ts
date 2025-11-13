@@ -1,6 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { guildPluginMessageCommand } from "knub";
-import { waitForReply } from "knub/helpers";
+import { guildPluginMessageCommand } from "vety";
+import { waitForReply } from "vety/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { UnknownUser, resolveUser } from "../../../utils.js";
 import { changeCounterValue } from "../functions/changeCounterValue.js";

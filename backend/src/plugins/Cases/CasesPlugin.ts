@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";

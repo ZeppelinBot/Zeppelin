@@ -1,5 +1,5 @@
 import { APIEmbed, ChannelType } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import {
   EmbedWith,
   formatNumber,

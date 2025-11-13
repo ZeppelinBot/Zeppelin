@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CounterEventEmitter, CountersPluginType } from "../types.js";
 
 export function offCounterEvent(

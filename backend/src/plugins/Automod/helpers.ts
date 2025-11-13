@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { z, type ZodTypeAny } from "zod";
 import { Awaitable } from "../../utils/typeUtils.js";
 import { AutomodContext, AutomodPluginType } from "./types.js";

@@ -1,5 +1,5 @@
 import { WebhookClient } from "discord.js";
-import { BasePluginType } from "knub";
+import { BasePluginType } from "vety";
 import { z } from "zod";
 import { Queue } from "../../Queue.js";
 import { Webhooks } from "../../data/Webhooks.js";

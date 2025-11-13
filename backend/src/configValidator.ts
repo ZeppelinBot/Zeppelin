@@ -1,4 +1,4 @@
-import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
+import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "vety";
 import { z, ZodError } from "zod";
 import { availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { zZeppelinGuildConfig } from "./types.js";

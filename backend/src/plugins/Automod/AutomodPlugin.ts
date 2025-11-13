@@ -1,4 +1,4 @@
-import { CooldownManager, guildPlugin } from "knub";
+import { CooldownManager, guildPlugin } from "vety";
 import { Queue } from "../../Queue.js";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels.js";
 import { GuildArchives } from "../../data/GuildArchives.js";

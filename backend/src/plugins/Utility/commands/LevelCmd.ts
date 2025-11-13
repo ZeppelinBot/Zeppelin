@@ -1,4 +1,4 @@
-import { helpers } from "knub";
+import { helpers } from "vety";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { renderUsername } from "../../../utils.js";
 import { utilityCmd } from "../types.js";

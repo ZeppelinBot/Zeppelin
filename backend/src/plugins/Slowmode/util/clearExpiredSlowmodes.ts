@@ -1,5 +1,5 @@
 import { GuildChannel, Snowflake, TextChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { logger } from "../../../logger.js";
 import { UnknownUser, verboseChannelMention, verboseUserMention } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";

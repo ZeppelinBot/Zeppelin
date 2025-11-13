@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
 import { modActionsSlashCmd } from "../../types.js";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants.js";

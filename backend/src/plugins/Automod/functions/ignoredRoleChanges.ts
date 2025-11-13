@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { MINUTES } from "../../../utils.js";
 import { AutomodPluginType } from "../types.js";
 

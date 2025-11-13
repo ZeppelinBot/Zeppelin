@@ -55,7 +55,7 @@ export const AboutCmd = utilityCmd({
     ];
 
     const loadedPlugins = Array.from(
-      pluginData.getKnubInstance().getLoadedGuild(pluginData.guild.id)!.loadedPlugins.keys(),
+      pluginData.getVetyInstance().getLoadedGuild(pluginData.guild.id)!.loadedPlugins.keys(),
     );
     loadedPlugins.sort();
 

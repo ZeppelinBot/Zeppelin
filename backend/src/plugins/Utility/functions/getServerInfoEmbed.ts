@@ -1,5 +1,5 @@
 import { APIEmbed, ChannelType, GuildPremiumTier, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import {
   EmbedWith,
   MINUTES,

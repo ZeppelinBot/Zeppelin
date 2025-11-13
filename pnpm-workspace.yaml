@@ -5,9 +5,10 @@ packages:
 
 minimumReleaseAge: 20160 # in minutes (2 weeks)
 minimumReleaseAgeExclude:
-  - 'knub'
+  - 'vety'
   - 'knub-command-manager'
 
 overrides:
-  # Keep in sync with Knub's discord.js version
+  # Keep in sync with Vety's discord.js version
+  discord.js: "14.23.2"
   discord-api-types: "0.38.30"

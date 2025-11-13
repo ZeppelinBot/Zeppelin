@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ReactionRole } from "../../../data/entities/ReactionRole.js";
 import { isDiscordAPIError, sleep } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";

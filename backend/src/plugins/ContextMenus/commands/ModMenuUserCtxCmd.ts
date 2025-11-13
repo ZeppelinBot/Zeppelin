@@ -9,7 +9,7 @@ import {
   PermissionFlagsBits,
   User,
 } from "discord.js";
-import { GuildPluginData, guildPluginUserContextMenuCommand } from "knub";
+import { GuildPluginData, guildPluginUserContextMenuCommand } from "vety";
 import { Case } from "../../../data/entities/Case.js";
 import { logger } from "../../../logger.js";
 import { SECONDS, UnknownUser, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils.js";

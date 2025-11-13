@@ -1,5 +1,5 @@
 import { APIEmbed, Awaitable } from "discord.js";
-import { BasePluginType } from "knub";
+import { BasePluginType } from "vety";
 import { z } from "zod";
 import { GuildCases } from "../../data/GuildCases.js";
 

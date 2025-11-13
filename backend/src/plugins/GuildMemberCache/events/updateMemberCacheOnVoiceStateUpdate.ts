@@ -1,4 +1,4 @@
-import { guildPluginEventListener } from "knub";
+import { guildPluginEventListener } from "vety";
 import { updateMemberCacheForMember } from "../functions/updateMemberCacheForMember.js";
 import { GuildMemberCachePluginType } from "../types.js";
 

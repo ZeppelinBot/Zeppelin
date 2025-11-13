@@ -1,5 +1,5 @@
 import { GuildBasedChannel, Message, OmitPartialGroupDMChannel, Snowflake, TextBasedChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { humanizeDurationShort } from "../../../humanizeDuration.js";
 import { allowTimeout } from "../../../RegExpRunner.js";

@@ -1,4 +1,4 @@
-import { BasePluginType } from "knub";
+import { BasePluginType } from "vety";
 import { z } from "zod";
 import { GuildRoleQueue } from "../../data/GuildRoleQueue.js";
 

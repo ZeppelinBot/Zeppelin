@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { EventEmitter } from "events";
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { Queue } from "../../Queue.js";
 import { GuildCases } from "../../data/GuildCases.js";
 import { onGuildEvent } from "../../data/GuildEvents.js";

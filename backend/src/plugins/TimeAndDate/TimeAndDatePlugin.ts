@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";

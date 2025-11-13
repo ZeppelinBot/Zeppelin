@@ -1,4 +1,4 @@
-import { BasePluginType, guildPluginEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener } from "vety";
 import { z } from "zod";
 import { Queue } from "../../Queue.js";
 import { UsernameHistory } from "../../data/UsernameHistory.js";

@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { z } from "zod";
 import { canActOn } from "../../../pluginUtils.js";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter.js";

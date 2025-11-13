@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import { UnknownUser, renderUsername, resolveUser } from "../../../utils.js";
 import { CaseNoteArgs, CasesPluginType } from "../types.js";

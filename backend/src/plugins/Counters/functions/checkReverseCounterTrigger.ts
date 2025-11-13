@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CounterTrigger } from "../../../data/entities/CounterTrigger.js";
 import { CountersPluginType } from "../types.js";
 import { emitCounterEvent } from "./emitCounterEvent.js";

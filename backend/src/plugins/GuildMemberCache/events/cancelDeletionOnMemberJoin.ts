@@ -1,4 +1,4 @@
-import { guildPluginEventListener } from "knub";
+import { guildPluginEventListener } from "vety";
 import { GuildMemberCachePluginType } from "../types.js";
 
 export const cancelDeletionOnMemberJoin = guildPluginEventListener<GuildMemberCachePluginType>()({

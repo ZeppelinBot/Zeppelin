@@ -1,5 +1,5 @@
 import { PermissionFlagsBits } from "discord.js";
-import { guildPluginUserContextMenuCommand } from "knub";
+import { guildPluginUserContextMenuCommand } from "vety";
 import { launchMuteActionModal } from "../actions/mute.js";
 
 export const MuteCmd = guildPluginUserContextMenuCommand({

@@ -1,5 +1,5 @@
 import { APIEmbed, MessageType, Snowflake, TextChannel } from "discord.js";
-import { GuildPluginData, getDefaultMessageCommandPrefix } from "knub";
+import { GuildPluginData, getDefaultMessageCommandPrefix } from "vety";
 import {
   EmbedWith,
   chunkMessageLines,

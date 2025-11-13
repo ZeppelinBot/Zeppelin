@@ -7,7 +7,7 @@ import {
   guildPluginSlashCommand,
   guildPluginSlashGroup,
   pluginUtils,
-} from "knub";
+} from "vety";
 import { z } from "zod";
 import { Queue } from "../../Queue.js";
 import { GuildCases } from "../../data/GuildCases.js";
