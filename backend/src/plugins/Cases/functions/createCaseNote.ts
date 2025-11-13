@@ -11,7 +11,7 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
     throw new RecoverablePluginError(ERRORS.UNKNOWN_NOTE_CASE);
   }
 
-  const mod = await resolveUser(pluginData.client, args.modId);
+  const mod = await resolveUser(pluginData.client, args.modId, "Cases:createCaseNote");
   if (mod instanceof UnknownUser) {
     throw new RecoverablePluginError(ERRORS.INVALID_USER);
   }

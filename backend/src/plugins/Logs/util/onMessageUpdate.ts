@@ -45,7 +45,7 @@ export async function onMessageUpdate(
     return;
   }
 
-  const user = await resolveUser(pluginData.client, savedMessage.user_id);
+  const user = await resolveUser(pluginData.client, savedMessage.user_id, "Logs:onMessageUpdate");
   const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as GuildTextBasedChannel;
 
   logMessageEdit(pluginData, {

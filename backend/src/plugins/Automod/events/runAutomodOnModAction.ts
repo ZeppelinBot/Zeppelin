@@ -12,7 +12,7 @@ export async function runAutomodOnModAction(
   isAutomodAction = false,
 ) {
   const [user, member] = await Promise.all([
-    resolveUser(pluginData.client, userId),
+    resolveUser(pluginData.client, userId, "Automod:runAutomodOnModAction"),
     resolveMember(pluginData.client, pluginData.guild, userId),
   ]);
 

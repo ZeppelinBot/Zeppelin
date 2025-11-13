@@ -20,7 +20,7 @@ export async function censorMessage(
     return;
   }
 
-  const user = await resolveUser(pluginData.client, savedMessage.user_id);
+  const user = await resolveUser(pluginData.client, savedMessage.user_id, "Censor:censorMessage");
   const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as GuildTextBasedChannel;
 
   pluginData.getPlugin(LogsPlugin).logCensor({

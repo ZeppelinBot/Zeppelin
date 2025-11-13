@@ -53,7 +53,7 @@ export async function muteUser(
     muteOptions.caseArgs.modId = pluginData.client.user!.id;
   }
 
-  const user = await resolveUser(pluginData.client, userId);
+  const user = await resolveUser(pluginData.client, userId, "Mutes:muteUser");
   if (!user.id) {
     lock.unlock();
     throw new RecoverablePluginError(ERRORS.INVALID_USER);
@@ -200,7 +200,7 @@ export async function muteUser(
           reason: reasonWithAttachments || "None",
           time: timeUntilUnmuteStr,
           moderator: muteOptions.caseArgs?.modId
-            ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
+            ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId, "Mutes:muteUser"))
             : null,
         }),
       ));
@@ -280,7 +280,7 @@ export async function muteUser(
   }
 
   // Log the action
-  const mod = await resolveUser(pluginData.client, muteOptions.caseArgs?.modId);
+  const mod = await resolveUser(pluginData.client, muteOptions.caseArgs?.modId, "Mutes:muteUser");
   if (muteTime) {
     pluginData.getPlugin(LogsPlugin).logMemberTimedMute({
       mod,

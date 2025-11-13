@@ -48,7 +48,7 @@ export async function clearTempban(pluginData: GuildPluginData<ModActionsPluginT
   // Log the unban
   const banTime = moment(tempban.created_at).diff(moment(tempban.expires_at));
   pluginData.getPlugin(LogsPlugin).logMemberTimedUnban({
-    mod: await resolveUser(pluginData.client, tempban.mod_id),
+    mod: await resolveUser(pluginData.client, tempban.mod_id, "ModActions:clearTempban"),
     userId: tempban.user_id,
     caseNumber: createdCase.case_number,
     reason,

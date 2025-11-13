@@ -22,7 +22,7 @@ export async function unmuteUser(
   caseArgs: Partial<CaseArgs> = {},
 ): Promise<UnmuteResult | null> {
   const existingMute = await pluginData.state.mutes.findExistingMuteForUserId(userId);
-  const user = await resolveUser(pluginData.client, userId);
+  const user = await resolveUser(pluginData.client, userId, "Mutes:unmuteUser");
   const member = await resolveMember(pluginData.client, pluginData.guild, userId, true); // Grab the fresh member so we don't have stale role info
   const modId = caseArgs.modId || pluginData.client.user!.id;
 

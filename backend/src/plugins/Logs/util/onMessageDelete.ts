@@ -9,7 +9,7 @@ import { LogsPluginType } from "../types.js";
 import { isLogIgnored } from "./isLogIgnored.js";
 
 export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
-  const user = await resolveUser(pluginData.client, savedMessage.user_id);
+  const user = await resolveUser(pluginData.client, savedMessage.user_id, "Logs:onMessageDelete");
   const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake);
 
   if (!channel?.isTextBased()) {

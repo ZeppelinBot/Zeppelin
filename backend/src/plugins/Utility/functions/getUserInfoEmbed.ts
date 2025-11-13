@@ -27,7 +27,7 @@ export async function getUserInfoEmbed(
   userId: string,
   compact = false,
 ): Promise<APIEmbed | null> {
-  const user = await resolveUser(pluginData.client, userId);
+  const user = await resolveUser(pluginData.client, userId, "Utility:getUserInfoEmbed");
   if (!user || user instanceof UnknownUser) {
     return null;
   }

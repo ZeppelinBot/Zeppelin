@@ -84,7 +84,7 @@ export const ViewCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
         return;
       }
 
-      const potentialUser = await resolveUser(pluginData.client, reply.content);
+      const potentialUser = await resolveUser(pluginData.client, reply.content, "Counters:ViewCounterCmd");
       if (!potentialUser || potentialUser instanceof UnknownUser) {
         void pluginData.state.common.sendErrorMessage(message, "Unknown user, cancelling");
         return;

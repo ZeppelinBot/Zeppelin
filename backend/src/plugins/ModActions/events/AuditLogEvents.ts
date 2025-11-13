@@ -18,7 +18,7 @@ export const AuditLogEvents = modActionsEvt({
 
     // Create mute/unmute cases for manual timeouts
     if (auditLogEntry.action === AuditLogEvent.MemberUpdate && config.create_cases_for_manual_actions) {
-      const target = await resolveUser(pluginData.client, auditLogEntry.targetId!);
+      const target = await resolveUser(pluginData.client, auditLogEntry.targetId!, "ModActions:AuditLogEvents");
 
       // Only act based on the last changes in this log
       let muteChange: AuditLogChange | null = null;

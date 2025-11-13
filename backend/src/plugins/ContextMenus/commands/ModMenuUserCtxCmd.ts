@@ -52,7 +52,7 @@ export const ModMenuCmd = guildPluginUserContextMenuCommand({
       return;
     }
 
-    const user = await resolveUser(pluginData.client, interaction.targetId);
+    const user = await resolveUser(pluginData.client, interaction.targetId, "ContextMenus:ModMenuCmd");
     if (!user.id) {
       await interaction.followUp("Error: User not found");
       return;
