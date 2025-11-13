@@ -401,7 +401,7 @@ connect().then(async () => {
     },
   });
 
-  client.once("ready", () => {
+  client.once("clientReady", () => {
     startUptimeCounter();
   });
 
