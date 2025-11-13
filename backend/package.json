@@ -71,7 +71,7 @@
     "tmp": "0.0.33",
     "tsconfig-paths": "^3.9.0",
     "twemoji": "^12.1.4",
-    "typeorm": "^0.3.17",
+    "typeorm": "^0.3.27",
     "utf-8-validate": "^5.0.5",
     "uuid": "^9.0.0",
     "vety": "1.0.0-rc1",
