@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { DispatchAliasEvt } from "./events/DispatchAliasEvt.js";
 import { CommandAliasesPluginType, zCommandAliasesConfig } from "./types.js";
 import { normalizeAliases } from "./functions/normalizeAliases.js";
