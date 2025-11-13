@@ -19,6 +19,6 @@ export const DispatchAliasEvt = commandAliasesEvt({
     const copiedMessage = Object.create(msg);
     copiedMessage.content = newContent;
 
-    await pluginData.getKnubInstance().dispatchMessageCommands(copiedMessage as Message);
+    await pluginData.getVetyInstance().dispatchMessageCommands(copiedMessage as Message);
   },
 });
