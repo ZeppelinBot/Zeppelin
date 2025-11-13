@@ -94,35 +94,6 @@ async function fishFishApiCall(method: string, path: string, query: Record<strin
   return response.json();
 }
 
-async function subscribeToFishFishUpdates(): Promise<void> {
-  if (updatesWs) {
-    return;
-  }
-  const sessionToken = await getSessionToken();
-  console.log("[FISHFISH] Connecting to WebSocket for real-time updates");
-  updatesWs = new WebSocket("wss://api.fishfish.gg/v1/stream", {
-    headers: {
-      Authorization: sessionToken,
-    },
-  });
-  updatesWs.addEventListener("open", () => {
-    console.log("[FISHFISH] WebSocket connection established");
-  });
-  updatesWs.addEventListener("message", (event) => {
-    console.log("[FISHFISH] ws update:", event.data);
-  });
-  updatesWs.addEventListener("error", (error) => {
-    console.error(`[FISHFISH] WebSocket error: ${error.message}`);
-  });
-  updatesWs.addEventListener("close", () => {
-    console.log("[FISHFISH] WebSocket connection closed, reconnecting after delay");
-    updatesWs = null;
-    setTimeout(() => {
-      subscribeToFishFishUpdates();
-    }, WS_RECONNECT_DELAY);
-  });
-}
-
 async function refreshFishFishDomains() {
   const rawData = await fishFishApiCall("GET", "domains", { full: "true" });
   const parseResult = z.array(zDomain).safeParse(rawData);
@@ -167,7 +138,8 @@ export async function initFishFish() {
   }
 
   await refreshFishFishDomains();
-  void subscribeToFishFishUpdates();
+  // Real-time updates disabled until we switch to a WebSocket lib that supports authorization headers
+  // void subscribeToFishFishUpdates();
   setInterval(() => refreshFishFishDomains(), FULL_REFRESH_INTERVAL);
 }
 
