@@ -3,6 +3,7 @@ import {
   ChannelType,
   Client,
   DiscordAPIError,
+  DiscordjsTypeError,
   EmbedData,
   EmbedType,
   Emoji,
@@ -81,6 +82,10 @@ export function isDiscordHTTPError(err: Error | string) {
 
 export function isDiscordAPIError(err: Error | string): err is DiscordAPIError {
   return err instanceof DiscordAPIError;
+}
+
+export function isDiscordJsTypeError(err: unknown): err is DiscordjsTypeError {
+  return err instanceof DiscordjsTypeError;
 }
 
 // null | undefined -> undefined
