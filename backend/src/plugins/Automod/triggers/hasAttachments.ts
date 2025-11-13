@@ -9,7 +9,8 @@ interface HasAttachmentsMatchResult {
 }
 
 const configSchema = z.strictObject({
-  has: z.boolean(),
+  min_count: z.number().int().min(0).nullable().default(1),
+  max_count: z.number().int().nullable().default(null),
 });
 
 export const HasAttachmentsTrigger = automodTrigger<HasAttachmentsMatchResult>()({
@@ -19,12 +20,17 @@ export const HasAttachmentsTrigger = automodTrigger<HasAttachmentsMatchResult>()
     if (!context.message) {
       return;
     }
+    if (triggerConfig.min_count == null && triggerConfig.max_count == null) {
+      return;
+    }
 
     const attachments = context.message.data.attachments;
     const attachmentCount = attachments?.length ?? 0;
     const hasAttachments = attachmentCount > 0;
+    const matchesMinCount = triggerConfig.min_count != null ? attachmentCount >= triggerConfig.min_count : true;
+    const matchesMaxCount = triggerConfig.max_count != null ? attachmentCount <= triggerConfig.max_count : true;
 
-    if (hasAttachments === triggerConfig.has) {
+    if (matchesMinCount && matchesMaxCount) {
       return {
         extra: {
           hasAttachments,
