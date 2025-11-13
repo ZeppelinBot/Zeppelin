@@ -164,8 +164,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.1
       vety:
-        specifier: 1.0.0-rc1
-        version: 1.0.0-rc1(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
+        specifier: 1.0.0-rc2
+        version: 1.0.0-rc2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
       yawn-yaml:
         specifier: github:dragory/yawn-yaml#string-number-fix-build
         version: https://codeload.github.com/dragory/yawn-yaml/tar.gz/77ab3870ca53c4693002c4a41336e7476e7934ed
@@ -3051,8 +3051,8 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
-  vety@1.0.0-rc1:
-    resolution: {integrity: sha512-kbzids6WlcDjwB2lioWvnsJNqM6BuUE5ysq2v9LxsnDpJMwHnpyDHJTkV/VeVKNzAuDl776IMqCTwGV5NmDVng==}
+  vety@1.0.0-rc2:
+    resolution: {integrity: sha512-mpV+nrZtnOgS+A8+b+iT4hc1R0nYx+ufNBnYQWZuBjcgMwtdymENHWiUbiqlcKA1rQF3rK9wk5+zj0+XeCiPyQ==}
     engines: {node: '>=22'}
 
   vscode-uri@3.1.0:
@@ -5844,7 +5844,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vety@1.0.0-rc1(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10):
+  vety@1.0.0-rc2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10):
     dependencies:
       discord.js: 14.23.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       knub-command-manager: 9.1.0

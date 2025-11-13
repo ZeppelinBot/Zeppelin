@@ -69,7 +69,7 @@
     "typeorm": "^0.3.27",
     "utf-8-validate": "^5.0.5",
     "uuid": "^9.0.0",
-    "vety": "1.0.0-rc1",
+    "vety": "1.0.0-rc2",
     "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
     "zod": "^4.1.12"
   },
