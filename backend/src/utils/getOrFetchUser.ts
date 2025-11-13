@@ -31,12 +31,11 @@ export async function getOrFetchUser(bot: Client, userId: string): Promise<User 
   const redisCacheKey = `cache:user:${userId}`;
   const userData = await redis.get(redisCacheKey);
   if (userData) {
-    incrementDebugCounter("getOrFetchUser:redisCache");
     if (userData === UNKNOWN_KEY) {
-      console.log("Found unknown user in Redis cache");
+      incrementDebugCounter("getOrFetchUser:redisCache:unknown");
       return undefined;
     }
-    console.log("Found user in Redis cache");
+    incrementDebugCounter("getOrFetchUser:redisCache:hit");
     // @ts-expect-error Replace with a proper solution once that exists
     return new User(bot, JSON.parse(userData));
   }
