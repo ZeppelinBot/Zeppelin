@@ -29,8 +29,9 @@ Zeppelin's production environment uses Docker. There are a few different ways to
 ### Updating the bot
 1. Shut the bot down
 2. Update the files (e.g. `git pull`)
-3. Rebuild: `docker compose -f docker-compose.standalone.yml build`
-4. Run the bot again
+3. Update images: `docker compose -f docker-compose.standalone.yml pull`
+4. Rebuild: `docker compose -f docker-compose.standalone.yml build`
+5. Run the bot again
 
 ### Viewing logs
 `docker compose -f docker-compose.standalone.yml logs -t -f`
@@ -51,8 +52,9 @@ Zeppelin's production environment uses Docker. There are a few different ways to
 ### Updating the bot
 1. Shut the bot down
 2. Update the files (e.g. `git pull`)
-3. Rebuild: `docker compose -f docker-compose.lightweight.yml build`
-4. Run the bot again
+3. Update images: `docker compose -f docker-compose.standalone.yml pull`
+4. Rebuild: `docker compose -f docker-compose.lightweight.yml build`
+5. Run the bot again
 
 ### Viewing logs
 `docker compose -f docker-compose.lightweight.yml logs -t -f`
