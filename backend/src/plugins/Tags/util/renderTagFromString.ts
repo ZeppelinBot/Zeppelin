@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { parseArguments } from "knub-command-manager";
 import { logger } from "../../../logger.js";
 import { TemplateParseError } from "../../../templateFormatter.js";

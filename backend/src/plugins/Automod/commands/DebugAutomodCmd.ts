@@ -1,4 +1,4 @@
-import { guildPluginMessageCommand } from "knub";
+import { guildPluginMessageCommand } from "vety";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";

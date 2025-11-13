@@ -1,4 +1,4 @@
-import { guildPluginMessageCommand } from "knub";
+import { guildPluginMessageCommand } from "vety";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { applyAllRoleButtons } from "../functions/applyAllRoleButtons.js";
 import { RoleButtonsPluginType } from "../types.js";

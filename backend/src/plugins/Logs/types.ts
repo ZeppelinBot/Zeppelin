@@ -1,4 +1,4 @@
-import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
+import { BasePluginType, CooldownManager, guildPluginEventListener } from "vety";
 import { z } from "zod";
 import { RegExpRunner } from "../../RegExpRunner.js";
 import { GuildArchives } from "../../data/GuildArchives.js";

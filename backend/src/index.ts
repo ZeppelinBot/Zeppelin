@@ -12,7 +12,7 @@ import {
   TextChannel,
   ThreadChannel,
 } from "discord.js";
-import { Knub, PluginError, PluginLoadError, PluginNotLoadedError } from "knub";
+import { Vety, PluginError, PluginLoadError, PluginNotLoadedError } from "vety";
 import moment from "moment-timezone";
 import { performance } from "perf_hooks";
 import process from "process";
@@ -293,7 +293,7 @@ connect().then(async () => {
   const allowedGuilds = new AllowedGuilds();
   const guildConfigs = new Configs();
 
-  const bot = new Knub(client, {
+  const bot = new Vety(client, {
     guildPlugins: availableGuildPlugins.map((obj) => obj.plugin),
     globalPlugins: availableGlobalPlugins.map((obj) => obj.plugin),
 
@@ -306,7 +306,7 @@ connect().then(async () => {
        * Plugins are enabled if they...
        * - are marked to be autoloaded, or
        * - are explicitly enabled in the guild config
-       * Dependencies are also automatically loaded by Knub.
+       * Dependencies are also automatically loaded by Vety.
        */
       async getEnabledGuildPlugins(ctx, plugins): Promise<string[]> {
         if (!ctx.config || !ctx.config.plugins) {

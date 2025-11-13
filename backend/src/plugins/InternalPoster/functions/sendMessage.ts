@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel, MessageCreateOptions, WebhookClient } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { isDiscordAPIError } from "../../../utils.js";
 import { InternalPosterPluginType } from "../types.js";
 import { getOrCreateWebhookClientForChannel } from "./getOrCreateWebhookClientForChannel.js";

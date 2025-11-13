@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ModActionsEvents, ModActionsPluginType } from "../types.js";
 
 export function onModActionsEvent<TEvent extends keyof ModActionsEvents>(

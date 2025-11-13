@@ -1,5 +1,5 @@
 import { GuildMember, GuildTextBasedChannel, PartialGuildMember, ThreadChannel, User } from "discord.js";
-import { BasePluginType, CooldownManager, pluginUtils } from "knub";
+import { BasePluginType, CooldownManager, pluginUtils } from "vety";
 import { z } from "zod";
 import { Queue } from "../../Queue.js";
 import { RegExpRunner } from "../../RegExpRunner.js";

@@ -1,4 +1,4 @@
-import { BasePluginType, pluginUtils } from "knub";
+import { BasePluginType, pluginUtils } from "vety";
 import { z } from "zod";
 import { zBoundedCharacters, zBoundedRecord } from "../../utils.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";

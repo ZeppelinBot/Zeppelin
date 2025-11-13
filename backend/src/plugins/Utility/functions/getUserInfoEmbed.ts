@@ -1,5 +1,5 @@
 import { APIEmbed } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import {
   EmbedWith,

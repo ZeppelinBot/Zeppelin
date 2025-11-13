@@ -1,5 +1,5 @@
 import { APIRole, AuditLogChange, AuditLogEvent } from "discord.js";
-import { guildPluginEventListener } from "knub";
+import { guildPluginEventListener } from "vety";
 import { resolveRole } from "../../../utils.js";
 import { logMemberRoleAdd } from "../logFunctions/logMemberRoleAdd.js";
 import { logMemberRoleRemove } from "../logFunctions/logMemberRoleRemove.js";

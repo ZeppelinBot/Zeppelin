@@ -1,4 +1,4 @@
-import { hasPermission } from "knub/helpers";
+import { hasPermission } from "vety/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
 import { resolveMessageMember } from "../../../../pluginUtils.js";
 import { resolveUser } from "../../../../utils.js";

@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { AutoDeletePluginType } from "../types.js";
 import { scheduleNextDeletion } from "./scheduleNextDeletion.js";

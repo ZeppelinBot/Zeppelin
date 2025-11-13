@@ -1,5 +1,5 @@
 import { ButtonStyle } from "discord.js";
-import { BasePluginType, pluginUtils } from "knub";
+import { BasePluginType, pluginUtils } from "vety";
 import { z } from "zod";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons.js";
 import { zBoundedCharacters, zBoundedRecord, zMessageContent, zSnowflake } from "../../utils.js";

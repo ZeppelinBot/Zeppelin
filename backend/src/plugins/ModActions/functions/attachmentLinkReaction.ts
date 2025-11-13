@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Message, SendableChannels } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ModActionsPluginType } from "../types.js";
 
 export function shouldReactToAttachmentLink(pluginData: GuildPluginData<ModActionsPluginType>) {

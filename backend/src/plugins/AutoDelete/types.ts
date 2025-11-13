@@ -1,4 +1,4 @@
-import { BasePluginType } from "knub";
+import { BasePluginType } from "vety";
 import { z } from "zod";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";

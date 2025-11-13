@@ -1,4 +1,4 @@
-import { GlobalPluginBlueprint, GuildPluginBlueprint, Knub } from "knub";
+import { GlobalPluginBlueprint, GuildPluginBlueprint } from "vety";
 import { z } from "zod";
 import { zSnowflake } from "./utils.js";
 
@@ -8,8 +8,6 @@ export const zZeppelinGuildConfig = z.strictObject({
   levels: z.record(zSnowflake, z.number()).optional(),
   plugins: z.record(z.string(), z.unknown()).optional(),
 });
-
-export type TZeppelinKnub = Knub;
 
 /**
  * Wrapper for the string type that indicates the text will be parsed as Markdown later

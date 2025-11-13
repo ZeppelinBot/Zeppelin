@@ -1,4 +1,4 @@
-import { BasePluginType } from "knub";
+import { BasePluginType } from "vety";
 import { U } from "ts-toolbelt";
 import { z } from "zod";
 import { CaseNameToType, CaseTypes } from "../../data/CaseTypes.js";

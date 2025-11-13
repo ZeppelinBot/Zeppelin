@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { ExtendedMatchParams, GuildPluginData } from "knub";
+import { ExtendedMatchParams, GuildPluginData } from "vety";
 import { StrictMessageContent } from "../../../utils.js";
 import { TTagCategory, TagsPluginType } from "../types.js";
 import { renderTagFromString } from "./renderTagFromString.js";

@@ -1,4 +1,4 @@
-import { guildPluginMessageCommand } from "knub";
+import { guildPluginMessageCommand } from "vety";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { confirm, noop, trimMultilineString } from "../../../utils.js";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues.js";
@@ -53,6 +53,6 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
       `All counter values for **${args.counterName}** have been reset`,
     );
 
-    pluginData.getKnubInstance().reloadGuild(pluginData.guild.id);
+    pluginData.getVetyInstance().reloadGuild(pluginData.guild.id);
   },
 });

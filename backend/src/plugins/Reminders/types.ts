@@ -1,4 +1,4 @@
-import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
+import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "vety";
 import { z } from "zod";
 import { GuildReminders } from "../../data/GuildReminders.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";

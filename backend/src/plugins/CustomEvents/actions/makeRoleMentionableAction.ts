@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { z } from "zod";
 import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
 import { convertDelayStringToMS, noop, zBoundedCharacters, zDelayString } from "../../../utils.js";

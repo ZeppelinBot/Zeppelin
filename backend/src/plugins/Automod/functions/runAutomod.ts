@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { performance } from "perf_hooks";
 import { calculateBlocking, profilingEnabled } from "../../../utils/easyProfiler.js";
 import { availableActions } from "../actions/availableActions.js";
@@ -147,7 +147,7 @@ export async function runAutomod(
         if (profilingEnabled()) {
           const blockingTime = getBlockingTime?.() || 0;
           pluginData
-            .getKnubInstance()
+            .getVetyInstance()
             .profiler.addDataPoint(
               `automod:${pluginData.guild.id}:${ruleName}:triggers:${triggerName}:blocking`,
               blockingTime,
@@ -191,7 +191,7 @@ export async function runAutomod(
 
         if (profilingEnabled()) {
           pluginData
-            .getKnubInstance()
+            .getVetyInstance()
             .profiler.addDataPoint(
               `automod:${pluginData.guild.id}:${ruleName}:triggers:${triggerName}`,
               performance.now() - triggerStartTime,
@@ -234,7 +234,7 @@ export async function runAutomod(
 
         if (profilingEnabled()) {
           pluginData
-            .getKnubInstance()
+            .getVetyInstance()
             .profiler.addDataPoint(
               `automod:${pluginData.guild.id}:${ruleName}:actions:${actionName}`,
               performance.now() - actionStartTime,
@@ -257,7 +257,7 @@ export async function runAutomod(
 
     if (profilingEnabled()) {
       pluginData
-        .getKnubInstance()
+        .getVetyInstance()
         .profiler.addDataPoint(`automod:${pluginData.guild.id}:${ruleName}`, performance.now() - ruleStartTime);
     }
 

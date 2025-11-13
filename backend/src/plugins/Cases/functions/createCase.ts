@@ -1,5 +1,5 @@
 import type { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { logger } from "../../../logger.js";
 import { renderUsername, resolveUser } from "../../../utils.js";
 import { CaseArgs, CasesPluginType } from "../types.js";

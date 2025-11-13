@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { logger } from "../../../logger.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { RoleManagerPluginType } from "../types.js";

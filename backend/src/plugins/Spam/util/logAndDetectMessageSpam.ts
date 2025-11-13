@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel, Snowflake, TextChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import moment from "moment-timezone";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import { CaseTypes } from "../../../data/CaseTypes.js";

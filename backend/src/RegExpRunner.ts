@@ -1,4 +1,4 @@
-import { CooldownManager } from "knub";
+import { CooldownManager } from "vety";
 import { EventEmitter } from "node:events";
 import { RegExpWorker, TimeoutError } from "regexp-worker";
 import { MINUTES, SECONDS } from "./utils.js";

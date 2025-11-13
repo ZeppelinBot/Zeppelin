@@ -1,5 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { z } from "zod";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import { zBoundedCharacters } from "../../../utils.js";

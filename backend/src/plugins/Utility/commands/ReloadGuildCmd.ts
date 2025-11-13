@@ -12,6 +12,6 @@ export const ReloadGuildCmd = utilityCmd({
     activeReloads.set(pluginData.guild.id, msg.channel as TextChannel);
 
     msg.channel.send("Reloading...");
-    pluginData.getKnubInstance().reloadGuild(pluginData.guild.id);
+    pluginData.getVetyInstance().reloadGuild(pluginData.guild.id);
   },
 });

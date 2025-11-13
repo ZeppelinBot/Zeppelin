@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { env } from "../../../env.js";
 import { CommonPluginType } from "../types.js";
 

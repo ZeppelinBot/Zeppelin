@@ -1,5 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { globalPlugin } from "knub";
+import { globalPlugin } from "vety";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments.js";
 import { Configs } from "../../data/Configs.js";

@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SECONDS } from "../../../utils.js";
 import { IgnoredEventType, ModActionsPluginType } from "../types.js";
 import { clearIgnoredEvents } from "./clearIgnoredEvents.js";

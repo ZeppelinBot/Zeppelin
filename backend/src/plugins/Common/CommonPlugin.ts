@@ -1,5 +1,5 @@
 import { Attachment, MessageMentionOptions, SendableChannels, TextBasedChannel } from "discord.js";
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { GenericCommandSource, makePublicFn, sendContextResponse } from "../../pluginUtils.js";
 import { errorMessage, successMessage } from "../../utils.js";
 import { getErrorEmoji, getSuccessEmoji } from "./functions/getEmoji.js";

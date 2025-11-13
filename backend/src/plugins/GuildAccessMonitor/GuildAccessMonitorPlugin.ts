@@ -1,5 +1,5 @@
 import { Guild } from "discord.js";
-import { GlobalPluginData, globalPlugin, globalPluginEventListener } from "knub";
+import { GlobalPluginData, globalPlugin, globalPluginEventListener } from "vety";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { Configs } from "../../data/Configs.js";
 import { env } from "../../env.js";

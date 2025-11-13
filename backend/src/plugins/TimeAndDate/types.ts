@@ -1,4 +1,4 @@
-import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
+import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "vety";
 import { z } from "zod";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones.js";
 import { keys } from "../../utils.js";

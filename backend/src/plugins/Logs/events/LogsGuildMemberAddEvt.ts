@@ -12,7 +12,7 @@ export const LogsGuildMemberAddEvt = logsEvt({
       member,
     });
 
-    // TODO: Uncomment below once circular dependencies in Knub have been fixed
+    // TODO: Uncomment below once circular dependencies in Vety have been fixed
 
     // const cases = (await pluginData.state.cases.with("notes").getByUserId(member.id)).filter(c => !c.is_hidden);
     // cases.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));

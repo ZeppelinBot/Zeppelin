@@ -12,7 +12,7 @@ import {
   CommandContext,
   messageCommandBaseTypeConverters,
   TypeConversionError,
-} from "knub";
+} from "vety";
 import { createTypeHelper } from "knub-command-manager";
 import {
   channelMentionRegex,

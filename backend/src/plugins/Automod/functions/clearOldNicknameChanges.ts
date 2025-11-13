@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { RECENT_NICKNAME_CHANGE_EXPIRY_TIME } from "../constants.js";
 import { AutomodPluginType } from "../types.js";
 

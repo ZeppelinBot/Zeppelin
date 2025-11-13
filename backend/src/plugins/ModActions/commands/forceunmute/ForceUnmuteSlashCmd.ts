@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { hasPermission } from "../../../../pluginUtils.js";
 import { convertDelayStringToMS, resolveMember } from "../../../../utils.js";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";

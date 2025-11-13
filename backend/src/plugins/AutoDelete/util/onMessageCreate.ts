@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { convertDelayStringToMS, resolveMember } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
