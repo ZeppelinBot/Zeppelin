@@ -43,6 +43,8 @@ import { sendDM } from "./utils/sendDM.js";
 import { Brand } from "./utils/typeUtils.js";
 import { waitForButtonConfirm } from "./utils/waitForInteraction.js";
 import { GenericCommandSource } from "./pluginUtils.js";
+import { getOrFetchUser } from "./utils/getOrFetchUser.js";
+import { incrementDebugCounter } from "./debugCounters.js";
 
 const fsp = fs.promises;
 
@@ -1158,9 +1160,7 @@ export function getUser(client: Client, userResolvable: string): User | UnknownU
  * Resolves a User from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
  * If the user is not found in the cache, it's fetched from the API.
  */
-export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser>;
-export async function resolveUser<T>(bot: Client, value: Not<T, string>): Promise<UnknownUser>;
-export async function resolveUser(bot, value) {
+export async function resolveUser(bot: Client, value: unknown, context?: string): Promise<User | UnknownUser> {
   if (typeof value !== "string") {
     return new UnknownUser();
   }
@@ -1170,26 +1170,8 @@ export async function resolveUser(bot, value) {
     return new UnknownUser();
   }
 
-  // If we have the user cached, return that directly
-  if (bot.users.cache.has(userId)) {
-    return bot.users.fetch(userId);
-  }
-
-  // We don't want to spam the API by trying to fetch unknown users again and again,
-  // so we cache the fact that they're "unknown" for a while
-  if (unknownUsers.has(userId)) {
-    return new UnknownUser({ id: userId });
-  }
-
-  const freshUser = await bot.users.fetch(userId, true, true).catch(noop);
-  if (freshUser) {
-    return freshUser;
-  }
-
-  unknownUsers.add(userId);
-  setTimeout(() => unknownUsers.delete(userId), 15 * MINUTES);
-
-  return new UnknownUser({ id: userId });
+  incrementDebugCounter(`resolveUser:${context ?? "unknown"}`);
+  return (await getOrFetchUser(bot, userId)) ?? new UnknownUser();
 }
 
 /**
