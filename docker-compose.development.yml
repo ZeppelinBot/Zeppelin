@@ -2,6 +2,7 @@ name: zeppelin-dev
 volumes:
   home: {}
   mysql-data: {}
+  redis-data: {}
 services:
   nginx:
     build:
@@ -26,6 +27,11 @@ services:
       - mysql-data:/var/lib/mysql
       # - ./docker/production/data/mysql:/var/lib/mysql
     command: --authentication-policy=mysql_native_password
+
+  redis:
+    image: redis:8.2.3
+    volumes:
+      - redis-data:/data
 
   devenv:
     build:

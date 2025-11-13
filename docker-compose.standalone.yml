@@ -1,7 +1,8 @@
 version: '3'
 name: zeppelin-prod
 volumes:
-  mysql-data:
+  mysql-data: {}
+  redis-data: {}
 services:
   mysql:
     image: mysql:8.0
@@ -24,6 +25,11 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
+
+  redis:
+    image: redis:8.2.3
+    volumes:
+      - redis-data:/data
 
   nginx:
     build:
