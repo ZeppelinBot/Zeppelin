@@ -74,6 +74,9 @@ const SAFE_TO_IGNORE_ERIS_ERROR_CODES = [
 
 const SAFE_TO_IGNORE_ERIS_ERROR_MESSAGES = ["Server didn't acknowledge previous heartbeat, possible lost connection"];
 
+// Ignore plugin load errors during initial startup to avoid noise in the logs
+let ignorePluginLoadErrors = true;
+
 function errorHandler(err) {
   const guildId = err.guild?.id || err.guildId || "0";
   const guildName = err.guild?.name || (guildId && guildId !== "0" ? "Unknown" : "Global");
@@ -94,8 +97,10 @@ function errorHandler(err) {
   }
 
   if (err instanceof PluginLoadError) {
-    // tslint:disable:no-console
-    console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
+    if (!ignorePluginLoadErrors) {
+      // tslint:disable:no-console
+      console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
+    }
     return;
   }
 
@@ -279,12 +284,9 @@ connect().then(async () => {
     }
   });
 
-  let ignorePluginLoadErrors = true;
   client.on("error", (err) => {
     if (err instanceof PluginLoadError) {
-      if (!ignorePluginLoadErrors) {
-        errorHandler(err);
-      }
+      errorHandler(err);
       return;
     }
     errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
