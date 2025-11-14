@@ -1,5 +1,5 @@
 import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { SlowmodeChannel } from "../../../data/entities/SlowmodeChannel.js";
 import { hasPermission } from "../../../pluginUtils.js";

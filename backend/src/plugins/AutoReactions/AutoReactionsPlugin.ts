@@ -1,4 +1,4 @@
-import { PluginOverride, guildPlugin } from "knub";
+import { PluginOverride, guildPlugin } from "vety";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";

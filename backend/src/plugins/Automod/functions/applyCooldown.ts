@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { convertDelayStringToMS } from "../../../utils.js";
 import { AutomodContext, AutomodPluginType, TRule } from "../types.js";
 

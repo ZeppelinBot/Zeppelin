@@ -6,7 +6,7 @@ import {
   MessageComponentInteraction,
   MessageCreateOptions,
 } from "discord.js";
-import moment from "moment";
+import moment from "moment-timezone";
 import { v4 as uuidv4 } from "uuid";
 import { GenericCommandSource, isContextInteraction, sendContextResponse } from "../pluginUtils.js";
 import { noop } from "../utils.js";

@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { Case } from "../../../../data/entities/Case.js";
 import { getContextChannel } from "../../../../pluginUtils.js";
 import { confirm, renderUsername } from "../../../../utils.js";

@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { AutoDeletePluginType } from "../types.js";
 import { deleteNextItem } from "./deleteNextItem.js";
 

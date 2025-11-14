@@ -12,7 +12,7 @@ import {
   CommandContext,
   messageCommandBaseTypeConverters,
   TypeConversionError,
-} from "knub";
+} from "vety";
 import { createTypeHelper } from "knub-command-manager";
 import {
   channelMentionRegex,
@@ -41,7 +41,7 @@ export const commandTypes = {
   },
 
   async resolvedUser(value, context: CommandContext<any>) {
-    const result = await resolveUser(context.pluginData.client, value);
+    const result = await resolveUser(context.pluginData.client, value, "commandTypes:resolvedUser");
     if (result == null || result instanceof UnknownUser) {
       throw new TypeConversionError(`User \`${escapeCodeBlock(value)}\` was not found`);
     }
@@ -49,7 +49,7 @@ export const commandTypes = {
   },
 
   async resolvedUserLoose(value, context: CommandContext<any>) {
-    const result = await resolveUser(context.pluginData.client, value);
+    const result = await resolveUser(context.pluginData.client, value, "commandTypes:resolvedUserLoose");
     if (result == null) {
       throw new TypeConversionError(`Invalid user: \`${escapeCodeBlock(value)}\``);
     }

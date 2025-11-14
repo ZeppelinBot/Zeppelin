@@ -1,4 +1,4 @@
-import { globalPlugin } from "knub";
+import { globalPlugin } from "vety";
 import { Configs } from "../../data/Configs.js";
 import { reloadChangedGuilds } from "./functions/reloadChangedGuilds.js";
 import { GuildConfigReloaderPluginType, zGuildConfigReloaderPluginConfig } from "./types.js";

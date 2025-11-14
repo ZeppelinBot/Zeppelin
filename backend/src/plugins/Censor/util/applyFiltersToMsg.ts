@@ -1,6 +1,6 @@
 import { Invite } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { ZalgoRegex } from "../../../data/Zalgo.js";
 import { ISavedMessageEmbedData, SavedMessage } from "../../../data/entities/SavedMessage.js";

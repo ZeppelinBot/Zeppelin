@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { env } from "../env.js";
 import { HOURS, MINUTES, SECONDS } from "../utils.js";
 
@@ -58,10 +58,13 @@ async function getSessionToken(): Promise<string> {
       throw new FishFishError(`Parse error when fetching session token: ${parseResult.error.message}`);
     }
 
-    const timeUntilExpiry = Date.now() - parseResult.data.expires * 1000;
-    setTimeout(() => {
-      sessionTokenPromise = null;
-    }, timeUntilExpiry - 1 * MINUTES); // Subtract a minute to ensure we refresh before expiry
+    const timeUntilExpiry = parseResult.data.expires * 1000 - Date.now();
+    setTimeout(
+      () => {
+        sessionTokenPromise = null;
+      },
+      timeUntilExpiry - 1 * MINUTES,
+    ); // Subtract a minute to ensure we refresh before expiry
 
     return parseResult.data.token;
   })();
@@ -89,35 +92,6 @@ async function fishFishApiCall(method: string, path: string, query: Record<strin
   }
 
   return response.json();
-}
-
-async function subscribeToFishFishUpdates(): Promise<void> {
-  if (updatesWs) {
-    return;
-  }
-  const sessionToken = await getSessionToken();
-  console.log("[FISHFISH] Connecting to WebSocket for real-time updates");
-  updatesWs = new WebSocket("wss://api.fishfish.gg/v1/stream", {
-    headers: {
-      Authorization: sessionToken,
-    },
-  });
-  updatesWs.addEventListener("open", () => {
-    console.log("[FISHFISH] WebSocket connection established");
-  });
-  updatesWs.addEventListener("message", (event) => {
-    console.log("[FISHFISH] ws update:", event.data);
-  });
-  updatesWs.addEventListener("error", (error) => {
-    console.error(`[FISHFISH] WebSocket error: ${error.message}`);
-  });
-  updatesWs.addEventListener("close", () => {
-    console.log("[FISHFISH] WebSocket connection closed, reconnecting after delay");
-    updatesWs = null;
-    setTimeout(() => {
-      subscribeToFishFishUpdates();
-    }, WS_RECONNECT_DELAY);
-  });
 }
 
 async function refreshFishFishDomains() {
@@ -164,7 +138,8 @@ export async function initFishFish() {
   }
 
   await refreshFishFishDomains();
-  void subscribeToFishFishUpdates();
+  // Real-time updates disabled until we switch to a WebSocket lib that supports authorization headers
+  // void subscribeToFishFishUpdates();
   setInterval(() => refreshFishFishDomains(), FULL_REFRESH_INTERVAL);
 }
 

@@ -52,4 +52,5 @@ export const PERMISSION_NAMES = {
   CreateEvents: "Create Events",
   SendPolls: "Send Polls",
   UseExternalApps: "Use External Apps",
+  PinMessages: "Pin Messages",
 } as const satisfies Record<keyof typeof PermissionFlagsBits, string>;

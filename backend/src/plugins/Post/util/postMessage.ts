@@ -1,6 +1,6 @@
 import { Attachment, GuildTextBasedChannel, Message, MessageCreateOptions } from "discord.js";
 import fs from "fs";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { downloadFile } from "../../../utils.js";
 import { PostPluginType } from "../types.js";
 import { formatContent } from "./formatContent.js";

@@ -1,4 +1,4 @@
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { modActionsSlashCmd } from "../../types.js";
 import { actualHideCaseCmd } from "./actualHideCaseCmd.js";
 

@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SelfGrantableRolesPluginType, TSelfGrantableRoleEntry } from "../types.js";
 
 export async function getApplyingEntries(

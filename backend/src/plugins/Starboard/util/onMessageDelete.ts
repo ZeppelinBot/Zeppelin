@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { StarboardPluginType } from "../types.js";
 import { removeMessageFromStarboard } from "./removeMessageFromStarboard.js";

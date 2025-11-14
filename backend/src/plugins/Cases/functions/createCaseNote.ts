@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import { UnknownUser, renderUsername, resolveUser } from "../../../utils.js";
 import { CaseNoteArgs, CasesPluginType } from "../types.js";
@@ -11,7 +11,7 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
     throw new RecoverablePluginError(ERRORS.UNKNOWN_NOTE_CASE);
   }
 
-  const mod = await resolveUser(pluginData.client, args.modId);
+  const mod = await resolveUser(pluginData.client, args.modId, "Cases:createCaseNote");
   if (mod instanceof UnknownUser) {
     throw new RecoverablePluginError(ERRORS.INVALID_USER);
   }

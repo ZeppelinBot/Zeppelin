@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { AddMuteParams } from "../../../data/GuildMutes.js";
@@ -53,7 +53,7 @@ export async function muteUser(
     muteOptions.caseArgs.modId = pluginData.client.user!.id;
   }
 
-  const user = await resolveUser(pluginData.client, userId);
+  const user = await resolveUser(pluginData.client, userId, "Mutes:muteUser");
   if (!user.id) {
     lock.unlock();
     throw new RecoverablePluginError(ERRORS.INVALID_USER);
@@ -186,8 +186,8 @@ export async function muteUser(
   const template = existingMute
     ? config.update_mute_message
     : muteTime
-    ? config.timed_mute_message
-    : config.mute_message;
+      ? config.timed_mute_message
+      : config.mute_message;
 
   let muteMessage: string | null = null;
   try {
@@ -200,7 +200,7 @@ export async function muteUser(
           reason: reasonWithAttachments || "None",
           time: timeUntilUnmuteStr,
           moderator: muteOptions.caseArgs?.modId
-            ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
+            ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId, "Mutes:muteUser"))
             : null,
         }),
       ));
@@ -280,7 +280,7 @@ export async function muteUser(
   }
 
   // Log the action
-  const mod = await resolveUser(pluginData.client, muteOptions.caseArgs?.modId);
+  const mod = await resolveUser(pluginData.client, muteOptions.caseArgs?.modId, "Mutes:muteUser");
   if (muteTime) {
     pluginData.getPlugin(LogsPlugin).logMemberTimedMute({
       mod,

@@ -21,7 +21,7 @@ export const WarnMsgCmd = modActionsMsgCmd({
   },
 
   async run({ pluginData, message: msg, args }) {
-    const user = await resolveUser(pluginData.client, args.user);
+    const user = await resolveUser(pluginData.client, args.user, "ModActions:WarnMsgCmd");
     if (!user.id) {
       await pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;

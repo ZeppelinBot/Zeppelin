@@ -1,5 +1,5 @@
 import { DiscordAPIError, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { LogType } from "../../../data/LogType.js";
 import { registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop.js";
@@ -35,7 +35,7 @@ export async function banUserId(
   banTime?: number,
 ): Promise<BanResult> {
   const config = pluginData.config.get();
-  const user = await resolveUser(pluginData.client, userId);
+  const user = await resolveUser(pluginData.client, userId, "ModActions:banUserId");
   if (!user.id) {
     return {
       status: "failed",
@@ -61,7 +61,7 @@ export async function banUserId(
               guildName: pluginData.guild.name,
               reason: reasonWithAttachments,
               moderator: banOptions.caseArgs?.modId
-                ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
+                ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId, "ModActions:banUserId"))
                 : null,
             }),
           );
@@ -85,7 +85,7 @@ export async function banUserId(
               guildName: pluginData.guild.name,
               reason: reasonWithAttachments,
               moderator: banOptions.caseArgs?.modId
-                ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
+                ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId, "ModActions:banUserId"))
                 : null,
               banTime: humanizeDuration(banTime),
             }),
@@ -165,7 +165,7 @@ export async function banUserId(
   });
 
   // Log the action
-  const mod = await resolveUser(pluginData.client, modId);
+  const mod = await resolveUser(pluginData.client, modId, "ModActions:banUserId");
 
   if (banTime) {
     pluginData.getPlugin(LogsPlugin).logMemberTimedBan({

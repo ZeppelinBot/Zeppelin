@@ -1,8 +1,8 @@
-import type { Knub } from "knub";
+import type { Vety } from "vety";
 import { performance } from "perf_hooks";
 import { noop, SECONDS } from "../utils.js";
 
-type Profiler = Knub["profiler"];
+type Profiler = Vety["profiler"];
 
 let _profilingEnabled = false;
 

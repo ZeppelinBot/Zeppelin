@@ -1,5 +1,5 @@
 import { Attachment, ChatInputCommandInteraction, Message, User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { Case } from "../../../data/entities/Case.js";
 import { CasesPlugin } from "../../Cases/CasesPlugin.js";

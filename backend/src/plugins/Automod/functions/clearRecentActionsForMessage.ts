@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { startProfiling } from "../../../utils/easyProfiler.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";
 
 export function clearRecentActionsForMessage(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const stopProfiling = startProfiling(
-    pluginData.getKnubInstance().profiler,
+    pluginData.getVetyInstance().profiler,
     "automod:fns:clearRecentActionsForMessage",
   );
   const message = context.message!;

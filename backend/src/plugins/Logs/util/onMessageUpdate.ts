@@ -1,5 +1,5 @@
 import { EmbedData, GuildTextBasedChannel, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { resolveUser } from "../../../utils.js";
 import { logMessageEdit } from "../logFunctions/logMessageEdit.js";
@@ -45,7 +45,7 @@ export async function onMessageUpdate(
     return;
   }
 
-  const user = await resolveUser(pluginData.client, savedMessage.user_id);
+  const user = await resolveUser(pluginData.client, savedMessage.user_id, "Logs:onMessageUpdate");
   const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as GuildTextBasedChannel;
 
   logMessageEdit(pluginData, {
