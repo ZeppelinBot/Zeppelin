@@ -1,4 +1,4 @@
-import { CooldownManager, guildPlugin } from "knub";
+import { CooldownManager, guildPlugin } from "vety";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { RoleAddCmd } from "./commands/RoleAddCmd.js";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd.js";

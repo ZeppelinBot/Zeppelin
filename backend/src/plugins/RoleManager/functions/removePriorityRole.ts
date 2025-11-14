@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { PRIORITY_ROLE_PRIORITY } from "../constants.js";
 import { RoleManagerPluginType } from "../types.js";
 import { runRoleAssignmentLoop } from "./runRoleAssignmentLoop.js";

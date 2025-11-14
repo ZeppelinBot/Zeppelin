@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import moment from "moment-timezone";
 import { TimeAndDatePluginType } from "../types.js";
 import { getMemberTz } from "./getMemberTz.js";

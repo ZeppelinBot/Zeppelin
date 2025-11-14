@@ -2,6 +2,7 @@ name: zeppelin-dev
 volumes:
   home: {}
   mysql-data: {}
+  redis-data: {}
 services:
   nginx:
     build:
@@ -27,6 +28,11 @@ services:
       # - ./docker/production/data/mysql:/var/lib/mysql
     command: --authentication-policy=mysql_native_password
 
+  redis:
+    image: redis:8.2.3
+    volumes:
+      - redis-data:/data
+
   devenv:
     build:
       context: ./docker/development/devenv
@@ -38,3 +44,10 @@ services:
     volumes:
       - home:/home/ubuntu
       - ./:/workspace/zeppelin
+
+  cftunnel:
+    profiles: [cftunnel]
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}

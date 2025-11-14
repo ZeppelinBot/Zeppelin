@@ -1,5 +1,5 @@
 import { GuildMember, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import {
@@ -35,7 +35,7 @@ export async function warnMember(
           guildName: pluginData.guild.name,
           reason: reasonWithAttachments,
           moderator: warnOptions.caseArgs?.modId
-            ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
+            ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId, "ModActions:warnMember"))
             : null,
         }),
       );

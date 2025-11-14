@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { resolveMember, resolveUser, UnknownUser } from "../../../utils.js";
 import { CountersPlugin } from "../../Counters/CountersPlugin.js";
 import { runAutomod } from "../functions/runAutomod.js";
@@ -12,7 +12,7 @@ export async function runAutomodOnCounterTrigger(
   userId: string | null,
   reverse: boolean,
 ) {
-  const user = userId ? await resolveUser(pluginData.client, userId) : undefined;
+  const user = userId ? await resolveUser(pluginData.client, userId, "Automod:runAutomodOnCounterTrigger") : undefined;
   const member = (userId && (await resolveMember(pluginData.client, pluginData.guild, userId))) || undefined;
   const prettyCounterName = pluginData.getPlugin(CountersPlugin).getPrettyNameForCounter(counterName);
   const prettyTriggerName = pluginData

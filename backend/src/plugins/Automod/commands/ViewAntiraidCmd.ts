@@ -1,4 +1,4 @@
-import { guildPluginMessageCommand } from "knub";
+import { guildPluginMessageCommand } from "vety";
 import { AutomodPluginType } from "../types.js";
 
 export const ViewAntiraidCmd = guildPluginMessageCommand<AutomodPluginType>()({

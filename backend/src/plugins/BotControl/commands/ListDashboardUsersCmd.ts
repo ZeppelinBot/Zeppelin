@@ -20,7 +20,7 @@ export const ListDashboardUsersCmd = botControlCmd({
     const dashboardUsers = await pluginData.state.apiPermissionAssignments.getByGuildId(guild.id);
     const users = await Promise.all(
       dashboardUsers.map(async (perm) => ({
-        user: await resolveUser(pluginData.client, perm.target_id),
+        user: await resolveUser(pluginData.client, perm.target_id, "BotControl:ListDashboardUsersCmd"),
         permission: perm,
       })),
     );

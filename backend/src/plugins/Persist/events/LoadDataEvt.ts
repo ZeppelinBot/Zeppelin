@@ -1,5 +1,5 @@
 import { GuildMember, PermissionFlagsBits } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { intersection } from "lodash-es";
 import { PersistedData } from "../../../data/entities/PersistedData.js";
 import { SECONDS } from "../../../utils.js";

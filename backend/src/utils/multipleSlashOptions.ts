@@ -1,4 +1,4 @@
-import { AttachmentSlashCommandOption, slashOptions } from "knub";
+import { AttachmentSlashCommandOption, slashOptions } from "vety";
 
 type AttachmentSlashOptions = Omit<AttachmentSlashCommandOption, "type" | "resolveValue" | "getExtraAPIProps">;
 

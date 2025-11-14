@@ -1,5 +1,5 @@
 import { GuildMember, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { UtilityPluginType } from "../types.js";
 
 export async function hasPermission(

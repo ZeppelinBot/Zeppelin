@@ -1,5 +1,5 @@
 import { PermissionFlagsBits } from "discord.js";
-import { guildPluginMessageContextMenuCommand } from "knub";
+import { guildPluginMessageContextMenuCommand } from "vety";
 import { launchCleanActionModal } from "../actions/clean.js";
 
 export const CleanCmd = guildPluginMessageContextMenuCommand({

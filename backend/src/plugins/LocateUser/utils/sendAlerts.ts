@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { resolveMember } from "../../../utils.js";
 import { LocateUserPluginType } from "../types.js";
 import { moveMember } from "./moveMember.js";

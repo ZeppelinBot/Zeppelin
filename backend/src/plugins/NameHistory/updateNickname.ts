@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { NameHistoryPluginType } from "./types.js";
 
 export async function updateNickname(pluginData: GuildPluginData<NameHistoryPluginType>, member: GuildMember) {

@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel, MessageCreateOptions, PermissionsBitField, Snowflake, User } from "discord.js";
-import z from "zod/v4";
+import { z } from "zod";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import {
   convertDelayStringToMS,

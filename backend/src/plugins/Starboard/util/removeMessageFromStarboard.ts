@@ -1,5 +1,5 @@
 import { ChannelType } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { StarboardMessage } from "../../../data/entities/StarboardMessage.js";
 import { noop } from "../../../utils.js";
 import { StarboardPluginType } from "../types.js";

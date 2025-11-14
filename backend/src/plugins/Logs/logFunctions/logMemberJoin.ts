@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType.js";
 import { humanizeDuration } from "../../../humanizeDuration.js";

@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { asyncMap, nonNullish, resolveMember, unique, zBoundedCharacters, zSnowflake } from "../../../utils.js";
 import { CaseArgs } from "../../Cases/types.js";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin.js";

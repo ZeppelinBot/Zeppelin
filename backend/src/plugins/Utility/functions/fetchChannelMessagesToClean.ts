@@ -1,5 +1,5 @@
 import { GuildBasedChannel, Message, OmitPartialGroupDMChannel, Snowflake, TextBasedChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { humanizeDurationShort } from "../../../humanizeDuration.js";
 import { allowTimeout } from "../../../RegExpRunner.js";
@@ -55,7 +55,7 @@ export async function fetchChannelMessagesToClean(
     pinIds = new Set((await targetChannel.messages.fetchPinned()).keys());
   }
 
-  let rawMessagesToClean: Array<OmitPartialGroupDMChannel<Message<true>>> = [];
+  const rawMessagesToClean: Array<OmitPartialGroupDMChannel<Message<true>>> = [];
   let beforeId = opts.beforeId;
   let requests = 0;
   while (rawMessagesToClean.length < opts.count) {

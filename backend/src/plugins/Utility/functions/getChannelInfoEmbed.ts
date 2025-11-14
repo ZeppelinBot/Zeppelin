@@ -1,5 +1,5 @@
 import { APIEmbed, ChannelType, Snowflake, StageChannel, VoiceChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { humanizeDuration } from "../../../humanizeDuration.js";
 import { EmbedWith, MINUTES, formatNumber, preEmbedPadding, trimLines, verboseUserMention } from "../../../utils.js";
 import { UtilityPluginType } from "../types.js";

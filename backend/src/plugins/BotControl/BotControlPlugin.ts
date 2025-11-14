@@ -1,5 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { globalPlugin } from "knub";
+import { globalPlugin } from "vety";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments.js";
 import { Configs } from "../../data/Configs.js";
@@ -22,6 +22,7 @@ import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd.js";
 import { RestPerformanceCmd } from "./commands/RestPerformanceCmd.js";
 import { ServersCmd } from "./commands/ServersCmd.js";
 import { BotControlPluginType, zBotControlConfig } from "./types.js";
+import { DebugCountersCmd } from "./commands/DebugCountersCmd.js";
 
 export const BotControlPlugin = globalPlugin<BotControlPluginType>()({
   name: "bot_control",
@@ -45,6 +46,7 @@ export const BotControlPlugin = globalPlugin<BotControlPluginType>()({
     RateLimitPerformanceCmd,
     AddServerFromInviteCmd,
     ChannelToServerCmd,
+    DebugCountersCmd,
   ],
 
   async afterLoad(pluginData) {

@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { zZeppelinGuildConfig } from "./types.js";
 import { deepPartial } from "./utils/zodDeepPartial.js";
@@ -34,22 +34,24 @@ const basePluginOverrideCriteriaSchema = z.strictObject({
   extra: z.any().optional(),
 });
 
-const pluginOverrideCriteriaSchema = basePluginOverrideCriteriaSchema.extend({
-  get zzz_dummy_property_do_not_use() {
-    return pluginOverrideCriteriaSchema.optional();
-  },
-  get all() {
-    return z.array(pluginOverrideCriteriaSchema).optional();
-  },
-  get any() {
-    return z.array(pluginOverrideCriteriaSchema).optional();
-  },
-  get not() {
-    return pluginOverrideCriteriaSchema.optional();
-  },
-}).meta({
-  id: "overrideCriteria",
-});
+const pluginOverrideCriteriaSchema = basePluginOverrideCriteriaSchema
+  .extend({
+    get zzz_dummy_property_do_not_use() {
+      return pluginOverrideCriteriaSchema.optional();
+    },
+    get all() {
+      return z.array(pluginOverrideCriteriaSchema).optional();
+    },
+    get any() {
+      return z.array(pluginOverrideCriteriaSchema).optional();
+    },
+    get not() {
+      return pluginOverrideCriteriaSchema.optional();
+    },
+  })
+  .meta({
+    id: "overrideCriteria",
+  });
 
 const outputPath = process.argv[2];
 if (!outputPath) {

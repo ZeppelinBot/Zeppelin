@@ -1,4 +1,4 @@
-import { guildPluginMessageCommand } from "knub";
+import { guildPluginMessageCommand } from "vety";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { setAntiraidLevel } from "../functions/setAntiraidLevel.js";
 import { AutomodPluginType } from "../types.js";

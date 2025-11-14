@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { onGuildEvent } from "../../data/GuildEvents.js";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";

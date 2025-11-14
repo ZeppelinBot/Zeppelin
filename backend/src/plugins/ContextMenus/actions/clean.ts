@@ -7,7 +7,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { logger } from "../../../logger.js";
 import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin.js";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd.js";

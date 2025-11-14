@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import moment from "moment-timezone";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { startProfiling } from "../../../utils/easyProfiler.js";
@@ -15,7 +15,7 @@ export function getMatchingMessageRecentActions(
   within: number,
 ) {
   const stopProfiling = startProfiling(
-    pluginData.getKnubInstance().profiler,
+    pluginData.getVetyInstance().profiler,
     "automod:fns:getMatchingMessageRecentActions",
   );
   const since = moment.utc(message.posted_at).valueOf() - within;

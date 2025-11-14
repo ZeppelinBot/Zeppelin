@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import moment from "moment-timezone";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildLogs } from "../../data/GuildLogs.js";

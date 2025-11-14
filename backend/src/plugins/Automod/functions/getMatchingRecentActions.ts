@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { startProfiling } from "../../../utils/easyProfiler.js";
 import { RecentActionType } from "../constants.js";
 import { AutomodPluginType } from "../types.js";
@@ -10,7 +10,7 @@ export function getMatchingRecentActions(
   since: number,
   to?: number,
 ) {
-  const stopProfiling = startProfiling(pluginData.getKnubInstance().profiler, "automod:fns:getMatchingRecentActions");
+  const stopProfiling = startProfiling(pluginData.getVetyInstance().profiler, "automod:fns:getMatchingRecentActions");
   to = to || Date.now();
 
   const result = pluginData.state.recentActions.filter((action) => {

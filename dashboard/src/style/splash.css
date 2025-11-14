@@ -121,7 +121,7 @@
 
       & li:not(:first-child)::before {
         display: block;
-        content: ' ';
+        content: " ";
         width: 4px;
         height: 4px;
         border-radius: 50%;

@@ -1,5 +1,5 @@
-import { BasePluginType, guildPluginEventListener } from "knub";
-import z from "zod/v4";
+import { BasePluginType, guildPluginEventListener } from "vety";
+import { z } from "zod";
 import { GuildArchives } from "../../data/GuildArchives.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildMutes } from "../../data/GuildMutes.js";

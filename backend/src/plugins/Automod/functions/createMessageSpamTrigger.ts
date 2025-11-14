@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { humanizeDurationShort } from "../../../humanizeDuration.js";
 import { getBaseUrl } from "../../../pluginUtils.js";

@@ -1,5 +1,5 @@
 import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
-import z from "zod/v4";
+import { z } from "zod";
 import { convertDelayStringToMS, isDiscordAPIError, zDelayString, zSnowflake } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { automodAction } from "../helpers.js";

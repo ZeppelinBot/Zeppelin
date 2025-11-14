@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { sendContextResponse } from "../../../../pluginUtils.js";
 import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
 import { ModActionsPluginType } from "../../types.js";
