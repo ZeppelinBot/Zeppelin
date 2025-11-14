@@ -1,5 +1,5 @@
-import { BasePluginType } from "knub";
-import { z } from "zod/v4";
+import { BasePluginType } from "vety";
+import { z } from "zod";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 
 export const zGuildAccessMonitorConfig = z.strictObject({});

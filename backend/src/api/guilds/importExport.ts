@@ -1,7 +1,7 @@
 import { ApiPermissions } from "@zeppelinbot/shared/apiPermissions.js";
 import express, { Request, Response } from "express";
 import moment from "moment-timezone";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { GuildCases } from "../../data/GuildCases.js";
 import { Case } from "../../data/entities/Case.js";
 import { MINUTES } from "../../utils.js";

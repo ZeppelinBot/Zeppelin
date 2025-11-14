@@ -1,5 +1,5 @@
 import { User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { renderUsername } from "../../utils.js";
 import { UsernameSaverPluginType } from "./types.js";
 

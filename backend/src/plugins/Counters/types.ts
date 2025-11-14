@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
-import { BasePluginType, pluginUtils } from "knub";
-import z from "zod/v4";
+import { BasePluginType, pluginUtils } from "vety";
+import { z } from "zod";
 import { GuildCounters, MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../data/GuildCounters.js";
 import {
   CounterTrigger,

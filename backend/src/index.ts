@@ -12,7 +12,7 @@ import {
   TextChannel,
   ThreadChannel,
 } from "discord.js";
-import { Knub, PluginError, PluginLoadError, PluginNotLoadedError } from "knub";
+import { Vety, PluginError, PluginLoadError, PluginNotLoadedError } from "vety";
 import moment from "moment-timezone";
 import { performance } from "perf_hooks";
 import process from "process";
@@ -74,6 +74,9 @@ const SAFE_TO_IGNORE_ERIS_ERROR_CODES = [
 
 const SAFE_TO_IGNORE_ERIS_ERROR_MESSAGES = ["Server didn't acknowledge previous heartbeat, possible lost connection"];
 
+// Ignore plugin load errors during initial startup to avoid noise in the logs
+let ignorePluginLoadErrors = true;
+
 function errorHandler(err) {
   const guildId = err.guild?.id || err.guildId || "0";
   const guildName = err.guild?.name || (guildId && guildId !== "0" ? "Unknown" : "Global");
@@ -94,8 +97,10 @@ function errorHandler(err) {
   }
 
   if (err instanceof PluginLoadError) {
-    // tslint:disable:no-console
-    console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
+    if (!ignorePluginLoadErrors) {
+      // tslint:disable:no-console
+      console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
+    }
     return;
   }
 
@@ -199,14 +204,17 @@ setInterval(() => {
   avgCount++;
   lastCheck = now;
 }, 500);
-setInterval(() => {
-  const avgBlocking = avgTotal / (avgCount || 1);
-  // FIXME: Debug
-  // tslint:disable-next-line:no-console
-  console.log(`Average blocking in the last 5min: ${avgBlocking / avgTotal}ms`);
-  avgTotal = 0;
-  avgCount = 0;
-}, 5 * 60 * 1000);
+setInterval(
+  () => {
+    const avgBlocking = avgTotal / (avgCount || 1);
+    // FIXME: Debug
+    // tslint:disable-next-line:no-console
+    console.log(`Average blocking in the last 5min: ${avgBlocking / avgTotal}ms`);
+    avgTotal = 0;
+    avgCount = 0;
+  },
+  5 * 60 * 1000,
+);
 
 if (env.DEBUG) {
   logger.info("NOTE: Bot started in DEBUG mode");
@@ -287,7 +295,7 @@ connect().then(async () => {
   const allowedGuilds = new AllowedGuilds();
   const guildConfigs = new Configs();
 
-  const bot = new Knub(client, {
+  const bot = new Vety(client, {
     guildPlugins: availableGuildPlugins.map((obj) => obj.plugin),
     globalPlugins: availableGlobalPlugins.map((obj) => obj.plugin),
 
@@ -300,7 +308,7 @@ connect().then(async () => {
        * Plugins are enabled if they...
        * - are marked to be autoloaded, or
        * - are explicitly enabled in the guild config
-       * Dependencies are also automatically loaded by Knub.
+       * Dependencies are also automatically loaded by Vety.
        */
       async getEnabledGuildPlugins(ctx, plugins): Promise<string[]> {
         if (!ctx.config || !ctx.config.plugins) {
@@ -332,7 +340,7 @@ connect().then(async () => {
 
             if (loaded.success_emoji || loaded.error_emoji) {
               const deprecatedKeys = [] as string[];
-              const exampleConfig = `plugins:\n  common:\n    config:\n      success_emoji: "👍"\n      error_emoji: "👎"`;
+              // const exampleConfig = `plugins:\n  common:\n    config:\n      success_emoji: "👍"\n      error_emoji: "👎"`;
 
               if (loaded.success_emoji) {
                 deprecatedKeys.push("success_emoji");
@@ -395,7 +403,7 @@ connect().then(async () => {
     },
   });
 
-  client.once("ready", () => {
+  client.once("clientReady", () => {
     startUptimeCounter();
   });
 
@@ -410,6 +418,8 @@ connect().then(async () => {
     if (process.env.PROFILING === "true") {
       enableProfiling();
     }
+
+    ignorePluginLoadErrors = false;
 
     initFishFish();
 

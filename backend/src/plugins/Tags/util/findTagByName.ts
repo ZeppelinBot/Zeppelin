@@ -1,4 +1,4 @@
-import { ExtendedMatchParams, GuildPluginData } from "knub";
+import { ExtendedMatchParams, GuildPluginData } from "vety";
 import { TTag, TagsPluginType } from "../types.js";
 
 export async function findTagByName(

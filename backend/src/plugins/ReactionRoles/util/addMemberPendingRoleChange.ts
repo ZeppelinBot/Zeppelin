@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { logger } from "../../../logger.js";
 import { renderUsername, resolveMember } from "../../../utils.js";
 import { memberRolesLock } from "../../../utils/lockNameHelpers.js";

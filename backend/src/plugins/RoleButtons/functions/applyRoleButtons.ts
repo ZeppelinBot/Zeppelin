@@ -1,5 +1,5 @@
 import { Message, MessageCreateOptions, MessageEditOptions } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { RoleButtonsItem } from "../../../data/entities/RoleButtonsItem.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { RoleButtonsPluginType, TRoleButtonsConfigItem } from "../types.js";

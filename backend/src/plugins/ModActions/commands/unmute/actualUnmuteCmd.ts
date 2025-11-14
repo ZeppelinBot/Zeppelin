@@ -1,5 +1,5 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { humanizeDuration } from "../../../../humanizeDuration.js";
 import { UnknownUser, asSingleLine, renderUsername } from "../../../../utils.js";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";

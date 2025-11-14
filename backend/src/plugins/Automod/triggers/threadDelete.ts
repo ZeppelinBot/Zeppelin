@@ -1,5 +1,5 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
-import z from "zod/v4";
+import { z } from "zod";
 import { renderUsername } from "../../../utils.js";
 import { automodTrigger } from "../helpers.js";
 

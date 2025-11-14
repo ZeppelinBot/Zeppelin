@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
-import { guildPluginMessageCommand } from "knub";
-import { waitForReply } from "knub/helpers";
+import { guildPluginMessageCommand } from "vety";
+import { waitForReply } from "vety/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { resolveUser, UnknownUser } from "../../../utils.js";
 import { CountersPluginType } from "../types.js";
@@ -84,7 +84,7 @@ export const ViewCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
         return;
       }
 
-      const potentialUser = await resolveUser(pluginData.client, reply.content);
+      const potentialUser = await resolveUser(pluginData.client, reply.content, "Counters:ViewCounterCmd");
       if (!potentialUser || potentialUser instanceof UnknownUser) {
         void pluginData.state.common.sendErrorMessage(message, "Unknown user, cancelling");
         return;

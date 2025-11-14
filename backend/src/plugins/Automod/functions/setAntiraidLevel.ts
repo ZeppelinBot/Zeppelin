@@ -1,5 +1,5 @@
 import { User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { runAutomodOnAntiraidLevel } from "../events/runAutomodOnAntiraidLevel.js";
 import { AutomodPluginType } from "../types.js";

@@ -33,7 +33,7 @@ export const ForceMuteMsgCmd = modActionsMsgCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    const user = await resolveUser(pluginData.client, args.user);
+    const user = await resolveUser(pluginData.client, args.user, "ModActions:ForceMuteMsgCmd");
     if (!user.id) {
       pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;
@@ -77,7 +77,7 @@ export const ForceMuteMsgCmd = modActionsMsgCmd({
       [...msg.attachments.values()],
       mod,
       ppId,
-      "time" in args ? args.time ?? undefined : undefined,
+      "time" in args ? (args.time ?? undefined) : undefined,
       args.reason,
       contactMethods,
     );

@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { GuildPingableRoles } from "../../data/GuildPingableRoles.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { PingableRoleDisableCmd } from "./commands/PingableRoleDisableCmd.js";

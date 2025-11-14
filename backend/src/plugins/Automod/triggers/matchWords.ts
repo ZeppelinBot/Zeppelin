@@ -1,5 +1,5 @@
 import escapeStringRegexp from "escape-string-regexp";
-import z from "zod/v4";
+import { z } from "zod";
 import { normalizeText } from "../../../utils/normalizeText.js";
 import { stripMarkdown } from "../../../utils/stripMarkdown.js";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
@@ -44,9 +44,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
         let pattern;
 
         if (trigger.loose_matching) {
-          pattern = [...word]
-            .map((c) => escapeStringRegexp(c))
-            .join(`[\\s\\-_.,!?]{0,${looseMatchingThreshold}}`);
+          pattern = [...word].map((c) => escapeStringRegexp(c)).join(`[\\s\\-_.,!?]{0,${looseMatchingThreshold}}`);
         } else {
           pattern = escapeStringRegexp(word);
         }
@@ -62,10 +60,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
         return pattern;
       });
 
-      const mergedRegex = new RegExp(
-        patterns.map((p) => `(${p})`).join("|"),
-        trigger.case_sensitive ? "" : "i"
-      );
+      const mergedRegex = new RegExp(patterns.map((p) => `(${p})`).join("|"), trigger.case_sensitive ? "" : "i");
 
       regexCache.set(trigger, [mergedRegex]);
     }
@@ -84,7 +79,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
       for (const regex of regexes) {
         const match = regex.exec(str);
         if (match) {
-          const matchedWordIndex = match.slice(1).findIndex(group => group !== undefined);
+          const matchedWordIndex = match.slice(1).findIndex((group) => group !== undefined);
           const matchedWord = trigger.words[matchedWordIndex];
 
           return {

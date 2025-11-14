@@ -1,5 +1,5 @@
 import { PermissionFlagsBits } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import moment from "moment-timezone";
 import { MAX_TIMEOUT_DURATION } from "../../../data/Mutes.js";
 import { Mute } from "../../../data/entities/Mute.js";

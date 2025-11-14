@@ -1,4 +1,4 @@
-import { ExtendedMatchParams, GuildPluginData } from "knub";
+import { ExtendedMatchParams, GuildPluginData } from "vety";
 import { TemplateSafeValue, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import { StrictMessageContent, renderRecursively } from "../../../utils.js";
 import { TTag, TagsPluginType } from "../types.js";

@@ -1,5 +1,5 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { UserNotificationMethod, renderUsername } from "../../../../utils.js";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction.js";

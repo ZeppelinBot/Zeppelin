@@ -40,9 +40,12 @@ export class GuildLogs extends events.EventEmitter {
     this.ignoredLogs.push({ type, ignoreId });
 
     // Clear after expiry (15sec by default)
-    setTimeout(() => {
-      this.clearIgnoredLog(type, ignoreId);
-    }, timeout || 1000 * 15);
+    setTimeout(
+      () => {
+        this.clearIgnoredLog(type, ignoreId);
+      },
+      timeout || 1000 * 15,
+    );
   }
 
   isLogIgnored(type: keyof typeof LogType, ignoreId: any) {

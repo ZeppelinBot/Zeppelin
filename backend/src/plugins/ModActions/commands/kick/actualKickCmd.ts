@@ -1,5 +1,5 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { LogType } from "../../../../data/LogType.js";
 import { canActOn } from "../../../../pluginUtils.js";
 import {

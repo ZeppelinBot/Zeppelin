@@ -1,4 +1,4 @@
-import { guildPluginEventListener } from "knub";
+import { guildPluginEventListener } from "vety";
 import { difference, isEqual } from "lodash-es";
 import { runAutomod } from "../functions/runAutomod.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";

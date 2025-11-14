@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { GlobalPluginData } from "knub";
+import { GlobalPluginData } from "vety";
 import { SECONDS } from "../../../utils.js";
 import { GuildConfigReloaderPluginType } from "../types.js";
 
@@ -15,7 +15,7 @@ export async function reloadChangedGuilds(pluginData: GlobalPluginData<GuildConf
     const guildId = item.key.slice("guild-".length) as Snowflake;
     // tslint:disable-next-line:no-console
     console.log(`Config changed, reloading guild ${guildId}`);
-    await pluginData.getKnubInstance().reloadGuild(guildId);
+    await pluginData.getVetyInstance().reloadGuild(guildId);
 
     if (item.id > pluginData.state.highestConfigId) {
       pluginData.state.highestConfigId = item.id;

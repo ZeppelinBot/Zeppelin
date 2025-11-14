@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import { UserNotificationMethod, disableUserNotificationStrings } from "../../../utils.js";
 import { AutomodPluginType } from "../types.js";

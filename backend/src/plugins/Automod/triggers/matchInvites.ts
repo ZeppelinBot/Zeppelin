@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { getInviteCodesInString, GuildInvite, isGuildInvite, resolveInvite, zSnowflake } from "../../../utils.js";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage.js";
@@ -15,8 +15,16 @@ const configSchema = z.strictObject({
   exclude_guilds: z.array(zSnowflake).max(255).optional(),
   include_invite_codes: z.array(z.string().max(32)).max(255).optional(),
   exclude_invite_codes: z.array(z.string().max(32)).max(255).optional(),
-  include_custom_invite_codes: z.array(z.string().max(32)).max(255).transform(arr => arr.map(str => str.toLowerCase())).optional(),
-  exclude_custom_invite_codes: z.array(z.string().max(32)).max(255).transform(arr => arr.map(str => str.toLowerCase())).optional(),
+  include_custom_invite_codes: z
+    .array(z.string().max(32))
+    .max(255)
+    .transform((arr) => arr.map((str) => str.toLowerCase()))
+    .optional(),
+  exclude_custom_invite_codes: z
+    .array(z.string().max(32))
+    .max(255)
+    .transform((arr) => arr.map((str) => str.toLowerCase()))
+    .optional(),
   allow_group_dm_invites: z.boolean().default(false),
   match_messages: z.boolean().default(true),
   match_embeds: z.boolean().default(false),
