@@ -28,6 +28,7 @@ const configSchema = z.strictObject({
   match_usernames: z.boolean().default(false),
   match_nicknames: z.boolean().default(false),
   match_custom_status: z.boolean().default(false),
+  match_polls: z.boolean().default(false),
 });
 
 export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
