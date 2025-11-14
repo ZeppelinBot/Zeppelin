@@ -1,4 +1,4 @@
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
 import { updateCase } from "../../functions/updateCase.js";
 import { modActionsSlashCmd } from "../../types.js";

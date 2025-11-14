@@ -9,7 +9,7 @@ import {
   PermissionFlagsBits,
   User,
 } from "discord.js";
-import { GuildPluginData, guildPluginUserContextMenuCommand } from "knub";
+import { GuildPluginData, guildPluginUserContextMenuCommand } from "vety";
 import { Case } from "../../../data/entities/Case.js";
 import { logger } from "../../../logger.js";
 import { SECONDS, UnknownUser, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils.js";
@@ -52,7 +52,7 @@ export const ModMenuCmd = guildPluginUserContextMenuCommand({
       return;
     }
 
-    const user = await resolveUser(pluginData.client, interaction.targetId);
+    const user = await resolveUser(pluginData.client, interaction.targetId, "ContextMenus:ModMenuCmd");
     if (!user.id) {
       await interaction.followUp("Error: User not found");
       return;

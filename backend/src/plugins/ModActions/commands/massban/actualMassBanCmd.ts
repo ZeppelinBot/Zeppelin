@@ -1,5 +1,5 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { LogType } from "../../../../data/LogType.js";
 import { humanizeDurationShort } from "../../../../humanizeDuration.js";

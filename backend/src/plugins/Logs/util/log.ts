@@ -1,5 +1,5 @@
 import { APIEmbed, MessageMentionTypes, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { LogType } from "../../../data/LogType.js";
 import { TypedTemplateSafeValueContainer } from "../../../templateFormatter.js";

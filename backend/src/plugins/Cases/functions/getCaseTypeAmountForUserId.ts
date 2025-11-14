@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { CasesPluginType } from "../types.js";
 

@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { AutomodContext, AutomodPluginType, TRule } from "../types.js";
 
 export function checkCooldown(

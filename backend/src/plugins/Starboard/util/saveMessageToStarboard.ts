@@ -1,5 +1,5 @@
 import { APIEmbed, Message, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { StarboardPluginType, TStarboardOpts } from "../types.js";
 import { createStarboardEmbedFromMessage } from "./createStarboardEmbedFromMessage.js";
 import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage.js";

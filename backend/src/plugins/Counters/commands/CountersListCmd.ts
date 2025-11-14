@@ -1,4 +1,4 @@
-import { guildPluginMessageCommand } from "knub";
+import { guildPluginMessageCommand } from "vety";
 import { trimMultilineString, ucfirst } from "../../../utils.js";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix.js";
 import { CountersPluginType } from "../types.js";

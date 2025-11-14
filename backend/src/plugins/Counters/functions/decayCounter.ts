@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { counterIdLock } from "../../../utils/lockNameHelpers.js";
 import { CountersPluginType } from "../types.js";
 import { checkAllValuesForReverseTrigger } from "./checkAllValuesForReverseTrigger.js";

@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { RoleManagerPluginType } from "../types.js";
 import { runRoleAssignmentLoop } from "./runRoleAssignmentLoop.js";
 

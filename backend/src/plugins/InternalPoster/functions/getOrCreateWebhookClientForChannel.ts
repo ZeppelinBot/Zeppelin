@@ -1,5 +1,5 @@
 import { WebhookClient } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { InternalPosterPluginType } from "../types.js";
 import { getOrCreateWebhookForChannel, WebhookableChannel } from "./getOrCreateWebhookForChannel.js";
 

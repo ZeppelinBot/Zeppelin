@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { TimeAndDatePluginType } from "../types.js";
 
 export function getGuildTz(pluginData: GuildPluginData<TimeAndDatePluginType>) {

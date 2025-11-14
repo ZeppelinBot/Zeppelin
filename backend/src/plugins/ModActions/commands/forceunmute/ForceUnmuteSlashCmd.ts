@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { hasPermission } from "../../../../pluginUtils.js";
 import { convertDelayStringToMS, resolveMember } from "../../../../utils.js";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
@@ -52,7 +52,7 @@ export const ForceUnmuteSlashCmd = modActionsSlashCmd({
       ppId = interaction.user.id;
     }
 
-    const convertedTime = options.time ? convertDelayStringToMS(options.time) ?? undefined : undefined;
+    const convertedTime = options.time ? (convertDelayStringToMS(options.time) ?? undefined) : undefined;
     if (options.time && !convertedTime) {
       pluginData.state.common.sendErrorMessage(interaction, `Could not convert ${options.time} to a delay`);
       return;

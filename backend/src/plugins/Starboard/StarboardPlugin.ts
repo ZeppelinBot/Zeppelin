@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages.js";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions.js";

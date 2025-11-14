@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { LogType } from "../../../data/LogType.js";
 import { Case } from "../../../data/entities/Case.js";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";

@@ -28,10 +28,10 @@ import {
   GuildPluginData,
   helpers,
   PluginConfigManager,
-} from "knub";
-import z from "zod/v4";
+  Vety,
+} from "vety";
+import { z } from "zod";
 import { isStaff } from "./staff.js";
-import { TZeppelinKnub } from "./types.js";
 import { Tail } from "./utils/typeUtils.js";
 
 const { getMemberLevel } = helpers;
@@ -168,7 +168,7 @@ export async function getConfigForContext<TPluginData extends BasePluginData<any
   context: GenericCommandSource,
 ): Promise<z.output<TPluginData["_pluginType"]["configSchema"]>> {
   if (context instanceof ChatInputCommandInteraction) {
-    // TODO: Support for modal interactions (here and Knub)
+    // TODO: Support for modal interactions (here and Vety)
     return config.getForInteraction(context);
   }
   const channel = await getContextChannel(context);
@@ -181,15 +181,15 @@ export async function getConfigForContext<TPluginData extends BasePluginData<any
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {
-  const knub = pluginData.getKnubInstance() as TZeppelinKnub;
+  const vety = pluginData.getVetyInstance() as Vety;
   // @ts-expect-error
-  return knub.getGlobalConfig().url;
+  return vety.getGlobalConfig().url;
 }
 
 export function isOwner(pluginData: AnyPluginData<any>, userId: string) {
-  const knub = pluginData.getKnubInstance() as TZeppelinKnub;
+  const vety = pluginData.getVetyInstance() as Vety;
   // @ts-expect-error
-  const owners = knub.getGlobalConfig()?.owners;
+  const owners = vety.getGlobalConfig()?.owners;
   if (!owners) {
     return false;
   }

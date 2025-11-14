@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel, Message } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import moment from "moment-timezone";
 import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop.js";
 import { humanizeDuration } from "../../../humanizeDuration.js";

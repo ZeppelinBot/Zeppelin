@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { MuteTypes } from "../../../data/MuteTypes.js";
 import { Mute } from "../../../data/entities/Mute.js";
 import { clearExpiringMute } from "../../../data/loops/expiringMutesLoop.js";

@@ -35,7 +35,7 @@ export const CasesUserMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user =
       (await resolveMember(pluginData.client, pluginData.guild, args.user)) ||
-      (await resolveUser(pluginData.client, args.user));
+      (await resolveUser(pluginData.client, args.user, "ModActions:CasesUserMsgCmd"));
 
     if (user instanceof UnknownUser) {
       pluginData.state.common.sendErrorMessage(msg, `User not found`);

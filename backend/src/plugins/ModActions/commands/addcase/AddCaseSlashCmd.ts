@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { hasPermission } from "../../../../pluginUtils.js";
 import { resolveMember } from "../../../../utils.js";

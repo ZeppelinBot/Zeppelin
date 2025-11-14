@@ -1,5 +1,5 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
-import z from "zod/v4";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "vety";
+import { z } from "zod";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";

@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { StarboardPluginType } from "../types.js";
 
 export async function removeMessageFromStarboardMessages(

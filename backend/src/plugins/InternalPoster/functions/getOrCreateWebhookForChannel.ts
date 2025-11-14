@@ -1,5 +1,5 @@
 import { GuildBasedChannel, PermissionsBitField } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { isDiscordAPIError } from "../../../utils.js";
 import { InternalPosterPluginType } from "../types.js";
 

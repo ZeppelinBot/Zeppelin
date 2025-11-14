@@ -13,7 +13,7 @@ import {
   StickerFormatType,
   User,
 } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { Case } from "../data/entities/Case.js";
 import {
   ISavedMessageAttachmentData,

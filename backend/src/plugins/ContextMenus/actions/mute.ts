@@ -7,7 +7,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import { humanizeDuration } from "../../../humanizeDuration.js";
 import { logger } from "../../../logger.js";

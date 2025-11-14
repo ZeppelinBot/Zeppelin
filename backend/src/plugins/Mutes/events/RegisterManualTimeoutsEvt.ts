@@ -15,7 +15,7 @@ export const RegisterManualTimeoutsEvt = mutesEvt({
       return;
     }
 
-    const target = await resolveUser(pluginData.client, auditLogEntry.targetId!);
+    const target = await resolveUser(pluginData.client, auditLogEntry.targetId!, "Mutes:RegisterManualTimeoutsEvt");
 
     // Only act based on the last changes in this log
     let lastTimeoutChange: AuditLogChange | null = null;

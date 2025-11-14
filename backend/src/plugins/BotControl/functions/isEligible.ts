@@ -1,5 +1,5 @@
 import { User } from "discord.js";
-import { GlobalPluginData } from "knub";
+import { GlobalPluginData } from "vety";
 import { GuildInvite } from "../../../utils.js";
 import { BotControlPluginType } from "../types.js";
 

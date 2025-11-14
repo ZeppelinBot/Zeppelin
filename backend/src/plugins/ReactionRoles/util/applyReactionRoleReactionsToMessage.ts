@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { ReactionRole } from "../../../data/entities/ReactionRole.js";
-import { isDiscordAPIError, sleep } from "../../../utils.js";
+import { isDiscordAPIError, isDiscordJsTypeError, sleep } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { ReactionRolesPluginType } from "../types.js";
 
@@ -72,7 +72,12 @@ export async function applyReactionRoleReactionsToMessage(
       await targetMessage.react(rawEmoji);
       await sleep(750); // Make sure we don't hit rate limits
     } catch (e) {
-      if (isDiscordAPIError(e)) {
+      if (isDiscordJsTypeError(e)) {
+        errors.push(e.message);
+        logs.logBotAlert({
+          body: `Error ${e.code} while applying reaction role reactions to ${channelId}/${messageId}: ${e.message}.`,
+        });
+      } else if (isDiscordAPIError(e)) {
         if (e.code === 10014) {
           pluginData.state.reactionRoles.removeFromMessage(messageId, rawEmoji);
           errors.push(`Unknown emoji: ${rawEmoji}`);

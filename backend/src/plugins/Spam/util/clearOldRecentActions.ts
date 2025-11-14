@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SpamPluginType } from "../types.js";
 
 const MAX_INTERVAL = 300;

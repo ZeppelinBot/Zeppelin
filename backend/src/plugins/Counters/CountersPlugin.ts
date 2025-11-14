@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { PluginOverride, guildPlugin } from "knub";
+import { PluginOverride, guildPlugin } from "vety";
 import { GuildCounters } from "../../data/GuildCounters.js";
 import {
   CounterTrigger,

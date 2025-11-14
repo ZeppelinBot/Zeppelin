@@ -1,4 +1,4 @@
-import { waitForReply } from "knub/helpers";
+import { waitForReply } from "vety/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
 import { resolveMessageMember } from "../../../../pluginUtils.js";
 import { modActionsMsgCmd } from "../../types.js";

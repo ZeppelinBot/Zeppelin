@@ -1,5 +1,5 @@
-import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
-import z from "zod/v4";
+import { BasePluginType, CooldownManager, guildPluginEventListener } from "vety";
+import { z } from "zod";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { zBoundedCharacters, zSnowflake } from "../../utils.js";
 
