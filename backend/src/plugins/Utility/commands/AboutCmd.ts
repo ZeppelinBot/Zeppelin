@@ -1,6 +1,6 @@
 import { APIEmbed, GuildChannel } from "discord.js";
 import LCL from "last-commit-log";
-import shuffle from "lodash/shuffle.js";
+import { shuffle } from "lodash-es";
 import moment from "moment-timezone";
 import { humanizeDuration } from "../../../humanizeDuration.js";
 import { rootDir } from "../../../paths.js";
@@ -55,7 +55,7 @@ export const AboutCmd = utilityCmd({
     ];
 
     const loadedPlugins = Array.from(
-      pluginData.getKnubInstance().getLoadedGuild(pluginData.guild.id)!.loadedPlugins.keys(),
+      pluginData.getVetyInstance().getLoadedGuild(pluginData.guild.id)!.loadedPlugins.keys(),
     );
     loadedPlugins.sort();
 

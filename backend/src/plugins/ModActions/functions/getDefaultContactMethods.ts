@@ -1,5 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { UserNotificationMethod } from "../../../utils.js";
 import { ModActionsPluginType } from "../types.js";
 

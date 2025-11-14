@@ -1,5 +1,5 @@
 import { User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { runAutomod } from "../functions/runAutomod.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";
 

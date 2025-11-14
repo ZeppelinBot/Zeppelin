@@ -1,5 +1,5 @@
 import { AnyThreadChannel, GuildTextBasedChannel, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { LogType } from "../../../data/LogType.js";
 import { SlowmodePluginType } from "../types.js";
 

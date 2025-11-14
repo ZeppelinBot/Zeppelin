@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { PingableRole } from "../../../data/entities/PingableRole.js";
 import { PingableRolesPluginType } from "../types.js";
 

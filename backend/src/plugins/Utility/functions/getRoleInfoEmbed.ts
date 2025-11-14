@@ -1,5 +1,5 @@
 import { APIEmbed, PermissionFlagsBits, Role } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils.js";
 import { PERMISSION_NAMES } from "../../../utils/permissionNames.js";
 import { UtilityPluginType } from "../types.js";

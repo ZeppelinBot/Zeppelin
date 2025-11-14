@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils.js";
 import { RecentActionType } from "../constants.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";

@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { RoleButtonsPluginType } from "../types.js";
 import { applyRoleButtons } from "./applyRoleButtons.js";
 

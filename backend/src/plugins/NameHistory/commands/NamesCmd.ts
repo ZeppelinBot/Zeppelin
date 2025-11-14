@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { createChunkedMessage, disableCodeBlocks } from "knub/helpers";
+import { createChunkedMessage, disableCodeBlocks } from "vety/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { MAX_NICKNAME_ENTRIES_PER_USER } from "../../../data/GuildNicknameHistory.js";
 import { MAX_USERNAME_ENTRIES_PER_USER } from "../../../data/UsernameHistory.js";

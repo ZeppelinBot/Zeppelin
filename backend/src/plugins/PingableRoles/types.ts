@@ -1,5 +1,5 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
-import z from "zod/v4";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "vety";
+import { z } from "zod";
 import { GuildPingableRoles } from "../../data/GuildPingableRoles.js";
 import { PingableRole } from "../../data/entities/PingableRole.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";

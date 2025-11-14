@@ -1,5 +1,5 @@
 import { APIEmbed } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import {
   EmbedWith,
@@ -27,7 +27,7 @@ export async function getUserInfoEmbed(
   userId: string,
   compact = false,
 ): Promise<APIEmbed | null> {
-  const user = await resolveUser(pluginData.client, userId);
+  const user = await resolveUser(pluginData.client, userId, "Utility:getUserInfoEmbed");
   if (!user || user instanceof UnknownUser) {
     return null;
   }

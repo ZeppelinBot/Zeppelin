@@ -1,5 +1,5 @@
 import { Attachment, MessageMentionOptions, SendableChannels, TextBasedChannel } from "discord.js";
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { GenericCommandSource, makePublicFn, sendContextResponse } from "../../pluginUtils.js";
 import { errorMessage, successMessage } from "../../utils.js";
 import { getErrorEmoji, getSuccessEmoji } from "./functions/getEmoji.js";
@@ -49,7 +49,7 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
       storeAttachmentsAsMessage: async (attachments: Attachment[], backupChannel?: TextBasedChannel | null) => {
         const attachmentChannelId = pluginData.config.get().attachment_storing_channel;
         const channel = attachmentChannelId
-          ? (pluginData.guild.channels.cache.get(attachmentChannelId) as TextBasedChannel) ?? backupChannel
+          ? ((pluginData.guild.channels.cache.get(attachmentChannelId) as TextBasedChannel) ?? backupChannel)
           : backupChannel;
 
         if (!channel) {

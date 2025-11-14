@@ -1,4 +1,4 @@
-import { PluginOverride, guildPlugin } from "knub";
+import { PluginOverride, guildPlugin } from "vety";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners.js";

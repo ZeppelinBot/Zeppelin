@@ -68,7 +68,7 @@ export const ListDashboardPermsCmd = botControlCmd({
 
       finalMessage += `The server ${guildInfo} has the following assigned permissions:\n`; // Double \n for consistency with AddDashboardUserCmd
       for (const assignment of existingGuildAssignment) {
-        const user = await resolveUser(pluginData.client, assignment.target_id);
+        const user = await resolveUser(pluginData.client, assignment.target_id, "BotControl:ListDashboardPermsCmd");
         finalMessage += `\n**${renderUsername(user)}**, \`${assignment.target_id}\`: ${assignment.permissions.join(
           ", ",
         )}`;

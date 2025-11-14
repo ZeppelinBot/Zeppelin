@@ -1,5 +1,5 @@
-import { BasePluginType, globalPluginEventListener, globalPluginMessageCommand } from "knub";
-import z from "zod/v4";
+import { BasePluginType, globalPluginEventListener, globalPluginMessageCommand } from "vety";
+import { z } from "zod";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments.js";
 import { Configs } from "../../data/Configs.js";

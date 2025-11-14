@@ -1,5 +1,5 @@
 import { ChannelType, GuildMember } from "discord.js";
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { canActOn, hasPermission } from "../../../../pluginUtils.js";
 import { UserNotificationMethod, resolveMember } from "../../../../utils.js";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";

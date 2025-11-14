@@ -1,4 +1,4 @@
-import { CooldownManager, guildPlugin } from "knub";
+import { CooldownManager, guildPlugin } from "vety";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { VoiceStateUpdateEvt } from "./events/VoiceStateUpdateEvt.js";

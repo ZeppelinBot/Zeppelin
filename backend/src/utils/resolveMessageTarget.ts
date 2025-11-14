@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId.js";
 import { isSnowflake } from "../utils.js";
 

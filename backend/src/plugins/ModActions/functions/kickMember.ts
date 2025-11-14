@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { LogType } from "../../../data/LogType.js";
 import { renderTemplate, TemplateParseError, TemplateSafeValueContainer } from "../../../templateFormatter.js";
@@ -46,7 +46,7 @@ export async function kickMember(
               guildName: pluginData.guild.name,
               reason: reasonWithAttachments,
               moderator: kickOptions.caseArgs?.modId
-                ? userToTemplateSafeUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
+                ? userToTemplateSafeUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId, "ModActions:kickMember"))
                 : null,
             }),
           );
@@ -93,7 +93,7 @@ export async function kickMember(
   });
 
   // Log the action
-  const mod = await resolveUser(pluginData.client, modId);
+  const mod = await resolveUser(pluginData.client, modId, "ModActions:kickMember");
   pluginData.getPlugin(LogsPlugin).logMemberKick({
     mod,
     user: member.user,

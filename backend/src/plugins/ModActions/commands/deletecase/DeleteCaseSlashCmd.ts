@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { modActionsSlashCmd } from "../../types.js";
 import { actualDeleteCaseCmd } from "./actualDeleteCaseCmd.js";
 

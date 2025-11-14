@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import https from "https";
-import pick from "lodash/pick.js";
+import { pick } from "lodash-es";
 import passport from "passport";
 import { Strategy as CustomStrategy } from "passport-custom";
 import OAuth2Strategy from "passport-oauth2";

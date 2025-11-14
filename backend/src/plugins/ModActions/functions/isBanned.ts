@@ -1,5 +1,5 @@
 import { PermissionsBitField, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SECONDS, isDiscordAPIError, isDiscordHTTPError, sleep } from "../../../utils.js";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";

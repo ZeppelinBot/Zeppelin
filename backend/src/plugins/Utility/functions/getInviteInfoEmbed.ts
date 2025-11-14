@@ -1,5 +1,5 @@
 import { APIEmbed, ChannelType } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import {
   EmbedWith,
   formatNumber,
@@ -18,7 +18,7 @@ export async function getInviteInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   inviteCode: string,
 ): Promise<APIEmbed | null> {
-  let invite = await resolveInvite(pluginData.client, inviteCode, true);
+  const invite = await resolveInvite(pluginData.client, inviteCode, true);
   if (!invite) {
     return null;
   }

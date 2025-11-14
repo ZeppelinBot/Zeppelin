@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { RecentActionType, SpamPluginType } from "../types.js";
 
 export function addRecentAction(

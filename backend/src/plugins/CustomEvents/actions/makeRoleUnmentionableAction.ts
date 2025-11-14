@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
-import z from "zod/v4";
+import { GuildPluginData } from "vety";
+import { z } from "zod";
 import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
 import { zSnowflake } from "../../../utils.js";
 import { ActionError } from "../ActionError.js";

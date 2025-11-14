@@ -1,5 +1,5 @@
 import { APIEmbed } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils.js";
 import { UtilityPluginType } from "../types.js";
 

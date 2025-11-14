@@ -1,6 +1,6 @@
 import { APIEmbed, Awaitable } from "discord.js";
-import { BasePluginType } from "knub";
-import z from "zod/v4";
+import { BasePluginType } from "vety";
+import { z } from "zod";
 import { GuildCases } from "../../data/GuildCases.js";
 
 export const zContextMenusConfig = z.strictObject({

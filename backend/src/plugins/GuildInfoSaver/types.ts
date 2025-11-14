@@ -1,5 +1,5 @@
-import { BasePluginType } from "knub";
-import { z } from "zod/v4";
+import { BasePluginType } from "vety";
+import { z } from "zod";
 
 export const zGuildInfoSaverConfig = z.strictObject({});
 

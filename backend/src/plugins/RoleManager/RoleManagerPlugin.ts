@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { GuildRoleQueue } from "../../data/GuildRoleQueue.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";

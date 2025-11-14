@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { VCAlert } from "../../../data/entities/VCAlert.js";
 import { LocateUserPluginType } from "../types.js";
 import { removeUserIdFromActiveAlerts } from "./removeUserIdFromActiveAlerts.js";

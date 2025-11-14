@@ -1,4 +1,4 @@
-import { PluginOverride, guildPlugin } from "knub";
+import { PluginOverride, guildPlugin } from "vety";
 import { GuildCases } from "../../data/GuildCases.js";
 import { CasesPlugin } from "../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";

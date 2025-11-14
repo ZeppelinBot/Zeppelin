@@ -1,5 +1,5 @@
-import { BasePluginType } from "knub";
-import z from "zod/v4";
+import { BasePluginType } from "vety";
+import { z } from "zod";
 import { RegExpRunner } from "../../RegExpRunner.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
