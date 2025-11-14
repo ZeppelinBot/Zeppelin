@@ -1,5 +1,5 @@
 import { Attachment, ChatInputCommandInteraction, Message } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { isContextMessage } from "../../../pluginUtils.js";
 import { ModActionsPluginType } from "../types.js";
 

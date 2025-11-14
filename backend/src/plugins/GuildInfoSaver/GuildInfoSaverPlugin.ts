@@ -1,5 +1,5 @@
 import { Guild } from "discord.js";
-import { guildPlugin, guildPluginEventListener } from "knub";
+import { guildPlugin, guildPluginEventListener } from "vety";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments.js";
 import { MINUTES } from "../../utils.js";

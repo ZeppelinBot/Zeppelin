@@ -1,4 +1,4 @@
-import { LoadedGuildPlugin, PluginCommandDefinition } from "knub";
+import { LoadedGuildPlugin, PluginCommandDefinition } from "vety";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { env } from "../../../env.js";
 import { createChunkedMessage } from "../../../utils.js";
@@ -22,7 +22,7 @@ export const HelpCmd = utilityCmd({
       command: PluginCommandDefinition;
     }> = [];
 
-    const guildData = pluginData.getKnubInstance().getLoadedGuild(pluginData.guild.id)!;
+    const guildData = pluginData.getVetyInstance().getLoadedGuild(pluginData.guild.id)!;
     for (const plugin of guildData.loadedPlugins.values()) {
       const registeredCommands = plugin.pluginData.messageCommands.getAll();
       for (const registeredCommand of registeredCommands) {

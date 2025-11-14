@@ -1,5 +1,5 @@
 import { APIEmbed, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { FindOptionsWhere, In } from "typeorm";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { Case } from "../../../../data/entities/Case.js";
@@ -235,7 +235,7 @@ export async function actualCasesCmd(
   show: boolean | null,
 ) {
   const mod = modId
-    ? (await resolveMember(pluginData.client, pluginData.guild, modId)) || (await resolveUser(pluginData.client, modId))
+    ? (await resolveMember(pluginData.client, pluginData.guild, modId)) || (await resolveUser(pluginData.client, modId, "ModActions:actualCasesCmd"))
     : null;
   const modName = modId ? (mod instanceof UnknownUser ? modId : renderUsername(mod!)) : renderUsername(author);
 

@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { Queue } from "../../Queue.js";
 import { Webhooks } from "../../data/Webhooks.js";
 import { makePublicFn } from "../../pluginUtils.js";

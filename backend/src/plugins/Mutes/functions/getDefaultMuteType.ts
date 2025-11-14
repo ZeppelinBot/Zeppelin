@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { MuteTypes } from "../../../data/MuteTypes.js";
 import { MutesPluginType } from "../types.js";
 

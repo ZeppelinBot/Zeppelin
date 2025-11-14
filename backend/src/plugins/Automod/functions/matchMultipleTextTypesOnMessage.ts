@@ -1,5 +1,5 @@
 import { ActivityType, Embed } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { renderUsername, resolveMember } from "../../../utils.js";
 import { DeepMutable } from "../../../utils/typeUtils.js";

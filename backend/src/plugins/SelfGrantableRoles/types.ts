@@ -1,5 +1,5 @@
-import { BasePluginType, CooldownManager, guildPluginMessageCommand, pluginUtils } from "knub";
-import z from "zod/v4";
+import { BasePluginType, CooldownManager, guildPluginMessageCommand, pluginUtils } from "vety";
+import { z } from "zod";
 import { zBoundedCharacters, zBoundedRecord } from "../../utils.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 

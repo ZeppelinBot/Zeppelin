@@ -24,7 +24,7 @@ export const ServersCmd = botControlCmd({
     const search = args.search ? new RegExp([...args.search].map((s) => escapeStringRegexp(s)).join(".*"), "i") : null;
 
     const joinedGuilds = Array.from(pluginData.client.guilds.cache.values());
-    const loadedGuilds = pluginData.getKnubInstance().getLoadedGuilds();
+    const loadedGuilds = pluginData.getVetyInstance().getLoadedGuilds();
     const loadedGuildsMap = loadedGuilds.reduce((map, guildData) => map.set(guildData.guildId, guildData), new Map());
 
     if (showList) {

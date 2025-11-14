@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { parseColor } from "./parseColor.js";
 import { rgbToInt } from "./rgbToInt.js";
 

@@ -1,5 +1,5 @@
 import { PermissionsBitField, Snowflake, StageChannel, TextChannel, VoiceChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { LogType } from "../../../data/LogType.js";
 import { MINUTES, isDiscordAPIError } from "../../../utils.js";
 import { filterObject } from "../../../utils/filterObject.js";

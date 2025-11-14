@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { CountersPluginType } from "../types.js";
 
 export function getPrettyNameForCounter(pluginData: GuildPluginData<CountersPluginType>, counterName: string) {

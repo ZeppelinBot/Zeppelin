@@ -1,6 +1,6 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
-import { GuildPluginData } from "knub";
-import { getMemberLevel } from "knub/helpers";
+import { GuildPluginData } from "vety";
+import { getMemberLevel } from "vety/helpers";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { clearExpiringTempban, registerExpiringTempban } from "../../../../data/loops/expiringTempbansLoop.js";
 import { humanizeDuration } from "../../../../humanizeDuration.js";

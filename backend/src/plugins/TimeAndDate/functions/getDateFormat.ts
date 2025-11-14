@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { defaultDateFormats } from "../defaultDateFormats.js";
 import { TimeAndDatePluginType } from "../types.js";
 

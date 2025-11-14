@@ -21,7 +21,7 @@ export const ReloadServerCmd = botControlCmd({
     }
 
     try {
-      await pluginData.getKnubInstance().reloadGuild(args.guildId);
+      await pluginData.getVetyInstance().reloadGuild(args.guildId);
     } catch (e) {
       void msg.channel.send(`Failed to reload guild: ${e.message}`);
       return;

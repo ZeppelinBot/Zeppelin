@@ -1,5 +1,5 @@
-import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
-import { z } from "zod/v4";
+import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "vety";
+import { z } from "zod";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zChannelArchiverPluginConfig = z.strictObject({});

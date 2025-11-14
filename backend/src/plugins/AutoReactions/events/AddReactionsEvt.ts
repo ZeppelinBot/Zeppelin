@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, PermissionsBitField } from "discord.js";
 import { AutoReaction } from "../../../data/entities/AutoReaction.js";
-import { isDiscordAPIError } from "../../../utils.js";
+import { isDiscordAPIError, isDiscordJsTypeError } from "../../../utils.js";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions.js";
 import { missingPermissionError } from "../../../utils/missingPermissionError.js";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions.js";
@@ -53,7 +53,12 @@ export const AddReactionsEvt = autoReactionsEvt({
       try {
         await message.react(reaction);
       } catch (e) {
-        if (isDiscordAPIError(e)) {
+        if (isDiscordJsTypeError(e)) {
+          const logs = pluginData.getPlugin(LogsPlugin);
+          logs.logBotAlert({
+            body: `Could not apply auto-reactions in <#${channel.id}> for message \`${message.id}\`: ${e.message}.`,
+          });
+        } else if (isDiscordAPIError(e)) {
           const logs = pluginData.getPlugin(LogsPlugin);
           if (e.code === 10008) {
             logs.logBotAlert({

@@ -8,6 +8,8 @@
 
 **/node_modules
 **/dist
+**/.pnpm-store
+**/.docker
 
 **/*.log
 **/npm-debug.log*
@@ -35,6 +37,7 @@
 # Debug files
 **/*.debug.ts
 **/*.debug.js
+/debug
 
 **/.vscode
 

@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { slashOptions } from "knub";
+import { slashOptions } from "vety";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { hasPermission } from "../../../../pluginUtils.js";
 import { resolveMember } from "../../../../utils.js";
@@ -28,7 +28,9 @@ export const AddCaseSlashCmd = modActionsSlashCmd({
       name: "type",
       description: "The type of case to add",
       required: true,
-      choices: Object.keys(CaseTypes).map((type) => ({ name: type, value: type })),
+      choices: Object.keys(CaseTypes)
+        .filter((key) => isNaN(Number(key)))
+        .map((key) => ({ name: key, value: key })),
     }),
     slashOptions.user({ name: "user", description: "The user to add a case to", required: true }),
 

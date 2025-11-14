@@ -58,17 +58,17 @@ These commands are run inside the dev container. You should be able to open a te
 
 ### 1. Install dependencies
 
-1. `npm ci`
+1. `pnpm install`
 
 ### Starting the backend (bot + api)
 
 1. `cd ~/zeppelin/backend`
-2. `npm run watch`
+2. `pnpm run watch`
 
 ### Starting the dashboard
 
 1. `cd ~/zeppelin/dashboard`
-2. `npm run watch`
+2. `pnpm run watch`
 
 ### Opening the dashboard
 Browse to https://localhost:3300 to view the dashboard

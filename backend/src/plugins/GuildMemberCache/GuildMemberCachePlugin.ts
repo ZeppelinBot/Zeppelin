@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { GuildMemberCache } from "../../data/GuildMemberCache.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { SECONDS } from "../../utils.js";

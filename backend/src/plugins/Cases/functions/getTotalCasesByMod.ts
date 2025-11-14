@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { FindOptionsWhere } from "typeorm";
 import { Case } from "../../../data/entities/Case.js";
 import { CasesPluginType } from "../types.js";

@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { guildPluginEventListener } from "knub";
+import { guildPluginEventListener } from "vety";
 import { SECONDS } from "../../../utils.js";
 import { renderRecursively } from "../../../utils.js";
 import { parseCustomId } from "../../../utils/parseCustomId.js";
