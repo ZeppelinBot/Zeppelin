@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
 import { ActionError } from "../ActionError.js";
 import { addRoleAction } from "../actions/addRoleAction.js";

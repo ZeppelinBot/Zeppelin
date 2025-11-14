@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { getChannelId, getRoleId } from "knub/helpers";
+import { getChannelId, getRoleId } from "vety/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { resolveMessageMember } from "../../../pluginUtils.js";
 import { isValidSnowflake, noop, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils.js";
@@ -64,7 +64,7 @@ export const InfoCmd = utilityCmd({
 
     // 3. User
     if (userCfg.can_userinfo) {
-      const user = await resolveUser(pluginData.client, value);
+      const user = await resolveUser(pluginData.client, value, "Utility:InfoCmd");
       if (user && userCfg.can_userinfo) {
         const embed = await getUserInfoEmbed(pluginData, user.id, Boolean(args.compact));
         if (embed) {

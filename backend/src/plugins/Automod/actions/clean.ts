@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel, Snowflake } from "discord.js";
-import z from "zod/v4";
+import { z } from "zod";
 import { LogType } from "../../../data/LogType.js";
 import { noop } from "../../../utils.js";
 import { automodAction } from "../helpers.js";

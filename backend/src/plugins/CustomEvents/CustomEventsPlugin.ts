@@ -1,5 +1,5 @@
 import { GuildChannel, GuildMember, User } from "discord.js";
-import { guildPlugin, guildPluginMessageCommand, parseSignature } from "knub";
+import { guildPlugin, guildPluginMessageCommand, parseSignature } from "vety";
 import { TSignature } from "knub-command-manager";
 import { commandTypes } from "../../commandTypes.js";
 import { TemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter.js";

@@ -1,5 +1,5 @@
 import { ActivityType, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { messageSummary, verboseChannelMention } from "../../../utils.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";
 import { MatchableTextType } from "./matchMultipleTextTypesOnMessage.js";

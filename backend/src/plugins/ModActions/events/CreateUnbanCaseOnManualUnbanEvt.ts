@@ -37,7 +37,7 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt({
       const modId = relevantAuditLogEntry.executor!.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      mod = await resolveUser(pluginData.client, modId);
+      mod = await resolveUser(pluginData.client, modId, "ModActions:CreateUnbanCaseOnManualUnbanEvt");
 
       const config = mod instanceof UnknownUser ? pluginData.config.get() : await pluginData.config.getForUser(mod);
 

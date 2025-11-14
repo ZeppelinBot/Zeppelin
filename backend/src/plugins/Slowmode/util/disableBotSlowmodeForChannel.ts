@@ -1,5 +1,5 @@
 import { AnyThreadChannel, GuildTextBasedChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SlowmodePluginType } from "../types.js";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId.js";
 

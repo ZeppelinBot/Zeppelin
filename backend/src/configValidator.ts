@@ -1,5 +1,5 @@
-import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
-import { z, ZodError } from "zod/v4";
+import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "vety";
+import { z, ZodError } from "zod";
 import { availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { zZeppelinGuildConfig } from "./types.js";
 import { formatZodIssue } from "./utils/formatZodIssue.js";
@@ -28,15 +28,12 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
       }
 
       const plugin = pluginNameToPlugin.get(pluginName)!;
-      const configManager = new PluginConfigManager(
-        pluginOptions,
-        {
-          configSchema: plugin.configSchema,
-          defaultOverrides: plugin.defaultOverrides ?? [],
-          levels: {},
-          customOverrideCriteriaFunctions: plugin.customOverrideCriteriaFunctions,
-        },
-      );
+      const configManager = new PluginConfigManager(pluginOptions, {
+        configSchema: plugin.configSchema,
+        defaultOverrides: plugin.defaultOverrides ?? [],
+        levels: {},
+        customOverrideCriteriaFunctions: plugin.customOverrideCriteriaFunctions,
+      });
 
       try {
         await configManager.init();

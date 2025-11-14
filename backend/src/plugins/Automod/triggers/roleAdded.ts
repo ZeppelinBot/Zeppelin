@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import z from "zod/v4";
+import { z } from "zod";
 import { renderUsername, zSnowflake } from "../../../utils.js";
 import { consumeIgnoredRoleChange } from "../functions/ignoredRoleChanges.js";
 import { automodTrigger } from "../helpers.js";

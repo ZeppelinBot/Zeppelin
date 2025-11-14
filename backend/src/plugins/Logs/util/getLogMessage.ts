@@ -1,5 +1,5 @@
 import { MessageCreateOptions } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { LogType } from "../../../data/LogType.js";
 import { logger } from "../../../logger.js";

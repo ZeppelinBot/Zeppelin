@@ -1,5 +1,5 @@
 import { Message, MessageEditOptions, WebhookClient, WebhookMessageEditOptions } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { isDiscordAPIError, noop } from "../../../utils.js";
 import { InternalPosterPluginType } from "../types.js";
 

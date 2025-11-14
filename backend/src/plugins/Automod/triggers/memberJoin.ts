@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { z } from "zod";
 import { convertDelayStringToMS, zDelayString } from "../../../utils.js";
 import { automodTrigger } from "../helpers.js";
 

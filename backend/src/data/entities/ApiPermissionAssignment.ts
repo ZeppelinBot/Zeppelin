@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, Relation } from "typeorm";
 import { ApiPermissionTypes } from "../ApiPermissionAssignments.js";
 import { ApiUserInfo } from "./ApiUserInfo.js";
 
@@ -24,5 +24,5 @@ export class ApiPermissionAssignment {
 
   @ManyToOne(() => ApiUserInfo, (userInfo) => userInfo.permissionAssignments)
   @JoinColumn({ name: "target_id" })
-  userInfo: ApiUserInfo;
+  userInfo: Relation<ApiUserInfo>;
 }

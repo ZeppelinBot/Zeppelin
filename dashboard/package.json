@@ -13,6 +13,7 @@
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue/tsconfig": "^0.7.0",
+    "@zeppelinbot/shared": "workspace:*",
     "cross-env": "^7.0.3",
     "highlight.js": "^11.8.0",
     "humanize-duration": "^3.27.0",
@@ -32,6 +33,7 @@
   },
   "dependencies": {
     "@fastify/static": "^7.0.1",
+    "ace-builds": "1.43.4",
     "fastify": "^4.26.2"
   },
   "browserslist": [

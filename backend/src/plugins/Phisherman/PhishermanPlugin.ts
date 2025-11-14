@@ -1,4 +1,4 @@
-import { guildPlugin } from "knub";
+import { guildPlugin } from "vety";
 import { PhishermanPluginType, zPhishermanConfig } from "./types.js";
 
 export const PhishermanPlugin = guildPlugin<PhishermanPluginType>()({

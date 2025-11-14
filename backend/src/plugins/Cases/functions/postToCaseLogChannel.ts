@@ -1,5 +1,5 @@
 import { MessageCreateOptions, NewsChannel, RESTJSONErrorCodes, Snowflake, TextChannel } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { Case } from "../../../data/entities/Case.js";
 import { isDiscordAPIError } from "../../../utils.js";
 import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin.js";

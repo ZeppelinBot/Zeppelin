@@ -1,4 +1,4 @@
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { MutesEvents, MutesPluginType } from "../types.js";
 
 export function onMutesEvent<TEvent extends keyof MutesEvents>(

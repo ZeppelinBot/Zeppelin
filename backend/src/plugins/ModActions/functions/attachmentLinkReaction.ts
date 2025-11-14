@@ -1,10 +1,9 @@
-import { ChatInputCommandInteraction, Message, TextBasedChannel } from "discord.js";
-import { AnyPluginData, GuildPluginData } from "knub";
+import { ChatInputCommandInteraction, Message, SendableChannels } from "discord.js";
+import { GuildPluginData } from "vety";
 import { ModActionsPluginType } from "../types.js";
 
 export function shouldReactToAttachmentLink(pluginData: GuildPluginData<ModActionsPluginType>) {
   const config = pluginData.config.get();
-
   return !config.attachment_link_reaction || config.attachment_link_reaction !== "none";
 }
 
@@ -16,9 +15,9 @@ export function detectAttachmentLink(reason: string | null | undefined) {
   return reason && /https:\/\/(cdn|media)\.discordapp\.(com|net)\/(ephemeral-)?attachments/gu.test(reason);
 }
 
-export function sendAttachmentLinkDetectionErrorMessage(
-  pluginData: AnyPluginData<any>,
-  context: TextBasedChannel | Message | ChatInputCommandInteraction,
+function sendAttachmentLinkDetectionErrorMessage(
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  context: SendableChannels | Message | ChatInputCommandInteraction,
   restricted = false,
 ) {
   const emoji = pluginData.state.common.getErrorEmoji();
@@ -33,7 +32,7 @@ export function sendAttachmentLinkDetectionErrorMessage(
 
 export async function handleAttachmentLinkDetectionAndGetRestriction(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | Message | ChatInputCommandInteraction,
+  context: SendableChannels | Message | ChatInputCommandInteraction,
   reason: string | null | undefined,
 ) {
   if (!shouldReactToAttachmentLink(pluginData) || !detectAttachmentLink(reason)) {

@@ -3,9 +3,9 @@ import {
   APIEmbed,
   ButtonBuilder,
   ChannelType,
-  ChatInputCommandInteraction,
   Client,
   DiscordAPIError,
+  DiscordjsTypeError,
   EmbedData,
   EmbedType,
   Emoji,
@@ -23,25 +23,22 @@ import {
   MessageActionRowComponentBuilder,
   MessageCreateOptions,
   MessageMentionOptions,
-  PartialChannelData,
   PartialGroupDMChannel,
   PartialMessage,
-  PartialUser,
   RoleResolvable,
   SendableChannels,
   Sticker,
-  TextBasedChannel,
   User,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
 import fs from "fs";
 import https from "https";
-import isEqual from "lodash/isEqual.js";
+import { isEqual } from "lodash-es";
 import { performance } from "perf_hooks";
 import tlds from "tlds" with { type: "json" };
 import tmp from "tmp";
 import { URL } from "url";
-import { z, ZodError, ZodPipe, ZodRecord, ZodString, ZodTransform } from "zod/v4";
+import { z, ZodError, ZodPipe, ZodRecord, ZodString, ZodTransform } from "zod";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage.js";
 import { delayStringMultipliers, humanizeDuration } from "./humanizeDuration.js";
 import { getProfiler } from "./profiler.js";
@@ -50,6 +47,8 @@ import { sendDM } from "./utils/sendDM.js";
 import { Brand } from "./utils/typeUtils.js";
 import { waitForButtonConfirm } from "./utils/waitForInteraction.js";
 import { GenericCommandSource } from "./pluginUtils.js";
+import { getOrFetchUser } from "./utils/getOrFetchUser.js";
+import { incrementDebugCounter } from "./debugCounters.js";
 
 const fsp = fs.promises;
 
@@ -86,6 +85,10 @@ export function isDiscordHTTPError(err: Error | string) {
 
 export function isDiscordAPIError(err: Error | string): err is DiscordAPIError {
   return err instanceof DiscordAPIError;
+}
+
+export function isDiscordJsTypeError(err: unknown): err is DiscordjsTypeError {
+  return err instanceof DiscordjsTypeError;
 }
 
 // null | undefined -> undefined
@@ -200,94 +203,99 @@ export function zRegex<T extends ZodString>(zStr: T) {
   });
 }
 
-export const zEmbedInput = z.strictObject({
-  title: z.string().optional(),
-  description: z.string().optional(),
-  url: z.string().optional(),
-  timestamp: z.string().optional(),
-  color: z.number().optional(),
+export const zEmbedInput = z
+  .strictObject({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    url: z.string().optional(),
+    timestamp: z.string().optional(),
+    color: z.number().optional(),
 
-  footer: z.optional(
-    z.object({
-      text: z.string(),
-      icon_url: z.string().optional(),
-    }),
-  ),
-
-  image: z.optional(
-    z.object({
-      url: z.string().optional(),
-      width: z.number().optional(),
-      height: z.number().optional(),
-    }),
-  ),
-
-  thumbnail: z.optional(
-    z.object({
-      url: z.string().optional(),
-      width: z.number().optional(),
-      height: z.number().optional(),
-    }),
-  ),
-
-  video: z.optional(
-    z.object({
-      url: z.string().optional(),
-      width: z.number().optional(),
-      height: z.number().optional(),
-    }),
-  ),
-
-  provider: z.optional(
-    z.object({
-      name: z.string(),
-      url: z.string().optional(),
-    }),
-  ),
-
-  fields: z.optional(
-    z.array(
+    footer: z.optional(
       z.object({
-        name: z.string().optional(),
-        value: z.string().optional(),
-        inline: z.boolean().optional(),
+        text: z.string(),
+        icon_url: z.string().optional(),
       }),
     ),
-  ),
 
-  author: z
-    .optional(
+    image: z.optional(
       z.object({
-        name: z.string(),
         url: z.string().optional(),
         width: z.number().optional(),
         height: z.number().optional(),
       }),
-    )
-    .nullable(),
-}).meta({
-  id: "embedInput",
-});
+    ),
+
+    thumbnail: z.optional(
+      z.object({
+        url: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      }),
+    ),
+
+    video: z.optional(
+      z.object({
+        url: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      }),
+    ),
+
+    provider: z.optional(
+      z.object({
+        name: z.string(),
+        url: z.string().optional(),
+      }),
+    ),
+
+    fields: z.optional(
+      z.array(
+        z.object({
+          name: z.string().optional(),
+          value: z.string().optional(),
+          inline: z.boolean().optional(),
+        }),
+      ),
+    ),
+
+    author: z
+      .optional(
+        z.object({
+          name: z.string(),
+          url: z.string().optional(),
+          width: z.number().optional(),
+          height: z.number().optional(),
+        }),
+      )
+      .nullable(),
+  })
+  .meta({
+    id: "embedInput",
+  });
 
 export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEmbed>, T>;
 
-export const zStrictMessageContent = z.strictObject({
-  content: z.string().optional(),
-  tts: z.boolean().optional(),
-  embeds: z.union([z.array(zEmbedInput), zEmbedInput]).optional(),
-  embed: zEmbedInput.optional(),
-}).transform((data) => {
-  if (data.embed) {
-    data.embeds = [data.embed];
-    delete data.embed;
-  }
-  if (data.embeds && !Array.isArray(data.embeds)) {
-    data.embeds = [data.embeds];
-  }
-  return data as StrictMessageContent;
-}).meta({
-  id: "strictMessageContent",
-});
+export const zStrictMessageContent = z
+  .strictObject({
+    content: z.string().optional(),
+    tts: z.boolean().optional(),
+    embeds: z.union([z.array(zEmbedInput), zEmbedInput]).optional(),
+    embed: zEmbedInput.optional(),
+  })
+  .transform((data) => {
+    if (data.embed) {
+      data.embeds = [data.embed];
+      delete data.embed;
+    }
+    if (data.embeds && !Array.isArray(data.embeds)) {
+      data.embeds = [data.embeds];
+    }
+    return data as StrictMessageContent;
+  })
+  .meta({
+    id: "strictMessageContent",
+  });
 
 export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
 
@@ -298,10 +306,7 @@ export type StrictMessageContent = {
 };
 
 export type MessageContent = string | StrictMessageContent;
-export const zMessageContent = z.union([
-  zBoundedCharacters(0, 4000),
-  zStrictMessageContent,
-]);
+export const zMessageContent = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]);
 
 export function validateAndParseMessageContent(input: unknown): StrictMessageContent {
   if (input == null) {
@@ -1163,9 +1168,7 @@ export function getUser(client: Client, userResolvable: string): User | UnknownU
  * Resolves a User from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
  * If the user is not found in the cache, it's fetched from the API.
  */
-export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser>;
-export async function resolveUser<T>(bot: Client, value: Not<T, string>): Promise<UnknownUser>;
-export async function resolveUser(bot, value) {
+export async function resolveUser(bot: Client, value: unknown, context?: string): Promise<User | UnknownUser> {
   if (typeof value !== "string") {
     return new UnknownUser();
   }
@@ -1175,26 +1178,8 @@ export async function resolveUser(bot, value) {
     return new UnknownUser();
   }
 
-  // If we have the user cached, return that directly
-  if (bot.users.cache.has(userId)) {
-    return bot.users.fetch(userId);
-  }
-
-  // We don't want to spam the API by trying to fetch unknown users again and again,
-  // so we cache the fact that they're "unknown" for a while
-  if (unknownUsers.has(userId)) {
-    return new UnknownUser({ id: userId });
-  }
-
-  const freshUser = await bot.users.fetch(userId, true, true).catch(noop);
-  if (freshUser) {
-    return freshUser;
-  }
-
-  unknownUsers.add(userId);
-  setTimeout(() => unknownUsers.delete(userId), 15 * MINUTES);
-
-  return new UnknownUser({ id: userId });
+  incrementDebugCounter(`resolveUser:${context ?? "unknown"}`);
+  return (await getOrFetchUser(bot, userId)) ?? new UnknownUser();
 }
 
 /**
@@ -1511,7 +1496,7 @@ export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
   return invite.type === InviteType.GroupDM;
 }
 
-export function inviteHasCounts(invite: Invite): invite is Invite {
+export function inviteHasCounts(invite: Invite): invite is Invite & { memberCount: number; presenceCount: number } {
   return invite.memberCount != null;
 }
 

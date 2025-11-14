@@ -1,5 +1,5 @@
 import { APIEmbed, ChannelType, GuildPremiumTier, Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import {
   EmbedWith,
   MINUTES,
@@ -59,7 +59,7 @@ export async function getServerInfoEmbed(
   basicInformation.push(`Created: **<t:${Math.round(createdAtTs / 1000)}:R>**`);
 
   if (thisServer) {
-    const owner = await resolveUser(pluginData.client, thisServer.ownerId);
+    const owner = await resolveUser(pluginData.client, thisServer.ownerId, "Utility:getServerInfoEmbed");
     const ownerName = renderUsername(owner.username, owner.discriminator);
 
     basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerId}\`)`);

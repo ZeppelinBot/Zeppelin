@@ -1,5 +1,5 @@
 import { GuildBasedChannel, Snowflake, TextBasedChannel, User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { LogType } from "../../../data/LogType.js";
 import { getBaseUrl } from "../../../pluginUtils.js";

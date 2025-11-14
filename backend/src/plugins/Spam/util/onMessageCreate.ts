@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils.js";
 import { RecentActionType, SpamPluginType } from "../types.js";

@@ -1,5 +1,5 @@
 import { Snowflake, User } from "discord.js";
-import { GuildPluginData } from "knub";
+import { GuildPluginData } from "vety";
 import moment from "moment-timezone";
 import { ScheduledPost } from "../../../data/entities/ScheduledPost.js";
 import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop.js";

@@ -17,7 +17,6 @@ function tempbanToKey(tempban: Tempban) {
 }
 
 function broadcastExpiredTempban(tempban: Tempban, tries = 0) {
-  console.log(`[EXPIRING TEMPBANS LOOP] Broadcasting expired tempban: ${tempban.guild_id}/${tempban.user_id}`);
   if (!hasGuildEventListener(tempban.guild_id, "expiredTempban")) {
     // If there are no listeners registered for the server yet, try again in a bit
     if (tries < MAX_TRIES_PER_SERVER) {
@@ -28,6 +27,7 @@ function broadcastExpiredTempban(tempban: Tempban, tries = 0) {
     }
     return;
   }
+  console.log(`[EXPIRING TEMPBANS LOOP] Broadcasting expired tempban: ${tempban.guild_id}/${tempban.user_id}`);
   emitGuildEvent(tempban.guild_id, "expiredTempban", [tempban]);
 }
 
