@@ -1,6 +1,7 @@
-import { MessagePayload, User } from "discord.js";
+import { User } from "discord.js";
 import { logger } from "../logger.js";
 import { HOURS, createChunkedMessage, isDiscordAPIError } from "../utils.js";
+import { MessageContent } from "../utils.js";
 import Timeout = NodeJS.Timeout;
 
 let dmsDisabled = false;
@@ -16,7 +17,11 @@ export class DMError extends Error {}
 
 const error20026 = "The bot cannot currently send DMs";
 
-export async function sendDM(user: User, content: string | MessagePayload, source: string) {
+export async function sendDM(
+  user: User,
+  content: MessageContent,
+  source: string,
+) {
   if (dmsDisabled) {
     throw new DMError(error20026);
   }
@@ -36,7 +41,6 @@ export async function sendDM(user: User, content: string | MessagePayload, sourc
       disableDMs(1 * HOURS);
       throw new DMError(error20026);
     }
-
     throw e;
   }
 }
