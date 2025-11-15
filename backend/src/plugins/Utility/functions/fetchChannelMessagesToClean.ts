@@ -112,12 +112,14 @@ export async function fetchChannelMessagesToClean(
   }
 
   // Discord messages -> SavedMessages
-  const existingStored = await pluginData.state.savedMessages.getMultiple(rawMessagesToClean.map((m) => m.id));
-  const alreadyStored = existingStored.map((stored) => stored.id);
-  const messagesToStore = rawMessagesToClean.filter((potentialMsg) => !alreadyStored.includes(potentialMsg.id));
-  await pluginData.state.savedMessages.createFromMessages(messagesToStore);
+  if (rawMessagesToClean.length > 0) {
+    const existingStored = await pluginData.state.savedMessages.getMultiple(rawMessagesToClean.map((m) => m.id));
+    const alreadyStored = existingStored.map((stored) => stored.id);
+    const messagesToStore = rawMessagesToClean.filter((potentialMsg) => !alreadyStored.includes(potentialMsg.id));
+    await pluginData.state.savedMessages.createFromMessages(messagesToStore);
 
-  result.messages = await pluginData.state.savedMessages.getMultiple(rawMessagesToClean.map((m) => m.id));
+    result.messages = await pluginData.state.savedMessages.getMultiple(rawMessagesToClean.map((m) => m.id));
+  }
 
   return result;
 }

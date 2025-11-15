@@ -172,6 +172,10 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
   }
 
   async getMultiple(messageIds: string[]): Promise<SavedMessage[]> {
+    if (messageIds.length === 0) {
+      return [];
+    }
+
     const results = await this.messages
       .createQueryBuilder()
       .where("guild_id = :guild_id", { guild_id: this.guildId })
