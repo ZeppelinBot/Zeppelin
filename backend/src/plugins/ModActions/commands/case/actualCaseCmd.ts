@@ -9,7 +9,7 @@ export async function actualCaseCmd(
   context: Message | ChatInputCommandInteraction,
   authorId: string,
   caseNumber: number,
-  show: boolean | null,
+  show?: boolean | null,
 ) {
   const theCase = await pluginData.state.cases.findByCaseNumber(caseNumber);
 
