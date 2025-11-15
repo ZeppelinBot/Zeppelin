@@ -1,5 +1,7 @@
 import {
+  ActionRowBuilder,
   APIEmbed,
+  ButtonBuilder,
   ChannelType,
   Client,
   DiscordAPIError,
@@ -18,6 +20,7 @@ import {
   InviteType,
   LimitedCollection,
   Message,
+  MessageActionRowComponentBuilder,
   MessageCreateOptions,
   MessageMentionOptions,
   PartialGroupDMChannel,
@@ -1304,6 +1307,20 @@ export async function confirm(
   content: MessageCreateOptions,
 ): Promise<boolean> {
   return waitForButtonConfirm(context, content, { restrictToId: userId });
+}
+
+export function createDisabledButtonRow(
+  row: ActionRowBuilder<MessageActionRowComponentBuilder>
+): ActionRowBuilder<MessageActionRowComponentBuilder> {
+  const newRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+  for (const component of row.components) {
+    if (component instanceof ButtonBuilder) {
+      newRow.addComponents(
+        ButtonBuilder.from(component).setDisabled(true)
+      );
+    }
+  }
+  return newRow;
 }
 
 export function messageSummary(msg: SavedMessage) {
