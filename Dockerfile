@@ -1,4 +1,4 @@
-FROM node:24 AS build
+FROM node:25 AS build
 
 ARG COMMIT_HASH
 ARG BUILD_TIME
@@ -43,7 +43,7 @@ RUN echo "${BUILD_TIME}" > /zeppelin/.build-time
 
 # --- Main image ---
 
-FROM node:24-alpine AS main
+FROM node:25-alpine AS main
 
 RUN npm install -g pnpm@10.19.0
 
