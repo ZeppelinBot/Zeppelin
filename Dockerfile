@@ -1,5 +1,8 @@
 FROM node:24 AS build
 
+ARG COMMIT_HASH
+ARG BUILD_TIME
+
 RUN mkdir /zeppelin
 RUN chown node:node /zeppelin
 
@@ -34,6 +37,9 @@ RUN pnpm run build
 WORKDIR /zeppelin
 RUN CI=true pnpm install --prod
 
+# Add version info
+RUN echo "${COMMIT_HASH}" > /zeppelin/.commit-hash
+RUN echo "${BUILD_TIME}" > /zeppelin/.build-time
 
 # --- Main image ---
 

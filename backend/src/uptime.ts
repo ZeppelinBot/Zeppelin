@@ -7,3 +7,7 @@ export function startUptimeCounter() {
 export function getCurrentUptime() {
   return Date.now() - start;
 }
+
+export function getBotStartTime() {
+  return start;
+}

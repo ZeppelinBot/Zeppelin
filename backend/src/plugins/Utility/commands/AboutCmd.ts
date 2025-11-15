@@ -1,13 +1,24 @@
 import { APIEmbed, GuildChannel } from "discord.js";
-import LCL from "last-commit-log";
 import { shuffle } from "lodash-es";
 import moment from "moment-timezone";
-import { humanizeDuration } from "../../../humanizeDuration.js";
+import { accessSync, readFileSync } from "node:fs";
 import { rootDir } from "../../../paths.js";
-import { getCurrentUptime } from "../../../uptime.js";
+import { getBotStartTime } from "../../../uptime.js";
 import { resolveMember, sorter } from "../../../utils.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 import { utilityCmd } from "../types.js";
+
+let commitHash: string | null = null;
+try {
+  accessSync(`${rootDir}/.commit-hash`);
+  commitHash = readFileSync(`${rootDir}/.commit-hash`, "utf-8").trim();
+} catch {}
+
+let buildTime: string | null = null;
+try {
+  accessSync(`${rootDir}/.build-time`);
+  buildTime = readFileSync(`${rootDir}/.build-time`, "utf-8").trim();
+} catch {}
 
 export const AboutCmd = utilityCmd({
   trigger: "about",
@@ -17,39 +28,14 @@ export const AboutCmd = utilityCmd({
   async run({ message: msg, pluginData }) {
     const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
-    const uptime = getCurrentUptime();
-    const prettyUptime = humanizeDuration(uptime, { largest: 2, round: true });
-
-    let lastCommit;
-
-    try {
-      const lcl = new LCL(rootDir);
-      lastCommit = await lcl.getLastCommit();
-    } catch {} // eslint-disable-line no-empty
-
-    let lastUpdate;
-    let version;
-
-    if (lastCommit) {
-      lastUpdate = timeAndDate
-        .inGuildTz(moment.utc(lastCommit.committer.date, "X"))
-        .format(pluginData.getPlugin(TimeAndDatePlugin).getDateFormat("pretty_datetime"));
-      version = lastCommit.shortHash;
-    } else {
-      lastUpdate = "?";
-      version = "?";
-    }
-
-    const lastReload = humanizeDuration(Date.now() - pluginData.state.lastReload, {
-      largest: 2,
-      round: true,
-    });
+    const botStartTime = getBotStartTime();
+    const buildTimeMoment = buildTime ? moment.utc(buildTime, "YYYY-MM-DDTHH:mm:ss[Z]") : null;
 
     const basicInfoRows = [
-      ["Uptime", prettyUptime],
-      ["Last config reload", `${lastReload} ago`],
-      ["Last bot update", lastUpdate],
-      ["Version", version],
+      ["Bot start time", `<t:${Math.floor(botStartTime / 1000)}:R>`],
+      ["Last config reload", `<t:${Math.floor(pluginData.state.lastReload / 1000)}:R>`],
+      ["Last bot update", buildTimeMoment ? `<t:${Math.floor(buildTimeMoment.unix())}:f>` : "Unknown"],
+      ["Version", commitHash?.slice(0, 7) || "Unknown"],
       ["API latency", `${pluginData.client.ws.ping}ms`],
       ["Server timezone", timeAndDate.getGuildTz()],
     ];
