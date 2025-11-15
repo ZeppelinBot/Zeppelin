@@ -1,4 +1,4 @@
-import { MessageCreateOptions, PermissionsBitField, Snowflake, TextChannel } from "discord.js";
+import { PermissionsBitField, Snowflake, TextChannel } from "discord.js";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import {
   createChunkedMessage,
@@ -6,6 +6,7 @@ import {
   verboseChannelMention,
   verboseUserMention
 } from "../../../utils.js";
+import { MessageContent } from "../../../utils.js";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions.js";
 import { sendDM } from "../../../utils/sendDM.js";
 import {
@@ -42,12 +43,12 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
 
     const renderMessageText = (str: string) => renderTemplate(str, templateValues);
 
-    let formatted: string | MessageCreateOptions;
+    let formatted: MessageContent;
 
     try {
       formatted = typeof config.message === "string"
         ? await renderMessageText(config.message)
-        : ((await renderRecursively(config.message, renderMessageText)) as MessageCreateOptions);
+        : ((await renderRecursively(config.message, renderMessageText)) as MessageContent);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
