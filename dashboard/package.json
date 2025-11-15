@@ -12,7 +12,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^5.2.4",
-    "@vue/tsconfig": "^0.7.0",
+    "@vue/tsconfig": "^0.8.1",
     "@zeppelinbot/shared": "workspace:*",
     "cross-env": "^7.0.3",
     "highlight.js": "^11.8.0",
