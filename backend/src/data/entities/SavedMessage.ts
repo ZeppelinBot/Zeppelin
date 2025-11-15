@@ -75,6 +75,11 @@ export interface ISavedMessageData {
   embeds?: ISavedMessageEmbedData[];
   stickers?: ISavedMessageStickerData[];
   timestamp: number;
+  reference?: {
+    messageId?: Snowflake | null;
+    channelId?: Snowflake | null;
+    guildId?: Snowflake | null;
+  };
 }
 
 @Entity("messages")

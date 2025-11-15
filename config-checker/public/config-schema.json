@@ -9210,7 +9210,7 @@
                             ]
                           },
                           "MESSAGE_DELETE": {
-                            "default": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+                            "default": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -9650,7 +9650,7 @@
                             ]
                           },
                           "MESSAGE_DELETE_AUTO": {
-                            "default": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+                            "default": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -10037,7 +10037,7 @@
                       ]
                     },
                     "MESSAGE_DELETE": {
-                      "default": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+                      "default": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
                       "anyOf": [
                         {
                           "type": "string"
@@ -10477,7 +10477,7 @@
                       ]
                     },
                     "MESSAGE_DELETE_AUTO": {
-                      "default": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+                      "default": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
                       "anyOf": [
                         {
                           "type": "string"
@@ -11153,7 +11153,7 @@
                                   ]
                                 },
                                 "MESSAGE_DELETE": {
-                                  "default": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+                                  "default": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
                                   "anyOf": [
                                     {
                                       "type": "string"
@@ -11593,7 +11593,7 @@
                                   ]
                                 },
                                 "MESSAGE_DELETE_AUTO": {
-                                  "default": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+                                  "default": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
                                   "anyOf": [
                                     {
                                       "type": "string"
@@ -11980,7 +11980,7 @@
                             ]
                           },
                           "MESSAGE_DELETE": {
-                            "default": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+                            "default": "{timestamp} 🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -12420,7 +12420,7 @@
                             ]
                           },
                           "MESSAGE_DELETE_AUTO": {
-                            "default": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
+                            "default": "{timestamp} 🗑 Auto-deleted message (`{message.id}`) from {userMention(user)} in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}{replyInfo}",
                             "anyOf": [
                               {
                                 "type": "string"
