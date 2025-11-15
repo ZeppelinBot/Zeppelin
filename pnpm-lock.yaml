@@ -95,8 +95,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       moment-timezone:
-        specifier: ^0.5.21
-        version: 0.5.48
+        specifier: ^0.6.0
+        version: 0.6.0
       multer:
         specifier: ^2.0.2
         version: 2.0.2
@@ -107,8 +107,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       passport:
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.7.0
+        version: 0.7.0
       passport-custom:
         specifier: ^1.0.5
         version: 1.1.1
@@ -122,8 +122,8 @@ importers:
         specifier: ^5.9.0
         version: 5.9.0
       reflect-metadata:
-        specifier: ^0.1.12
-        version: 0.1.14
+        specifier: ^0.2.2
+        version: 0.2.2
       regexp-worker:
         specifier: ^1.1.0
         version: 1.1.1
@@ -153,7 +153,7 @@ importers:
         version: 12.1.6
       typeorm:
         specifier: ^0.3.27
-        version: 0.3.27(mysql2@3.15.3)(redis@5.9.0)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@22.18.13)(typescript@5.9.3))
+        version: 0.3.27(mysql2@3.15.3)(redis@5.9.0)(reflect-metadata@0.2.2)(ts-node@10.9.2(@types/node@22.18.13)(typescript@5.9.3))
       utf-8-validate:
         specifier: ^5.0.5
         version: 5.0.10
@@ -195,8 +195,8 @@ importers:
         specifier: ^1.1.2
         version: 1.1.6
       '@types/tmp':
-        specifier: 0.0.33
-        version: 0.0.33
+        specifier: 0.2.6
+        version: 0.2.6
       '@types/twemoji':
         specifier: ^12.1.0
         version: 12.1.2
@@ -224,13 +224,13 @@ importers:
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.8
-        version: 4.1.16(rolldown-vite@7.1.20(@types/node@22.18.13)(jiti@2.6.1))
+        version: 4.1.16(rolldown-vite@7.1.20(@types/node@24.9.2)(jiti@2.6.1))
       '@vitejs/plugin-vue':
         specifier: ^5.2.4
-        version: 5.2.4(rolldown-vite@7.1.20(@types/node@22.18.13)(jiti@2.6.1))(vue@3.5.22(typescript@5.9.3))
+        version: 5.2.4(rolldown-vite@7.1.20(@types/node@24.9.2)(jiti@2.6.1))(vue@3.5.22(typescript@5.9.3))
       '@vue/tsconfig':
-        specifier: ^0.7.0
-        version: 0.7.0(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
+        specifier: ^0.8.1
+        version: 0.8.1(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       '@zeppelinbot/shared':
         specifier: workspace:*
         version: link:../shared
@@ -260,7 +260,7 @@ importers:
         version: 4.1.16
       vite:
         specifier: npm:rolldown-vite@latest
-        version: rolldown-vite@7.1.20(@types/node@22.18.13)(jiti@2.6.1)
+        version: rolldown-vite@7.1.20(@types/node@24.9.2)(jiti@2.6.1)
       vue:
         specifier: ^3.5.13
         version: 3.5.22(typescript@5.9.3)
@@ -763,6 +763,9 @@ packages:
   '@types/node@22.18.13':
     resolution: {integrity: sha512-Bo45YKIjnmFtv6I1TuC8AaHBbqXtIo+Om5fE4QiU1Tj8QR/qt+8O3BAtOimG5IFmwaWiPmB3Mv3jtYzBA4Us2A==}
 
+  '@types/node@24.9.2':
+    resolution: {integrity: sha512-uWN8YqxXxqFMX2RqGOrumsKeti4LlmIMIyV0lgut4jx7KQBcBiW6vkDtIBvHnHIquwNfJhk8v2OtmO8zXWHfPA==}
+
   '@types/oauth@0.9.6':
     resolution: {integrity: sha512-H9TRCVKBNOhZZmyHLqFt9drPM9l+ShWiqqJijU1B8P3DX3ub84NjxDuy+Hjrz+fEca5Kwip3qPMKNyiLgNJtIA==}
 
@@ -796,8 +799,8 @@ packages:
   '@types/serve-static@1.15.10':
     resolution: {integrity: sha512-tRs1dB+g8Itk72rlSI2ZrW6vZg0YrLI81iQSTkMmOqnqCaNr/8Ek4VwWcN5vZgCYWbg/JJSGBlUaYGAOP73qBw==}
 
-  '@types/tmp@0.0.33':
-    resolution: {integrity: sha512-gVC1InwyVrO326wbBZw+AO3u2vRXz/iRWq9jYhpG4W8LXyIgDv3ZmcLQ5Q4Gs+gFMyqx+viFoFT+l3p61QFCmQ==}
+  '@types/tmp@0.2.6':
+    resolution: {integrity: sha512-chhaNf2oKHlRkDGt+tiKE2Z5aJ6qalm7Z9rlLdBwmOiAAf09YQvvoLXjWK4HWPF1xU/fqvMgfNfpVoBscA/tKA==}
 
   '@types/twemoji@12.1.2':
     resolution: {integrity: sha512-3eMyKenMi0R1CeKzBYtk/Z2JIHsTMQrIrTah0q54o45pHTpWVNofU2oHx0jS8tqsDRhis2TbB6238WP9oh2l2w==}
@@ -932,8 +935,8 @@ packages:
   '@vue/shared@3.5.22':
     resolution: {integrity: sha512-F4yc6palwq3TT0u+FYf0Ns4Tfl9GRFURDN2gWG7L1ecIaS/4fCIuFOjMTnCyjsu/OK6vaDKLCrGAa+KvvH+h4w==}
 
-  '@vue/tsconfig@0.7.0':
-    resolution: {integrity: sha512-ku2uNz5MaZ9IerPPUyOHzyjhXoX2kVJaVf7hL315DC17vS6IiZRmmCPfggNbU16QTvM80+uYYy3eYJB59WCtvg==}
+  '@vue/tsconfig@0.8.1':
+    resolution: {integrity: sha512-aK7feIWPXFSUhsCP9PFqPyFOcz4ENkb8hZ2pneL6m2UjCkccvaOhC/5KCKluuBufvp2KzkbdA2W2pk20vLzu3g==}
     peerDependencies:
       typescript: 5.x
       vue: ^3.4.0
@@ -2099,8 +2102,8 @@ packages:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
 
-  moment-timezone@0.5.48:
-    resolution: {integrity: sha512-f22b8LV1gbTO2ms2j2z13MuPogNoh5UzxL3nzNAYKGraILnbGc9NEE6dyiiiLv46DGRb8A4kg8UKWLjPthxBHw==}
+  moment-timezone@0.6.0:
+    resolution: {integrity: sha512-ldA5lRNm3iJCWZcBCab4pnNL3HSZYXVb/3TYr75/1WCTWYuTqYUb5f/S384pncYjJ88lbO8Z4uPDvmoluHJc8Q==}
 
   moment@2.30.1:
     resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
@@ -2259,8 +2262,8 @@ packages:
     resolution: {integrity: sha512-CB97UUvDKJde2V0KDWWB3lyf6PC3FaZP7YxZ2G8OAtn9p4HI9j9JLP9qjOGZFvyl8uwNT8qM+hGnz/n16NI7oA==}
     engines: {node: '>= 0.4.0'}
 
-  passport@0.6.0:
-    resolution: {integrity: sha512-0fe+p3ZnrWRW74fe8+SvCyf4a3Pb2/h7gFkQ8yTJpAO50gDzlfjZUZTO1k5Eg9kUct22OxHLqDZoKUWRHOh9ug==}
+  passport@0.7.0:
+    resolution: {integrity: sha512-cPLl+qZpSc+ireUvt+IzqbED1cHHkDoVYMo30jbJIdOOjQ1MQYZBPiNvmi8UM6lJuOpTPXJGZQk0DtC4y61MYQ==}
     engines: {node: '>= 0.4.0'}
 
   path-browserify@1.0.1:
@@ -2433,8 +2436,8 @@ packages:
     resolution: {integrity: sha512-E8dQVLSyH6UE/C9darFuwq4usOPrqfZ1864kI4RFbr5Oj9ioB9qPF0oJMwX7s8mf6sPYrz84x/Dx1PGF3/0EaQ==}
     engines: {node: '>= 18'}
 
-  reflect-metadata@0.1.14:
-    resolution: {integrity: sha512-ZhYeb6nRaXCfhnndflDK8qI6ZQ/YcWZCISRAWICW9XYqMUwjZM9Z0DveWX/ABN01oxSHwVxKQmxeYZSsm0jh5A==}
+  reflect-metadata@0.2.2:
+    resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
 
   regexp-tree@0.1.27:
     resolution: {integrity: sha512-iETxpjK6YoRWJG5o6hXLwvjYAoW+FEZn9os0PD/b6AP6xQwsa/Y7lCVgIixBbUPMfhu+i2LtdeAqVTgGlQarfA==}
@@ -2923,6 +2926,9 @@ packages:
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
+  undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
   undici@6.21.3:
     resolution: {integrity: sha512-gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==}
@@ -3448,12 +3454,12 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.16
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.16
 
-  '@tailwindcss/vite@4.1.16(rolldown-vite@7.1.20(@types/node@22.18.13)(jiti@2.6.1))':
+  '@tailwindcss/vite@4.1.16(rolldown-vite@7.1.20(@types/node@24.9.2)(jiti@2.6.1))':
     dependencies:
       '@tailwindcss/node': 4.1.16
       '@tailwindcss/oxide': 4.1.16
       tailwindcss: 4.1.16
-      vite: rolldown-vite@7.1.20(@types/node@22.18.13)(jiti@2.6.1)
+      vite: rolldown-vite@7.1.20(@types/node@24.9.2)(jiti@2.6.1)
 
   '@tsconfig/node10@1.0.11': {}
 
@@ -3523,6 +3529,11 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/node@24.9.2':
+    dependencies:
+      undici-types: 7.16.0
+    optional: true
+
   '@types/oauth@0.9.6':
     dependencies:
       '@types/node': 22.18.12
@@ -3565,7 +3576,7 @@ snapshots:
       '@types/node': 22.18.12
       '@types/send': 0.17.6
 
-  '@types/tmp@0.0.33': {}
+  '@types/tmp@0.2.6': {}
 
   '@types/twemoji@12.1.2': {}
 
@@ -3573,7 +3584,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.18.12
+      '@types/node': 22.18.13
 
   '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
@@ -3661,9 +3672,9 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vitejs/plugin-vue@5.2.4(rolldown-vite@7.1.20(@types/node@22.18.13)(jiti@2.6.1))(vue@3.5.22(typescript@5.9.3))':
+  '@vitejs/plugin-vue@5.2.4(rolldown-vite@7.1.20(@types/node@24.9.2)(jiti@2.6.1))(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      vite: rolldown-vite@7.1.20(@types/node@22.18.13)(jiti@2.6.1)
+      vite: rolldown-vite@7.1.20(@types/node@24.9.2)(jiti@2.6.1)
       vue: 3.5.22(typescript@5.9.3)
 
   '@vladfrangu/async_event_emitter@2.4.7': {}
@@ -3754,7 +3765,7 @@ snapshots:
 
   '@vue/shared@3.5.22': {}
 
-  '@vue/tsconfig@0.7.0(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))':
+  '@vue/tsconfig@0.8.1(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))':
     optionalDependencies:
       typescript: 5.9.3
       vue: 3.5.22(typescript@5.9.3)
@@ -4907,7 +4918,7 @@ snapshots:
     dependencies:
       minimist: 1.2.8
 
-  moment-timezone@0.5.48:
+  moment-timezone@0.6.0:
     dependencies:
       moment: 2.30.1
 
@@ -5054,7 +5065,7 @@ snapshots:
 
   passport-strategy@1.0.0: {}
 
-  passport@0.6.0:
+  passport@0.7.0:
     dependencies:
       passport-strategy: 1.0.0
       pause: 0.0.1
@@ -5211,7 +5222,7 @@ snapshots:
       '@redis/search': 5.9.0(@redis/client@5.9.0)
       '@redis/time-series': 5.9.0(@redis/client@5.9.0)
 
-  reflect-metadata@0.1.14: {}
+  reflect-metadata@0.2.2: {}
 
   regexp-tree@0.1.27: {}
 
@@ -5241,7 +5252,7 @@ snapshots:
     dependencies:
       glob: 7.2.3
 
-  rolldown-vite@7.1.20(@types/node@22.18.13)(jiti@2.6.1):
+  rolldown-vite@7.1.20(@types/node@24.9.2)(jiti@2.6.1):
     dependencies:
       '@oxc-project/runtime': 0.95.0
       fdir: 6.5.0(picomatch@4.0.3)
@@ -5251,7 +5262,7 @@ snapshots:
       rolldown: 1.0.0-beta.45
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 22.18.13
+      '@types/node': 24.9.2
       fsevents: 2.3.3
       jiti: 2.6.1
 
@@ -5613,7 +5624,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm@0.3.27(mysql2@3.15.3)(redis@5.9.0)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@22.18.13)(typescript@5.9.3)):
+  typeorm@0.3.27(mysql2@3.15.3)(redis@5.9.0)(reflect-metadata@0.2.2)(ts-node@10.9.2(@types/node@22.18.13)(typescript@5.9.3)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 3.17.0
@@ -5624,7 +5635,7 @@ snapshots:
       dedent: 1.7.0
       dotenv: 16.6.1
       glob: 10.4.5
-      reflect-metadata: 0.1.14
+      reflect-metadata: 0.2.2
       sha.js: 2.4.12
       sql-highlight: 6.1.0
       tslib: 2.8.1
@@ -5643,6 +5654,9 @@ snapshots:
   uid2@0.0.4: {}
 
   undici-types@6.21.0: {}
+
+  undici-types@7.16.0:
+    optional: true
 
   undici@6.21.3: {}
 
