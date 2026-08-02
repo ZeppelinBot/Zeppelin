@@ -22,6 +22,14 @@ import { ModActionsPluginType } from "../../types.js";
 const casesPerPage = 5;
 const maxExpandedCases = 8;
 
+function filterCasesByReason(cases: Case[], reason: string): Case[] {
+  const normalizedReason = reason.toLowerCase();
+
+  return cases.filter((theCase) =>
+    theCase.notes?.some((note) => note.body.toLowerCase().includes(normalizedReason)),
+  );
+}
+
 async function sendExpandedCases(
   pluginData: GuildPluginData<ModActionsPluginType>,
   context: Message | ChatInputCommandInteraction,
@@ -54,6 +62,7 @@ async function casesUserCmd(
   user: GuildMember | User | UnknownUser,
   modName: string,
   typesToShow: CaseTypes[],
+  reason: string | null,
   hidden: boolean | null,
   expand: boolean | null,
   show: boolean | null,
@@ -66,26 +75,29 @@ async function casesUserCmd(
   }
 
   const cases = await pluginData.state.cases.with("notes").getByUserId(user.id, casesFilters);
-  const normalCases = cases.filter((c) => !c.is_hidden);
-  const hiddenCases = cases.filter((c) => c.is_hidden);
+  const matchingCases = reason ? filterCasesByReason(cases, reason) : cases;
+  const normalCases = matchingCases.filter((c) => !c.is_hidden);
+  const hiddenCases = matchingCases.filter((c) => c.is_hidden);
 
   const userName =
     user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUsername(user);
 
-  if (cases.length === 0) {
+  if (matchingCases.length === 0) {
     await sendContextResponse(context, {
-      content: `No cases found for **${userName}**${modId ? ` by ${modName}` : ""}.`,
+      content: `No cases found for **${userName}**${modId ? ` by ${modName}` : ""}${
+        reason ? ` with reason matching "${reason}"` : ""
+      }.`,
       ephemeral: !show,
     });
 
     return;
   }
 
-  const casesToDisplay = hidden ? cases : normalCases;
+  const casesToDisplay = hidden ? matchingCases : normalCases;
 
   if (!casesToDisplay.length) {
     await sendContextResponse(context, {
-      content: `No normal cases found for **${userName}**. Use "-hidden" to show ${cases.length} hidden cases.`,
+      content: `No normal cases found for **${userName}**. Use "-hidden" to show ${matchingCases.length} hidden cases.`,
       ephemeral: !show,
     });
 
@@ -148,6 +160,7 @@ async function casesModCmd(
   mod: GuildMember | User | UnknownUser,
   modName: string,
   typesToShow: CaseTypes[],
+  reason: string | null,
   hidden: boolean | null,
   expand: boolean | null,
   show: boolean | null,
@@ -155,10 +168,23 @@ async function casesModCmd(
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   const casesFilters = { type: In(typesToShow), is_hidden: !!hidden };
 
-  const totalCases = await casesPlugin.getTotalCasesByMod(modId ?? author.id, casesFilters);
+  const filteredCases = reason
+    ? filterCasesByReason(
+        await pluginData.state.cases.with("notes").getByModId(modId ?? author.id, casesFilters),
+        reason,
+      )
+    : null;
+
+  const totalCases = filteredCases?.length ?? (await casesPlugin.getTotalCasesByMod(modId ?? author.id, casesFilters));
 
   if (totalCases === 0) {
-    pluginData.state.common.sendErrorMessage(context, `No cases by **${modName}**`, undefined, undefined, !show);
+    pluginData.state.common.sendErrorMessage(
+      context,
+      `No cases by **${modName}**${reason ? ` with reason matching "${reason}"` : ""}`,
+      undefined,
+      undefined,
+      !show,
+    );
 
     return;
   }
@@ -168,7 +194,10 @@ async function casesModCmd(
 
   if (expand) {
     // Expanded view (= individual case embeds)
-    const cases = totalCases > 8 ? [] : await casesPlugin.getRecentCasesByMod(modId ?? author.id, 8, 0, casesFilters);
+    const cases =
+      filteredCases && totalCases > maxExpandedCases
+        ? filteredCases.slice(0, maxExpandedCases)
+        : filteredCases ?? (await casesPlugin.getRecentCasesByMod(modId ?? author.id, 8, 0, casesFilters));
 
     await sendExpandedCases(pluginData, context, totalCases, cases, show);
     return;
@@ -179,12 +208,14 @@ async function casesModCmd(
     context,
     totalPages,
     async (page) => {
-      const cases = await casesPlugin.getRecentCasesByMod(
-        modId ?? author.id,
-        casesPerPage,
-        (page - 1) * casesPerPage,
-        casesFilters,
-      );
+      const cases = filteredCases
+        ? filteredCases.slice((page - 1) * casesPerPage, (page - 1) * casesPerPage + casesPerPage)
+        : await casesPlugin.getRecentCasesByMod(
+            modId ?? author.id,
+            casesPerPage,
+            (page - 1) * casesPerPage,
+            casesFilters,
+          );
 
       const lines = await asyncMap(cases, (c) => casesPlugin.getCaseSummary(c, true, author.id));
       const firstCaseNum = (page - 1) * casesPerPage + 1;
@@ -230,6 +261,7 @@ export async function actualCasesCmd(
   bans: boolean | null,
   unbans: boolean | null,
   reverseFilters: boolean | null,
+  reason: string | null,
   hidden: boolean | null,
   expand: boolean | null,
   show: boolean | null,
@@ -275,6 +307,7 @@ export async function actualCasesCmd(
         user,
         modName,
         typesToShow,
+        reason,
         hidden,
         expand,
         show === true,
@@ -287,6 +320,7 @@ export async function actualCasesCmd(
         mod ?? author,
         modName,
         typesToShow,
+        reason,
         hidden,
         expand,
         show === true,

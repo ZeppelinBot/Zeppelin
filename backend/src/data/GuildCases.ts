@@ -144,6 +144,30 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
+  async getByModId(
+    modId: string,
+    filters: Omit<FindOptionsWhere<Case>, "guild_id" | "mod_id"> = {},
+  ): Promise<Case[]> {
+    const where: FindOptionsWhere<Case> = {
+      guild_id: this.guildId,
+      mod_id: modId,
+      is_hidden: false,
+      ...filters,
+    };
+
+    if (where.is_hidden === true) {
+      delete where.is_hidden;
+    }
+
+    return this.cases.find({
+      relations: this.getRelations(),
+      where,
+      order: {
+        case_number: "DESC",
+      },
+    });
+  }
+
   async getMinCaseNumber(): Promise<number> {
     const result = await this.cases
       .createQueryBuilder()
