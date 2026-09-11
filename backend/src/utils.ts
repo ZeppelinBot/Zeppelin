@@ -1202,7 +1202,7 @@ export async function resolveMember(
   // We don't want to spam the API by trying to fetch unknown members again and again,
   // so we cache the fact that they're "unknown" for a while
   const unknownKey = `${guild.id}-${userId}`;
-  if (unknownMembers.has(unknownKey)) {
+  if (!fresh && unknownMembers.has(unknownKey)) {
     return null;
   }
 
