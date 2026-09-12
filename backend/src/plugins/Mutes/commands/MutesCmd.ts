@@ -130,16 +130,14 @@ export const MutesCmd = mutesCmd({
         let line = `<@!${mute.user_id}> (**${username}**, \`${mute.user_id}\`)   📋 ${caseName}`;
 
         if (mute.expires_at) {
-          const timeUntilExpiry = moment.utc().diff(moment.utc(mute.expires_at, DBDateFormat));
-          const humanizedTime = humanizeDurationShort(timeUntilExpiry, { largest: 2, round: true });
-          line += `   ⏰ Expires in ${humanizedTime}`;
+          const expiresAtTs = Math.ceil(moment.utc(mute.expires_at).valueOf() / 1000);
+          line += `   ⏰ Expires <t:${expiresAtTs}:R>`;
         } else {
           line += `   ⏰ Indefinite`;
         }
 
-        const timeFromMute = moment.utc(mute.created_at, DBDateFormat).diff(moment.utc());
-        const humanizedTimeFromMute = humanizeDurationShort(timeFromMute, { largest: 2, round: true });
-        line += `   🕒 Muted ${humanizedTimeFromMute} ago`;
+        const mutedAtTs = Math.ceil(moment.utc(mute.created_at).valueOf() / 1000);
+        line += `   🕒 Muted <t:${mutedAtTs}:R>`;
 
         if (mute.banned) {
           line += `   🔨 Banned`;

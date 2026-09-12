@@ -97,13 +97,25 @@ export async function actualBanCmd(
       }
 
       // Create a new case for the updated ban since we never stored the old case id and log the action
+      const expiryTimestamp = time && time > 0 ? Math.ceil((Date.now() + time) / 1000) : null;
+      const expiryRelative = expiryTimestamp ? `<t:${expiryTimestamp}:R>` : null;
+      const noteDetails: string[] = [];
+      if (time && time > 0) {
+        noteDetails.push(`Ban updated to ${humanizeDuration(time)}`);
+        if (expiryRelative) {
+          noteDetails.push(`Expires ${expiryRelative}`);
+        }
+      } else {
+        noteDetails.push("Ban updated to indefinite");
+      }
+
       const casesPlugin = pluginData.getPlugin(CasesPlugin);
       const createdCase = await casesPlugin.createCase({
         modId: mod.id,
         type: CaseTypes.Ban,
         userId: user.id,
         reason: formattedReason,
-        noteDetails: [`Ban updated to ${time ? humanizeDuration(time) : "indefinite"}`],
+        noteDetails,
       });
       if (time) {
         pluginData.getPlugin(LogsPlugin).logMemberTimedBan({
@@ -124,7 +136,7 @@ export async function actualBanCmd(
 
       pluginData.state.common.sendSuccessMessage(
         context,
-        `Ban updated to ${time ? "expire in " + humanizeDuration(time) + " from now" : "indefinite"}`,
+        `Ban updated to ${time && expiryRelative ? `expire ${expiryRelative}` : "indefinite"}`,
       );
       lock.unlock();
       return;
@@ -171,6 +183,9 @@ export async function actualBanCmd(
     return;
   }
 
+  const banExpiryTimestamp = time && time > 0 ? Math.ceil((Date.now() + time) / 1000) : null;
+  const banExpiryRelative = banExpiryTimestamp ? `<t:${banExpiryTimestamp}:R>` : null;
+
   let forTime = "";
   if (time && time > 0) {
     forTime = `for ${humanizeDuration(time)} `;
@@ -183,6 +198,10 @@ export async function actualBanCmd(
     if (banResult.notifyResult.text) response += ` (${banResult.notifyResult.text})`;
   } else {
     response = `Member forcebanned ${forTime}(Case #${banResult.case.case_number})`;
+  }
+
+  if (banExpiryRelative) {
+    response += ` ⏰ ${banExpiryRelative}`;
   }
 
   lock.unlock();

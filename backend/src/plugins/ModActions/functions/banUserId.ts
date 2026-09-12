@@ -137,6 +137,9 @@ export async function banUserId(
 
   const tempbanLock = await pluginData.locks.acquire(`tempban-${user.id}`);
   const existingTempban = await pluginData.state.tempbans.findExistingTempbanForUserId(user.id);
+  const banExpiresAt = banTime && banTime > 0 ? Date.now() + banTime : null;
+  const banExpiryTimestamp = banExpiresAt ? Math.ceil(banExpiresAt / 1000) : null;
+  const banExpiryRelative = banExpiryTimestamp ? `<t:${banExpiryTimestamp}:R>` : null;
   if (banTime && banTime > 0) {
     const selfId = pluginData.client.user!.id;
     if (existingTempban) {
@@ -155,9 +158,17 @@ export async function banUserId(
 
   const noteDetails: string[] = [];
   const timeUntilUnban = banTime ? humanizeDuration(banTime) : "indefinite";
-  const timeDetails = `Banned ${banTime ? `for ${timeUntilUnban}` : "indefinitely"}`;
-  if (notifyResult.text) noteDetails.push(ucfirst(notifyResult.text));
-  noteDetails.push(timeDetails);
+  if (notifyResult.text) {
+    noteDetails.push(ucfirst(notifyResult.text));
+  }
+  if (banTime && banTime > 0) {
+    noteDetails.push(`Banned for ${timeUntilUnban}`);
+    if (banExpiryRelative) {
+      noteDetails.push(`Expires ${banExpiryRelative}`);
+    }
+  } else {
+    noteDetails.push("Banned indefinitely");
+  }
 
   const createdCase = await casesPlugin.createCase({
     ...banOptions.caseArgs,

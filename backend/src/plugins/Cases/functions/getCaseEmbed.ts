@@ -40,11 +40,15 @@ export async function getCaseEmbed(
   const createdAtWithTz = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
+  const createdAtTs = Math.ceil(createdAt.valueOf() / 1000);
+  const createdAtRelative = `<t:${createdAtTs}:R>`;
 
   const embed: any = {
     title: `${actionTypeStr} - Case #${theCase.case_number}`,
     footer: {
-      text: `Case created on ${createdAtWithTz.format(timeAndDate.getDateFormat("pretty_datetime"))}`,
+      text: `Case created on ${createdAtWithTz.format(
+        timeAndDate.getDateFormat("pretty_datetime"),
+      )} (${createdAtRelative})`,
     },
     fields: [
       {

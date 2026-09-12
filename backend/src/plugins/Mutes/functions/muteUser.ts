@@ -46,6 +46,8 @@ export async function muteUser(
   const muteType = getDefaultMuteType(pluginData);
   const muteExpiresAt = muteTime ? Date.now() + muteTime : null;
   const timeoutUntil = getTimeoutExpiryTime(muteExpiresAt);
+  const muteExpiryTimestamp = muteExpiresAt ? Math.ceil(muteExpiresAt / 1000) : null;
+  const muteExpiryRelative = muteExpiryTimestamp ? `<t:${muteExpiryTimestamp}:R>` : null;
 
   // No mod specified -> mark Zeppelin as the mod
   if (!muteOptions.caseArgs?.modId) {
@@ -245,7 +247,15 @@ export async function muteUser(
 
   if (theCase) {
     // Update old case
-    const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmuteStr : "indefinite"}`];
+    const noteDetails: string[] = [];
+    if (muteTime) {
+      noteDetails.push(`Mute updated to ${timeUntilUnmuteStr}`);
+      if (muteExpiryRelative) {
+        noteDetails.push(`Expires ${muteExpiryRelative}`);
+      }
+    } else {
+      noteDetails.push("Mute updated to indefinite");
+    }
     const reasons = reason ? [reason] : [""]; // Empty string so that there is a case update even without reason
 
     if (muteOptions.caseArgs?.extraNotes) {
@@ -263,7 +273,15 @@ export async function muteUser(
     }
   } else {
     // Create new case
-    const noteDetails = [`Muted ${muteTime ? `for ${timeUntilUnmuteStr}` : "indefinitely"}`];
+    const noteDetails: string[] = [];
+    if (muteTime) {
+      noteDetails.push(`Muted for ${timeUntilUnmuteStr}`);
+      if (muteExpiryRelative) {
+        noteDetails.push(`Expires ${muteExpiryRelative}`);
+      }
+    } else {
+      noteDetails.push("Muted indefinitely");
+    }
     if (notifyResult.text) {
       noteDetails.push(ucfirst(notifyResult.text));
     }
