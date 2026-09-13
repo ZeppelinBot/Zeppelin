@@ -11,12 +11,12 @@ export const automodPluginDocs: ZeppelinPluginDocs = {
       Allows specifying automated actions in response to triggers. Example use cases include word filtering and spam prevention.
   `),
   configurationGuide: trimPluginDescription(`
-      The automod plugin is very customizable. For a full list of available triggers, actions, and their options, see Config schema at the bottom of this page.    
-    
+      The automod plugin is very customizable. For a full list of available triggers, actions, and their options, see Config schema at the bottom of this page.
+
       ### Simple word filter
       Removes any messages that contain the word 'banana' and sends a warning to the user.
       Moderators (level >= 50) are ignored by the filter based on the override.
-      
+
       ~~~yml
       automod:
         config:
@@ -38,17 +38,17 @@ export const automodPluginDocs: ZeppelinPluginDocs = {
               my_filter:
                 enabled: false
       ~~~
-      
+
       ### Spam detection
       This example includes 2 filters:
-      
+
       - The first one is triggered if a user sends 5 messages within 10 seconds OR 3 attachments within 60 seconds.
         The messages are deleted and the user is muted for 5 minutes.
       - The second filter is triggered if a user sends more than 2 emoji within 5 seconds.
         The messages are deleted but the user is not muted.
-      
+
       Moderators are ignored by both filters based on the override.
-      
+
       ~~~yml
       automod:
         config:
@@ -82,10 +82,10 @@ export const automodPluginDocs: ZeppelinPluginDocs = {
               my_second_filter:
                 enabled: false
       ~~~
-      
+
       ### Custom status alerts
       This example sends an alert any time a user with a matching custom status sends a message.
-      
+
       ~~~yml
       automod:
         config:
@@ -101,6 +101,75 @@ export const automodPluginDocs: ZeppelinPluginDocs = {
                   text: |-
                     Bad custom status on user <@!{user.id}>:
                     {matchSummary}
+      ~~~
+
+      ### Combining multiple triggers
+      The \`and\` trigger lets you require several triggers to match before the rule fires.
+
+      ~~~yml
+      automod:
+        config:
+          rules:
+            suspicious_links:
+              triggers:
+              - and:
+                  triggers:
+                  - match_words:
+                      words: ['free nitro', 'airdrop']
+                  - match_links:
+                      include_domains: ['example.com']
+              actions:
+                clean: true
+                warn:
+                  reason: 'Potential scam link'
+      ~~~
+
+      ### Negating a trigger
+      Use \`not\` to require a trigger *not* to match. This is useful for deny-by-default rules or allowlists.
+
+      ~~~yml
+      automod:
+        config:
+          rules:
+            only_invite_links:
+              triggers:
+                - and:
+                    triggers:
+                      - match_links:
+                          only_real_links: true
+                          include_words: ['http']  # catch any real link
+                      - not:
+                          trigger:
+                            match_invites:
+                              allow_group_dm_invites: false
+                              exclude_invite_codes: []  # matches any invite code
+              actions:
+                clean: true
+                warn:
+                  reason: 'Only Discord invite links are allowed'
+      ~~~
+
+      ### Combining \`and\` + \`not\`
+      This pattern is useful for "allowlists with exceptions" or more fine-grained filtering.
+
+      ~~~yml
+      automod:
+        config:
+          rules:
+            allow_trusted_links_only:
+              triggers:
+              - and:
+                  triggers:
+                  - match_links:
+                      include_domains: ['example.com']
+                  - not:
+                      trigger:
+                        match_words:
+                          words: ['beta', 'free']
+              actions:
+                clean: true
+                warn:
+                  reason: 'Only approved links without banned keywords are allowed'
       ~~~
   `),
 };
