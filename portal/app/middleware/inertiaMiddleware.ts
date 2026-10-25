@@ -1,7 +1,7 @@
-import type { HttpContext } from '@adonisjs/core/http'
-import type { NextFn } from '@adonisjs/core/types/http'
-import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
-import { PortalUserTransformer } from '#backend/features/portalUsers/transformers/PortalUserTransformer'
+import type { HttpContext } from "@adonisjs/core/http";
+import type { NextFn } from "@adonisjs/core/types/http";
+import BaseInertiaMiddleware from "@adonisjs/inertia/inertia_middleware";
+import { PortalUserTransformer } from "#backend/features/portalUsers/transformers/PortalUserTransformer";
 
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
   share(ctx: HttpContext) {
@@ -13,13 +13,13 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
      * In that case, we must always assume that HttpContext is not fully hydrated
      * with all the properties
      */
-    const { auth, request } = ctx as Partial<HttpContext>
+    const { auth, request } = ctx as Partial<HttpContext>;
 
-    const theme: 'light' | 'dark' =
-      request?.plainCookie('app_theme', {
-        defaultValue: 'light',
+    const theme: "light" | "dark" =
+      request?.plainCookie("app_theme", {
+        defaultValue: "light",
         encoded: false,
-      }) ?? 'light'
+      }) ?? "light";
 
     /**
      * Data shared with all Inertia pages. Make sure you are using
@@ -29,7 +29,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
       user: ctx.inertia.always(auth?.user ? PortalUserTransformer.transform(auth.user) : undefined),
       preferences: ctx.inertia.always({ theme }),
-    }
+    };
   }
 
   flash(ctx: HttpContext) {
@@ -38,25 +38,25 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
      * object instead of props, and the client strips them from history
      * state so they never reappear when navigating back.
      */
-    const { session } = ctx as Partial<HttpContext>
+    const { session } = ctx as Partial<HttpContext>;
 
-    const success: string | undefined = session?.flashMessages.get('success')
-    const error: string | undefined = session?.flashMessages.get('error')
+    const success: string | undefined = session?.flashMessages.get("success");
+    const error: string | undefined = session?.flashMessages.get("error");
 
-    return { success, error }
+    return { success, error };
   }
 
   async handle(ctx: HttpContext, next: NextFn) {
-    await this.init(ctx)
+    await this.init(ctx);
 
-    const output = await next()
-    this.dispose(ctx)
+    const output = await next();
+    this.dispose(ctx);
 
-    return output
+    return output;
   }
 }
 
-declare module '@adonisjs/inertia/types' {
-  type MiddlewareSharedProps = InferSharedProps<InertiaMiddleware>
+declare module "@adonisjs/inertia/types" {
+  type MiddlewareSharedProps = InferSharedProps<InertiaMiddleware>;
   export interface SharedProps extends MiddlewareSharedProps {}
 }

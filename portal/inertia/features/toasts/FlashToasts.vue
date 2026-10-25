@@ -10,24 +10,24 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import { toast, Toaster } from 'vue-sonner'
-import { CircleAlert, CircleCheck } from 'lucide-vue-next'
+import { watch } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { toast, Toaster } from "vue-sonner";
+import { CircleAlert, CircleCheck } from "lucide-vue-next";
 
-const page = usePage()
+const page = usePage();
 
 watch(
   () => page.url,
-  () => toast.dismiss()
-)
+  () => toast.dismiss(),
+);
 
 watch(
   () => page.flash,
   (flash) => {
-    if (flash.error) toast.error(flash.error, { id: 'flash' })
-    if (flash.success) toast.success(flash.success, { id: 'flash' })
+    if (flash.error) toast.error(flash.error, { id: "flash" });
+    if (flash.success) toast.success(flash.success, { id: "flash" });
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 </script>

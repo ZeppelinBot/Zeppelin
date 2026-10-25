@@ -1,3 +1,1 @@
-<template>
-  Server error
-</template>
+<template>Server error</template>

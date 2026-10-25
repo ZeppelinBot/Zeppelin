@@ -1,5 +1,5 @@
-import { portalEnv } from '#start/env'
-import { defineConfig, stores } from '@adonisjs/session'
+import { portalEnv } from "#start/env";
+import { defineConfig, stores } from "@adonisjs/session";
 
 const sessionConfig = defineConfig({
   /**
@@ -10,7 +10,7 @@ const sessionConfig = defineConfig({
   /**
    * Cookie name storing the session identifier.
    */
-  cookieName: 'portalSession',
+  cookieName: "portalSession",
 
   /**
    * When set to true, the session id cookie will be deleted
@@ -22,7 +22,7 @@ const sessionConfig = defineConfig({
    * Define how long to keep the session data alive without
    * any activity.
    */
-  age: '2h',
+  age: "2h",
 
   /**
    * Configuration for session cookie and the
@@ -32,7 +32,7 @@ const sessionConfig = defineConfig({
     /**
      * Restrict the cookie to a URL path. '/' means all routes.
      */
-    path: '/',
+    path: "/",
 
     /**
      * Prevent JavaScript access to the cookie in the browser.
@@ -47,7 +47,7 @@ const sessionConfig = defineConfig({
     /**
      * Cross-site policy for cookie sending.
      */
-    sameSite: 'strict',
+    sameSite: "strict",
   },
 
   /**
@@ -55,7 +55,7 @@ const sessionConfig = defineConfig({
    * variable in order to infer the store name without any
    * errors.
    */
-  store: portalEnv.get('SESSION_DRIVER', "redis"),
+  store: portalEnv.get("SESSION_DRIVER", "redis"),
 
   /**
    * List of configured stores. Refer documentation to see
@@ -63,9 +63,9 @@ const sessionConfig = defineConfig({
    */
   stores: {
     redis: stores.redis({
-      connection: "main"
+      connection: "main",
     }),
   },
-})
+});
 
-export default sessionConfig
+export default sessionConfig;

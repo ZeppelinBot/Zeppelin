@@ -9,9 +9,9 @@
 |
 */
 
-import { Env } from '@adonisjs/core/env'
+import { Env } from "@adonisjs/core/env";
 
-export const rootEnv = await Env.create(new URL('../../', import.meta.url), {
+export const rootEnv = await Env.create(new URL("../../", import.meta.url), {
   KEY: Env.schema.string(),
   DB_HOST: Env.schema.string.optional(),
   DB_PORT: Env.schema.number.optional(),

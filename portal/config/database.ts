@@ -1,15 +1,15 @@
-import { rootEnv } from '#start/env'
-import { defineConfig } from '@adonisjs/lucid'
+import { rootEnv } from "#start/env";
+import { defineConfig } from "@adonisjs/lucid";
 
 const dbConfig = defineConfig({
   /**
    * Default connection used for all queries.
    */
-  connection: 'mysql',
+  connection: "mysql",
 
   connections: {
     mysql: {
-      client: 'mysql2',
+      client: "mysql2",
 
       connection: {
         host: rootEnv.get("DB_HOST", "mysql"),
@@ -29,16 +29,16 @@ const dbConfig = defineConfig({
         /**
          * Paths containing migration files.
          */
-        paths: ['database/migrations'],
+        paths: ["database/migrations"],
       },
 
       schemaGeneration: {
         enabled: true,
-        rulesPaths: ['./database/schemaRules.js'],
+        rulesPaths: ["./database/schemaRules.js"],
         excludeTables: ["migrations"],
       },
     },
   },
-})
+});
 
-export default dbConfig
+export default dbConfig;

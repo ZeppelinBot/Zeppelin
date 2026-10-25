@@ -1,4 +1,4 @@
-import type { Data } from '#client/data.d.ts'
+import type { Data } from "#client/data.d.ts";
 
 /**
  * Bridge the shared props and flash data inferred from the Inertia
@@ -6,9 +6,9 @@ import type { Data } from '#client/data.d.ts'
  * and layout callbacks are typed globally without passing a generic at each
  * call site.
  */
-declare module '@inertiajs/core' {
+declare module "@inertiajs/core" {
   interface InertiaConfig {
-    sharedPageProps: Data.SharedProps
-    flashDataType: Data.FlashMessages
+    sharedPageProps: Data.SharedProps;
+    flashDataType: Data.FlashMessages;
   }
 }
