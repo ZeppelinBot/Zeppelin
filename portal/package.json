@@ -1,12 +1,7 @@
 {
-  "name": "portal",
-  "version": "0.0.0",
+  "name": "@zeppelinbot/portal",
   "private": true,
   "type": "module",
-  "license": "UNLICENSED",
-  "engines": {
-    "node": ">=24.0.0"
-  },
   "scripts": {
     "start": "node bin/server.js",
     "build": "node ace build",
@@ -73,8 +68,8 @@
   },
   "hotHook": {
     "boundaries": [
-      "./app/features/**/*Controller.ts",
-      "./app/features/**/*Middleware.ts",
+      "./app/features/**/controllers/*.ts",
+      "./app/features/**/middleware/*.ts",
       "./app/middleware/*.ts"
     ]
   },
