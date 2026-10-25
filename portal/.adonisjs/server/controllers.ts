@@ -5,6 +5,6 @@
 
 export const controllers = {
   splash: {
-    Splash: () => import("#backend/features/splash/controllers/SplashController"),
+    Splash: () => import('#backend/features/splash/controllers/SplashController'),
   },
-};
+}

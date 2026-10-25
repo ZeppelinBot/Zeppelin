@@ -4,18 +4,18 @@
  */
 
 /// <reference path="./manifest.d.ts" />
-import type { InferData, InferVariants } from "@adonisjs/core/types/transformers";
-import type { InferSharedProps, InferFlashData } from "@adonisjs/inertia/types";
-import type PortalUsersPortalUserTransformer from "#backend/features/portalUsers/transformers/PortalUserTransformer";
-import type InertiaMiddleware from "#backend/middleware/inertiaMiddleware";
+import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
+import type { InferSharedProps, InferFlashData } from '@adonisjs/inertia/types'
+import type PortalUsersPortalUserTransformer from '#backend/features/portalUsers/transformers/PortalUserTransformer'
+import type InertiaMiddleware from '#backend/middleware/inertiaMiddleware'
 
 export namespace Data {
   export namespace PortalUsers {
-    export type PortalUser = InferData<PortalUsersPortalUserTransformer>;
+    export type PortalUser = InferData<PortalUsersPortalUserTransformer>
     export namespace PortalUser {
-      export type Variants = InferVariants<PortalUsersPortalUserTransformer>;
+      export type Variants = InferVariants<PortalUsersPortalUserTransformer>
     }
   }
-  export type SharedProps = InferSharedProps<InertiaMiddleware>;
-  export type FlashMessages = InferFlashData<InertiaMiddleware>;
+  export type SharedProps = InferSharedProps<InertiaMiddleware>
+  export type FlashMessages = InferFlashData<InertiaMiddleware>
 }

@@ -3,4 +3,4 @@
  * DO NOT EDIT manually
  */
 
-export const listeners = {};
+export const listeners = {}
