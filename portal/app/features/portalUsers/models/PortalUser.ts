@@ -1,22 +1,7 @@
-import { BaseModel, column } from "@adonisjs/lucid/orm";
+import { PortalUserSchema } from "#database/schema";
 
-export class PortalUser extends BaseModel {
+export class PortalUser extends PortalUserSchema {
   static table = "portal_users";
-
-  @column({ isPrimary: true })
-  declare id: number;
-
-  @column()
-  declare user_id: number;
-
-  @column()
-  declare username: string;
-
-  @column()
-  declare avatar: string;
-
-  @column()
-  declare created_at: string;
 }
 
-export default PortalUser
+export default PortalUser;

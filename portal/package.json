@@ -13,6 +13,7 @@
     "dev": "node ace serve --hmr",
     "test": "node ace test",
     "ace": "node ace",
+    "generate-db-schema": "node ace schema:generate",
     "typecheck": "tsc --noEmit && vue-tsc --noEmit --project inertia/tsconfig.json"
   },
   "imports": {

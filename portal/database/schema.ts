@@ -4,22 +4,768 @@
  * Run "node ace migration:run" command to re-generate this file
  */
 
-import { BaseModel, column } from '@adonisjs/lucid/orm'
-import { DateTime } from 'luxon'
+import { BaseModel, column } from "@adonisjs/lucid/orm";
+import { DateTime } from "luxon";
 
-export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
-  $columns = UserSchema.$columns
+export class AllowedGuildSchema extends BaseModel {
+  static $columns = ["createdAt", "icon", "id", "name", "ownerId", "updatedAt"] as const;
+  $columns = AllowedGuildSchema.$columns;
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare createdAt: DateTime;
   @column()
-  declare email: string
-  @column()
-  declare fullName: string | null
+  declare icon: string | null;
   @column({ isPrimary: true })
-  declare id: number
-  @column({ serializeAs: null })
-  declare password: string
+  declare id: string;
+  @column()
+  declare name: string;
+  @column()
+  declare ownerId: string;
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
+  declare updatedAt: DateTime;
+}
+
+export class AntiraidLevelSchema extends BaseModel {
+  static $columns = ["guildId", "level"] as const;
+  $columns = AntiraidLevelSchema.$columns;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare level: string;
+}
+
+export class ApiAuditLogSchema extends BaseModel {
+  static $columns = ["authorId", "createdAt", "eventData", "eventType", "guildId", "id"] as const;
+  $columns = ApiAuditLogSchema.$columns;
+  @column()
+  declare authorId: string;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare eventData: string;
+  @column()
+  declare eventType: string;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+}
+
+export class ApiLoginSchema extends BaseModel {
+  static $columns = ["expiresAt", "id", "loggedInAt", "token", "userId"] as const;
+  $columns = ApiLoginSchema.$columns;
+  @column.dateTime()
+  declare expiresAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: string;
+  @column.dateTime()
+  declare loggedInAt: DateTime;
+  @column()
+  declare token: string;
+  @column()
+  declare userId: string;
+}
+
+export class ApiPermissionSchema extends BaseModel {
+  static $columns = ["expiresAt", "guildId", "permissions", "targetId", "type"] as const;
+  $columns = ApiPermissionSchema.$columns;
+  @column.dateTime()
+  declare expiresAt: DateTime | null;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare permissions: string;
+  @column()
+  declare targetId: string;
+  @column()
+  declare type: string;
+}
+
+export class ApiUserInfoSchema extends BaseModel {
+  static $columns = ["data", "id", "updatedAt"] as const;
+  $columns = ApiUserInfoSchema.$columns;
+  @column()
+  declare data: string;
+  @column({ isPrimary: true })
+  declare id: string;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime;
+}
+
+export class ArchiveSchema extends BaseModel {
+  static $columns = ["body", "createdAt", "expiresAt", "guildId", "id"] as const;
+  $columns = ArchiveSchema.$columns;
+  @column()
+  declare body: string;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column.dateTime()
+  declare expiresAt: DateTime | null;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: string;
+}
+
+export class AutoReactionSchema extends BaseModel {
+  static $columns = ["channelId", "guildId", "reactions"] as const;
+  $columns = AutoReactionSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare reactions: string;
+}
+
+export class CaseNoteSchema extends BaseModel {
+  static $columns = ["body", "caseId", "createdAt", "id", "modId", "modName"] as const;
+  $columns = CaseNoteSchema.$columns;
+  @column()
+  declare body: string;
+  @column()
+  declare caseId: number;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare modId: string | null;
+  @column()
+  declare modName: string | null;
+}
+
+export class CaseSchema extends BaseModel {
+  static $columns = [
+    "auditLogId",
+    "caseNumber",
+    "createdAt",
+    "guildId",
+    "id",
+    "isHidden",
+    "logMessageId",
+    "modId",
+    "modName",
+    "ppId",
+    "ppName",
+    "type",
+    "userId",
+    "userName",
+  ] as const;
+  $columns = CaseSchema.$columns;
+  @column()
+  declare auditLogId: string | null;
+  @column()
+  declare caseNumber: number;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare isHidden: boolean;
+  @column()
+  declare logMessageId: string | null;
+  @column()
+  declare modId: string | null;
+  @column()
+  declare modName: string | null;
+  @column()
+  declare ppId: string | null;
+  @column()
+  declare ppName: string | null;
+  @column()
+  declare type: number;
+  @column()
+  declare userId: string;
+  @column()
+  declare userName: string;
+}
+
+export class ConfigSchema extends BaseModel {
+  static $columns = ["config", "editedAt", "editedBy", "id", "isActive", "key"] as const;
+  $columns = ConfigSchema.$columns;
+  @column()
+  declare config: string;
+  @column.dateTime()
+  declare editedAt: DateTime;
+  @column()
+  declare editedBy: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare isActive: boolean;
+  @column()
+  declare key: string;
+}
+
+export class ContextMenuSchema extends BaseModel {
+  static $columns = ["actionName", "contextId", "guildId"] as const;
+  $columns = ContextMenuSchema.$columns;
+  @column()
+  declare actionName: string;
+  @column({ isPrimary: true })
+  declare contextId: string;
+  @column()
+  declare guildId: string;
+}
+
+export class CounterTriggerStateSchema extends BaseModel {
+  static $columns = ["channelId", "id", "triggerId", "userId"] as const;
+  $columns = CounterTriggerStateSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column({ isPrimary: true })
+  declare id: string;
+  @column()
+  declare triggerId: number;
+  @column()
+  declare userId: string;
+}
+
+export class CounterTriggerSchema extends BaseModel {
+  static $columns = [
+    "comparisonOp",
+    "comparisonValue",
+    "counterId",
+    "deleteAt",
+    "id",
+    "name",
+    "reverseComparisonOp",
+    "reverseComparisonValue",
+  ] as const;
+  $columns = CounterTriggerSchema.$columns;
+  @column()
+  declare comparisonOp: string;
+  @column()
+  declare comparisonValue: number;
+  @column()
+  declare counterId: number;
+  @column.dateTime()
+  declare deleteAt: DateTime | null;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare name: string;
+  @column()
+  declare reverseComparisonOp: string;
+  @column()
+  declare reverseComparisonValue: number;
+}
+
+export class CounterValueSchema extends BaseModel {
+  static $columns = ["channelId", "counterId", "id", "userId", "value"] as const;
+  $columns = CounterValueSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column()
+  declare counterId: number;
+  @column({ isPrimary: true })
+  declare id: string;
+  @column()
+  declare userId: string;
+  @column()
+  declare value: number;
+}
+
+export class CounterSchema extends BaseModel {
+  static $columns = ["deleteAt", "guildId", "id", "lastDecayAt", "name", "perChannel", "perUser"] as const;
+  $columns = CounterSchema.$columns;
+  @column.dateTime()
+  declare deleteAt: DateTime | null;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column.dateTime()
+  declare lastDecayAt: DateTime;
+  @column()
+  declare name: string;
+  @column()
+  declare perChannel: boolean;
+  @column()
+  declare perUser: boolean;
+}
+
+export class MemberCacheSchema extends BaseModel {
+  static $columns = ["deleteAt", "guildId", "id", "lastSeen", "nickname", "roles", "userId", "username"] as const;
+  $columns = MemberCacheSchema.$columns;
+  @column.dateTime()
+  declare deleteAt: DateTime | null;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column.date()
+  declare lastSeen: DateTime;
+  @column()
+  declare nickname: string | null;
+  @column()
+  declare roles: string;
+  @column()
+  declare userId: string;
+  @column()
+  declare username: string;
+}
+
+export class MemberTimezoneSchema extends BaseModel {
+  static $columns = ["guildId", "memberId", "timezone"] as const;
+  $columns = MemberTimezoneSchema.$columns;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare memberId: string;
+  @column()
+  declare timezone: string;
+}
+
+export class MessageSchema extends BaseModel {
+  static $columns = [
+    "channelId",
+    "data",
+    "deletedAt",
+    "guildId",
+    "id",
+    "isBot",
+    "isPermanent",
+    "postedAt",
+    "userId",
+  ] as const;
+  $columns = MessageSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column()
+  declare data: string;
+  @column.dateTime()
+  declare deletedAt: DateTime | null;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: string;
+  @column()
+  declare isBot: boolean;
+  @column()
+  declare isPermanent: boolean;
+  @column.dateTime()
+  declare postedAt: DateTime;
+  @column()
+  declare userId: string;
+}
+
+export class MuteSchema extends BaseModel {
+  static $columns = [
+    "caseId",
+    "createdAt",
+    "expiresAt",
+    "guildId",
+    "muteRole",
+    "rolesToRestore",
+    "timeoutExpiresAt",
+    "type",
+    "userId",
+  ] as const;
+  $columns = MuteSchema.$columns;
+  @column()
+  declare caseId: number | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null;
+  @column.dateTime()
+  declare expiresAt: DateTime | null;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare muteRole: string | null;
+  @column()
+  declare rolesToRestore: string | null;
+  @column.dateTime()
+  declare timeoutExpiresAt: DateTime | null;
+  @column()
+  declare type: boolean;
+  @column()
+  declare userId: string;
+}
+
+export class NicknameHistorySchema extends BaseModel {
+  static $columns = ["guildId", "id", "nickname", "timestamp", "userId"] as const;
+  $columns = NicknameHistorySchema.$columns;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare nickname: string | null;
+  @column.dateTime()
+  declare timestamp: DateTime;
+  @column()
+  declare userId: string;
+}
+
+export class PersistedDatumSchema extends BaseModel {
+  static $columns = ["guildId", "isVoiceMuted", "nickname", "roles", "userId"] as const;
+  $columns = PersistedDatumSchema.$columns;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare isVoiceMuted: number;
+  @column()
+  declare nickname: string | null;
+  @column()
+  declare roles: string | null;
+  @column()
+  declare userId: string;
+}
+
+export class PhishermanCacheSchema extends BaseModel {
+  static $columns = ["data", "domain", "expiresAt", "id"] as const;
+  $columns = PhishermanCacheSchema.$columns;
+  @column()
+  declare data: string;
+  @column()
+  declare domain: string;
+  @column.dateTime()
+  declare expiresAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: number;
+}
+
+export class PhishermanKeyCacheSchema extends BaseModel {
+  static $columns = ["expiresAt", "hash", "id", "isValid"] as const;
+  $columns = PhishermanKeyCacheSchema.$columns;
+  @column.dateTime()
+  declare expiresAt: DateTime;
+  @column()
+  declare hash: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare isValid: boolean;
+}
+
+export class PingableRoleSchema extends BaseModel {
+  static $columns = ["channelId", "guildId", "id", "roleId"] as const;
+  $columns = PingableRoleSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare roleId: string;
+}
+
+export class PortalUserSchema extends BaseModel {
+  static $columns = ["avatar", "createdAt", "id", "lastLoginAt", "userId", "username"] as const;
+  $columns = PortalUserSchema.$columns;
+  @column()
+  declare avatar: string | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column.dateTime()
+  declare lastLoginAt: DateTime;
+  @column()
+  declare userId: string;
+  @column()
+  declare username: string;
+}
+
+export class ReactionRoleSchema extends BaseModel {
+  static $columns = ["channelId", "emoji", "guildId", "isExclusive", "messageId", "order", "roleId"] as const;
+  $columns = ReactionRoleSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column()
+  declare emoji: string;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare isExclusive: boolean;
+  @column()
+  declare messageId: string;
+  @column()
+  declare order: number | null;
+  @column()
+  declare roleId: string;
+}
+
+export class ReminderSchema extends BaseModel {
+  static $columns = ["body", "channelId", "createdAt", "guildId", "id", "remindAt", "userId"] as const;
+  $columns = ReminderSchema.$columns;
+  @column()
+  declare body: string;
+  @column()
+  declare channelId: string;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column.dateTime()
+  declare remindAt: DateTime;
+  @column()
+  declare userId: string;
+}
+
+export class RoleButtonSchema extends BaseModel {
+  static $columns = ["channelId", "guildId", "hash", "id", "messageId", "name"] as const;
+  $columns = RoleButtonSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column()
+  declare guildId: string;
+  @column()
+  declare hash: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare messageId: string;
+  @column()
+  declare name: string;
+}
+
+export class RoleQueueSchema extends BaseModel {
+  static $columns = ["guildId", "id", "priority", "roleId", "shouldAdd", "userId"] as const;
+  $columns = RoleQueueSchema.$columns;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare priority: number;
+  @column()
+  declare roleId: string;
+  @column()
+  declare shouldAdd: boolean;
+  @column()
+  declare userId: string;
+}
+
+export class ScheduledPostSchema extends BaseModel {
+  static $columns = [
+    "attachments",
+    "authorId",
+    "authorName",
+    "channelId",
+    "content",
+    "enableMentions",
+    "guildId",
+    "id",
+    "postAt",
+    "repeatInterval",
+    "repeatTimes",
+    "repeatUntil",
+  ] as const;
+  $columns = ScheduledPostSchema.$columns;
+  @column()
+  declare attachments: string;
+  @column()
+  declare authorId: string;
+  @column()
+  declare authorName: string;
+  @column()
+  declare channelId: string;
+  @column()
+  declare content: string;
+  @column()
+  declare enableMentions: boolean;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column.dateTime()
+  declare postAt: DateTime;
+  @column()
+  declare repeatInterval: number | null;
+  @column()
+  declare repeatTimes: number | null;
+  @column.dateTime()
+  declare repeatUntil: DateTime | null;
+}
+
+export class SelfGrantableRoleSchema extends BaseModel {
+  static $columns = ["aliases", "channelId", "guildId", "id", "roleId"] as const;
+  $columns = SelfGrantableRoleSchema.$columns;
+  @column()
+  declare aliases: string;
+  @column()
+  declare channelId: string;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare roleId: string;
+}
+
+export class SlowmodeChannelSchema extends BaseModel {
+  static $columns = ["channelId", "guildId", "slowmodeSeconds"] as const;
+  $columns = SlowmodeChannelSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare slowmodeSeconds: number;
+}
+
+export class SlowmodeUserSchema extends BaseModel {
+  static $columns = ["channelId", "expiresAt", "guildId", "userId"] as const;
+  $columns = SlowmodeUserSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column.dateTime()
+  declare expiresAt: DateTime;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare userId: string;
+}
+
+export class StarboardMessageSchema extends BaseModel {
+  static $columns = ["guildId", "messageId", "starboardChannelId", "starboardMessageId"] as const;
+  $columns = StarboardMessageSchema.$columns;
+  @column()
+  declare guildId: string;
+  @column()
+  declare messageId: string;
+  @column()
+  declare starboardChannelId: string;
+  @column({ isPrimary: true })
+  declare starboardMessageId: string;
+}
+
+export class StarboardReactionSchema extends BaseModel {
+  static $columns = ["guildId", "id", "messageId", "reactorId"] as const;
+  $columns = StarboardReactionSchema.$columns;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare messageId: string;
+  @column()
+  declare reactorId: string;
+}
+
+export class StatSchema extends BaseModel {
+  static $columns = ["createdAt", "guildId", "id", "key", "source", "value"] as const;
+  $columns = StatSchema.$columns;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: string;
+  @column()
+  declare key: string;
+  @column()
+  declare source: string;
+  @column()
+  declare value: number;
+}
+
+export class SupporterSchema extends BaseModel {
+  static $columns = ["amount", "name", "userId"] as const;
+  $columns = SupporterSchema.$columns;
+  @column()
+  declare amount: string | null;
+  @column()
+  declare name: string;
+  @column({ isPrimary: true })
+  declare userId: string;
+}
+
+export class TagResponseSchema extends BaseModel {
+  static $columns = ["commandMessageId", "guildId", "id", "responseMessageId"] as const;
+  $columns = TagResponseSchema.$columns;
+  @column()
+  declare commandMessageId: string;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare responseMessageId: string;
+}
+
+export class TagSchema extends BaseModel {
+  static $columns = ["body", "createdAt", "guildId", "tag", "userId"] as const;
+  $columns = TagSchema.$columns;
+  @column()
+  declare body: string;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare tag: string;
+  @column()
+  declare userId: string;
+}
+
+export class TempbanSchema extends BaseModel {
+  static $columns = ["createdAt", "expiresAt", "guildId", "modId", "userId"] as const;
+  $columns = TempbanSchema.$columns;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column.dateTime()
+  declare expiresAt: DateTime;
+  @column({ isPrimary: true })
+  declare guildId: string;
+  @column()
+  declare modId: string;
+  @column()
+  declare userId: string;
+}
+
+export class UsernameHistorySchema extends BaseModel {
+  static $columns = ["id", "timestamp", "userId", "username"] as const;
+  $columns = UsernameHistorySchema.$columns;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column.dateTime()
+  declare timestamp: DateTime;
+  @column()
+  declare userId: string;
+  @column()
+  declare username: string | null;
+}
+
+export class VcAlertSchema extends BaseModel {
+  static $columns = ["active", "body", "channelId", "expiresAt", "guildId", "id", "requestorId", "userId"] as const;
+  $columns = VcAlertSchema.$columns;
+  @column()
+  declare active: boolean;
+  @column()
+  declare body: string;
+  @column()
+  declare channelId: string;
+  @column.dateTime()
+  declare expiresAt: DateTime;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare requestorId: string;
+  @column()
+  declare userId: string;
+}
+
+export class WebhookSchema extends BaseModel {
+  static $columns = ["channelId", "createdAt", "guildId", "id", "token"] as const;
+  $columns = WebhookSchema.$columns;
+  @column()
+  declare channelId: string;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare guildId: string;
+  @column({ isPrimary: true })
+  declare id: string;
+  @column()
+  declare token: string;
 }
