@@ -1,3 +1,5 @@
+import "@fontsource-variable/recursive";
+import "./css/global.css";
 import "vue-sonner/style.css";
 import { client } from "#frontend/client.js";
 import { createInertiaApp } from "@inertiajs/vue3";

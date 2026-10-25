@@ -53,6 +53,7 @@
     "@adonisjs/shield": "^9.0.0",
     "@adonisjs/static": "^2.0.1",
     "@adonisjs/vite": "^6.0.2",
+    "@fontsource-variable/recursive": "^5.3.0",
     "@inertiajs/core": "^3.7.1",
     "@inertiajs/vue3": "^3.7.1",
     "@tuyau/core": "^1.2.2",
