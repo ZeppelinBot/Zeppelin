@@ -18,6 +18,9 @@ const dbConfig = defineConfig({
         password: rootEnv.get("DB_PASSWORD", rootEnv.get("DEVELOPMENT_MYSQL_PASSWORD", "")),
         database: rootEnv.get("DB_DATABASE", "zeppelin"),
         timezone: "Z",
+        supportBigNumbers: true,
+        bigNumberStrings: true,
+        charset: "utf8mb4",
       },
 
       migrations: {
