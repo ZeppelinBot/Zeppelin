@@ -17,5 +17,9 @@ export default defineConfig({
       ignored: ["**/storage/**", "**/tmp/**"],
     },
     allowedHosts,
+    ws: {
+      port: 3004,
+      clientPort: rootEnv.get("DEVELOPMENT_PORTAL_PORT", 3400),
+    },
   },
 });

@@ -19,5 +19,12 @@ https://:444 {
     tls internal {
         on_demand
     }
+
+    @vite_hmr {
+        path /
+        header Upgrade websocket
+    }
+
+    reverse_proxy @vite_hmr devenv:3004
     reverse_proxy devenv:3003
 }

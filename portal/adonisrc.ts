@@ -161,5 +161,6 @@ export default defineConfig({
       generateRegistry(),
     ],
     buildStarting: [() => import("@adonisjs/vite/build_hook")],
+    devServerStarting: [() => import("./hooks/devHmrPort.ts")]
   },
 });
