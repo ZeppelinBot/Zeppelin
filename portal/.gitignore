@@ -1,0 +1,7 @@
+# Dependencies and AdonisJS build
+build
+tmp/*
+!tmp/.gitkeep
+
+# Frontend assets compiled code
+public/assets

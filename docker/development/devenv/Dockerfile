@@ -14,7 +14,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
 RUN apt-get install -y nodejs gcc g++ make python3
 
 # Install pnpm
-RUN npm install -g pnpm@11.19.0
+RUN npm install -g --min-release-age=7 pnpm
 
 # Delete default sudo user and create unprivileged user
 RUN userdel -r ubuntu

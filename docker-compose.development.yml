@@ -5,31 +5,44 @@ volumes:
   untrusted-home: {}
   mysql-data: {}
   redis-data: {}
+  caddy-data: {}
 
 services:
-  nginx:
-    build:
-      context: ./docker/development/nginx
-      args:
-        DEVELOPMENT_WEB_PORT: ${DEVELOPMENT_WEB_PORT:?Missing DEVELOPMENT_WEB_PORT}
+  caddy:
+    image: caddy:2
+    pull_policy: daily
     ports:
-      - "${DEVELOPMENT_WEB_PORT:?Missing DEVELOPMENT_WEB_PORT}:443"
+      - "${DEVELOPMENT_BIND_HOST:-127.0.0.1}:${DEVELOPMENT_WEB_PORT:?Missing DEVELOPMENT_WEB_PORT}:443"
+      - "${DEVELOPMENT_BIND_HOST:-127.0.0.1}:${DEVELOPMENT_PORTAL_PORT:?Missing DEVELOPMENT_PORTAL_PORT}:444"
+    volumes:
+      - ./docker/development/caddy/config:/etc/caddy
+      - caddy-data:/data
+      # Mount host tailscale dir for tailscale cert support
+      # Creates an empty dir on host if it doesn't already exist
+      # Probably doesn't work on Windows but who cares
+      - type: bind
+        source: /var/run/tailscale
+        target: /var/run/tailscale
+        read_only: true
+        bind:
+          create_host_path: true
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8
+    pull_policy: daily
     environment:
       MYSQL_ROOT_PASSWORD: ${DEVELOPMENT_MYSQL_ROOT_PASSWORD?:Missing DEVELOPMENT_MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: zeppelin
       MYSQL_USER: zeppelin
       MYSQL_PASSWORD: ${DEVELOPMENT_MYSQL_PASSWORD?:Missing DEVELOPMENT_MYSQL_PASSWORD}
     ports:
-      - "127.0.0.1:${DEVELOPMENT_MYSQL_PORT:?Missing DEVELOPMENT_MYSQL_PORT}:3306"
+      - "${DEVELOPMENT_BIND_HOST:-127.0.0.1}:${DEVELOPMENT_MYSQL_PORT:?Missing DEVELOPMENT_MYSQL_PORT}:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-    command: --authentication-policy=mysql_native_password
 
   redis:
-    image: redis:8.2.3
+    image: redis:8
+    pull_policy: daily
     volumes:
       - redis-data:/data
 
@@ -40,7 +53,7 @@ services:
     environment:
       DEVELOPMENT_SSH_PASSWORD: ${DEVELOPMENT_SSH_PASSWORD:?Missing DEVELOPMENT_SSH_PASSWORD}
     ports:
-      - "127.0.0.1:${DEVELOPMENT_SSH_PORT:?Missing DEVELOPMENT_SSH_PORT}:22"
+      - "${DEVELOPMENT_BIND_HOST:-127.0.0.1}:${DEVELOPMENT_SSH_PORT:?Missing DEVELOPMENT_SSH_PORT}:22"
     volumes:
       - home:/home/dev
       - ./:/workspace/zeppelin

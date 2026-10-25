@@ -1,0 +1,3 @@
+<template>
+  Server error
+</template>
