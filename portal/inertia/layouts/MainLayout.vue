@@ -4,10 +4,11 @@
     <div class="grid x16" aria-hidden="true"></div>
     <div class="grid x8" aria-hidden="true"></div>
 
-    <div class="wrap">
+    <div class="wrap" :style="styleObj">
       <div class="header">
         <div class="logo">
           <img src="#frontend/assets/logo.svg" />
+          <div class="name">Zeppelin</div>
         </div>
         <div class="menu" role="menubar" aria-label="Main menu">
           <MainMenuItem :active="true">
@@ -18,9 +19,6 @@
           </MainMenuItem>
           <MainMenuItem :active="false">
             <Link href="#">Documentation</Link>
-          </MainMenuItem>
-          <MainMenuItem :active="false">
-            <Link href="#">Privacy policy</Link>
           </MainMenuItem>
         </div>
       </div>
@@ -103,11 +101,6 @@ body {
     width: calc(7 * 64px);
   }
 }
-@media (min-width: 448px) {
-  .wrap {
-    width: calc(7 * 64px);
-  }
-}
 @media (min-width: 576px) {
   .wrap {
     width: calc(9 * 64px);
@@ -133,6 +126,31 @@ body {
     width: calc(17 * 64px);
   }
 }
+@media (min-width: 1216px) {
+  .wrap {
+    width: calc(19 * 64px);
+  }
+}
+@media (min-width: 1344px) {
+  .wrap {
+    width: calc(21 * 64px);
+  }
+}
+@media (min-width: 1472px) {
+  .wrap {
+    width: calc(23 * 64px);
+  }
+}
+@media (min-width: 1600px) {
+  .wrap {
+    width: calc(25 * 64px);
+  }
+}
+@media (min-width: 1728px) {
+  .wrap {
+    width: calc(27 * 64px);
+  }
+}
 
 .header {
   height: 64px;
@@ -144,6 +162,7 @@ body {
   flex: 0 0 calc(64px * 4);
   margin: -16px 0 -17px;
   padding-left: 2px;
+  position: relative;
 }
 .logo img {
   width: 100%;
@@ -151,11 +170,24 @@ body {
   object-fit: contain;
   object-position: left center;
 }
+.logo .name {
+  font-size: 24px;
+  font-weight: 500;
+  padding: 4px 8px;
+  background-color: #f4f0e4;
+  color: #293d49;
+  box-shadow: 3px 3px 12px -2px rgba(0, 0, 0);
+  position: absolute;
+  top: 50%;
+  right: 50px;
+  transform: translateY(-50%) rotateZ(-5deg);
+  transform-origin: 50% 50%;
+}
 .menu {
   flex: 1 1 auto;
   justify-content: flex-end;
   align-items: center;
-  gap: 32px;
+  gap: 64px;
   font-weight: 450;
 
   display: none;
@@ -195,9 +227,20 @@ body {
 </style>
 
 <script setup lang="ts">
-import { client } from "#frontend/client.js";
 import BasicLink from "#frontend/components/BasicLink.vue";
 import MainMenuItem from "#frontend/components/MainMenuItem.vue";
 import FlashToasts from "#frontend/features/toasts/FlashToasts.vue";
 import { Link } from "@adonisjs/inertia/vue";
+import { computed } from "vue";
+
+const props = defineProps({
+  maxWidthStep: {
+    type: Number,
+    default: 6,
+  },
+});
+
+const styleObj = computed(() => ({
+  maxWidth: `${(5 + props.maxWidthStep * 2) * 64}px`,
+}));
 </script>

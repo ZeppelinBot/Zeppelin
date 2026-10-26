@@ -4,7 +4,7 @@
 
 <style scoped>
 .squiggle {
-  background-image: url(#frontend/assets/squiggle.svg);
+  background-image: url(../assets/squiggle.svg);
   background-repeat: repeat-x;
   background-size: auto 100%;
 }

@@ -1,26 +1,28 @@
 <template>
-  <MainLayout>
-    <div class="splash">
-      <h1>Zeppelin</h1>
-      <div class="blurb">
-        Zeppelin is a private moderation bot for Discord, designed with large servers and reliability in mind.
-      </div>
-      <div class="actions">
-        <div class="action">
-          <BasicButton class="action-btn">Dashboard</BasicButton>
+  <MainLayout :max-width-step="5">
+    <ContentPaper>
+      <div class="splash-content">
+        <h1>Zeppelin</h1>
+        <div class="blurb">
+          Zeppelin is a private moderation bot for Discord, designed with large servers and reliability in mind.
         </div>
-        <div class="action">
-          <BasicButton class="action-btn">Documentation</BasicButton>
+        <div class="actions">
+          <div class="action">
+            <BasicButton class="action-btn">Dashboard</BasicButton>
+          </div>
+          <div class="action">
+            <BasicButton class="action-btn">Documentation</BasicButton>
+          </div>
         </div>
       </div>
-    </div>
+    </ContentPaper>
   </MainLayout>
 </template>
 
 <style scoped>
-.splash {
+.splash-content {
   text-align: center;
-  margin-top: 32px;
+  padding-top: 32px;
 }
 h1 {
   font-size: 90px;
@@ -44,14 +46,12 @@ h1 {
   flex: 0 0 auto;
 }
 .action-btn {
-  width: 192px;
-  height: 64px;
   font-size: 20px;
-  font-weight: 400;
 }
 </style>
 
 <script setup lang="ts">
 import BasicButton from "#frontend/components/BasicButton.vue";
+import ContentPaper from "#frontend/components/ContentPaper.vue";
 import MainLayout from "#frontend/layouts/MainLayout.vue";
 </script>

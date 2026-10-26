@@ -77,6 +77,9 @@
   --color-gray-900: rgb(27, 27, 27);
   --color-gray-950: rgb(17, 17, 17);
 
+  --color-ink-dark: hsl(203, 28%, 22%);
+  --color-ink-light: hsl(202, 21%, 82%);
+
   --text-base: 16px;
   --text-lg: 24px;
   --text-xl: 32px;
@@ -108,5 +111,5 @@ body {
     helvetica,
     arial,
     sans-serif;
-  font-weight: 350;
+  font-weight: 400;
 }
