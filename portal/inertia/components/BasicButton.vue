@@ -1,10 +1,8 @@
 <template>
-  <button>
+  <button :class="`theme-${props.theme}`">
     <slot />
   </button>
 </template>
-
-<script setup lang="ts"></script>
 
 <style scoped>
 button {
@@ -49,9 +47,21 @@ button:active {
   box-shadow: none;
   transform: translateY(0.15em);
 }
+.theme-dark {
+  --fg-color: rgb(200, 200, 200);
+}
 @media (prefers-color-scheme: dark) {
-  button {
+  button.theme-auto {
     --fg-color: rgb(200, 200, 200);
   }
 }
 </style>
+
+<script setup lang="ts">
+const props = defineProps({
+  theme: {
+    type: String,
+    default: "auto",
+  },
+});
+</script>

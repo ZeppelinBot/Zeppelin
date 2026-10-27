@@ -12,6 +12,12 @@ const routes = {
     tokens: [{"old":"/","type":0,"val":"/","end":""}],
     types: placeholder as Registry['splash.get_index']['types'],
   },
+  'docs.get_index': {
+    methods: ["GET","HEAD"],
+    pattern: '/docs',
+    tokens: [{"old":"/docs","type":0,"val":"docs","end":""}],
+    types: placeholder as Registry['docs.get_index']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

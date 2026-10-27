@@ -19,4 +19,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/splash/controllers/SplashController').default['getIndex']>>>
     }
   }
+  'docs.get_index': {
+    methods: ["GET","HEAD"]
+    pattern: '/docs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/docs/controllers/DocsController').default['getIndex']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/docs/controllers/DocsController').default['getIndex']>>>
+    }
+  }
 }

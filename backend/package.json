@@ -22,6 +22,7 @@
     "migrate-rollback-dev": "pnpm run build && pnpm run migrate-rollback",
     "validate-active-configs": "node --enable-source-maps dist/validateActiveConfigs.js > ../config-errors.txt",
     "export-config-json-schema": "node --enable-source-maps dist/exportSchemas.js ../config-checker/public/config-schema.json",
+    "export-docs-data": "node --enable-source-maps dist/exportDocsData.js ../shared/src/docsData.json",
     "test": "pnpm run build && pnpm run run-tests",
     "run-tests": "ava"
   },
@@ -84,6 +85,12 @@
     "source-map-support": "^0.5.16",
     "ts-toolbelt": "^9.6.0",
     "typescript": "catalog:ts7"
+  },
+  "exports": {
+    "./*.js": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    }
   },
   "ava": {
     "files": [

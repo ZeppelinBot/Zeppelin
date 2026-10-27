@@ -85,18 +85,8 @@
   --text-xl: 32px;
   --text-xl2: 40px;
   --text-xl3: 48px;
-}
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font:
-    16px/1.2 "Recursive Variable",
+  --font-stack-system-sans:
     -apple-system,
     BlinkMacSystemFont,
     avenir next,
@@ -111,5 +101,31 @@ body {
     helvetica,
     arial,
     sans-serif;
+  --font-stack-recursive: "Recursive Variable", var(--font-stack-system-sans);
+  --font-stack-playpen-sans: "Playpen Sans Variable", var(--font-stack-system-sans);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font: 16px/1.2 var(--font-stack-system-sans);
   font-weight: 400;
+}
+
+@layer base {
+  body {
+    background-color: white;
+    color: black;
+  }
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: black;
+      color: white;
+    }
+  }
 }

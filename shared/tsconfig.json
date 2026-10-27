@@ -5,7 +5,8 @@
     "module": "NodeNext",
     "rootDir": "./src",
     "outDir": "./dist",
-    "declaration": true
+    "declaration": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts"]
 }

@@ -3,8 +3,8 @@
     <div class="foreground-paper">
       <slot></slot>
       <div class="footer" aria-hidden="true">
-        <div class="footer-left">Zeppelin Specification</div>
-        <div class="footer-right">01</div>
+        <div class="footer-left">{{ props.footerText }}</div>
+        <div class="footer-right">{{ String(props.footerNumber).padStart(2, "0") }}</div>
       </div>
     </div>
     <div class="background-paper"></div>
@@ -14,6 +14,8 @@
 <style scoped>
 .content-paper {
   position: relative;
+}
+.content-paper + .content-paper {
   margin-top: 32px;
 }
 .foreground-paper {
@@ -39,6 +41,8 @@
   z-index: 2;
 
   padding: 32px 32px 24px 32px;
+
+  font: 16px/1.4 var(--font-stack-recursive);
 }
 .footer {
   padding-top: 64px;
@@ -66,8 +70,8 @@
 @media (prefers-color-scheme: dark) {
   .foreground-paper {
     --stripe-color: rgba(0, 0, 0, 0.03);
-    background-image:
-      radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.1) 0%, transparent 100%),
+    background:
+      /* radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.1) 0%, transparent 100%) 100% 100%, */
       repeating-linear-gradient(
         1deg,
         var(--stripe-color) 0px,
@@ -75,8 +79,9 @@
         transparent 3px,
         transparent 5px,
         var(--stripe-color) 6px
-      ),
-      url(../assets/charcoal-noise.webp);
+      ) 100% 100%,
+      url(../../assets/charcoal-noise.webp) repeat top left / 50% 50%,
+      #222;
     color: rgb(213, 213, 213);
     border: 1px solid #3b4141;
   }
@@ -84,11 +89,40 @@
     color: rgb(80, 80, 80);
   }
   .background-paper {
-    background-image: url(../assets/charcoal-noise.webp);
+    background-image: url(../../assets/charcoal-noise.webp);
     border: 1px solid #3b4141;
   }
+}
+
+/* Content styles */
+
+.content-paper :deep(h1) {
+  margin: 0 0 32px;
+  font-size: 32px;
+  font-weight: 700;
+}
+.content-paper :deep(h2) {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 700;
+}
+.content-paper :deep(p) {
+  margin: 0 0 48px;
+}
+.content-paper :deep(a) {
+  color: currentColor;
 }
 </style>
 
 <script setup lang="ts">
+const props = defineProps({
+  footerText: {
+    type: String,
+    default: "Zeppelin",
+  },
+  footerNumber: {
+    type: Number,
+    default: 1,
+  },
+});
 </script>

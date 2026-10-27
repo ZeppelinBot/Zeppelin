@@ -4,6 +4,9 @@
  */
 
 export const controllers = {
+  docs: {
+    Docs: () => import('#backend/features/docs/controllers/DocsController'),
+  },
   splash: {
     Splash: () => import('#backend/features/splash/controllers/SplashController'),
   },

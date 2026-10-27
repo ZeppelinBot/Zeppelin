@@ -1,4 +1,5 @@
 import "@fontsource-variable/recursive";
+import "@fontsource-variable/playpen-sans";
 import "./css/global.css";
 import "vue-sonner/style.css";
 import { client } from "#frontend/client.js";
@@ -7,7 +8,7 @@ import { TuyauProvider } from "@adonisjs/inertia/vue";
 import { createApp, type DefineComponent, h } from "vue";
 import { resolvePageComponent } from "@adonisjs/inertia/helpers";
 
-const appName = import.meta.env.VITE_APP_NAME || "AdonisJS";
+const appName = import.meta.env.VITE_APP_NAME || "Zeppelin";
 
 createInertiaApp({
   title: (title) => (title ? `${title} - ${appName}` : appName),

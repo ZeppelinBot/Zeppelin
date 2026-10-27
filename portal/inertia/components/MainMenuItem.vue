@@ -14,8 +14,6 @@
   color: inherit;
 }
 .squiggle {
-  width: 100%;
-  height: 4px;
   visibility: hidden;
 }
 .active .squiggle {

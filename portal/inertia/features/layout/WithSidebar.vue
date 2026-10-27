@@ -13,10 +13,10 @@
 .with-sidebar {
   display: flex;
   align-items: flex-start;
-  gap: 32px;
+  gap: 24px;
 }
 .sidebar-wrap {
-  flex: 0 0 240px;
+  flex: 0 0 calc(96px * 2.5);
 }
 .content-wrap {
   flex: 1 1 100%;

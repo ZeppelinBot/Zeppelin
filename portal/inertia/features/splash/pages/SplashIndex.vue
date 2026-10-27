@@ -1,5 +1,5 @@
 <template>
-  <MainLayout :max-width-step="5">
+  <MainLayout :max-width-step="20">
     <ContentPaper>
       <div class="splash-content">
         <h1>Zeppelin</h1>
@@ -24,7 +24,7 @@
   text-align: center;
   padding-top: 32px;
 }
-h1 {
+.splash-content h1 {
   font-size: 90px;
   line-height: 128px;
   border: none;
@@ -52,6 +52,6 @@ h1 {
 
 <script setup lang="ts">
 import BasicButton from "#frontend/components/BasicButton.vue";
-import ContentPaper from "#frontend/components/ContentPaper.vue";
-import MainLayout from "#frontend/layouts/MainLayout.vue";
+import ContentPaper from "#frontend/features/layout/ContentPaper.vue";
+import MainLayout from "#frontend/features/layout/MainLayout.vue";
 </script>

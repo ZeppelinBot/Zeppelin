@@ -17,6 +17,8 @@ declare module '@adonisjs/inertia/types' {
 
   export interface InertiaPages {
 
+    'features/docs/pages/DocsIndex': ExtractProps<(typeof import('../../inertia/features/docs/pages/DocsIndex.vue'))['default']>
+
     'features/errors/pages/NotFound': ExtractProps<(typeof import('../../inertia/features/errors/pages/NotFound.vue'))['default']>
 
     'features/errors/pages/ServerError': ExtractProps<(typeof import('../../inertia/features/errors/pages/ServerError.vue'))['default']>
