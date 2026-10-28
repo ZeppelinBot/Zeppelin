@@ -12,16 +12,38 @@
           <div class="name">Zeppelin</div>
         </div>
         <div class="menu" role="menubar" aria-label="Main menu">
-          <MainMenuItem :active="true">
-            <Link route="splash.get_index">Home</Link>
+          <MainMenuItem v-for="item in mainMenuItems" :active="menuItemIsActive(item, currentPath)">
+            <Link :href="item.path">
+              {{ item.label }}
+            </Link>
+            <Squiggle class="squiggle" />
           </MainMenuItem>
-          <MainMenuItem :active="false">
-            <Link href="#">Dashboard</Link>
-          </MainMenuItem>
-          <MainMenuItem :active="false">
-            <Link href="#">Documentation</Link>
+          <MainMenuItem>
+            <BasicButton theme="menu">
+              Log out
+            </BasicButton>
           </MainMenuItem>
         </div>
+        <div class="mobile-menu-toggle">
+          <BasicButton theme="menu" role="button" aria-controls="mobile-menu" :aria-expanded="mobileMenuIsOpen" @click="mobileMenuIsOpen = !mobileMenuIsOpen">
+            Menu
+          </BasicButton>
+        </div>
+      </div>
+      <div id="mobile-menu" class="mobile-menu" :class="{ expanded: mobileMenuIsOpen }">
+        <MainMenuItem v-for="item in mainMenuItems" :active="menuItemIsActive(item, currentPath)">
+          <Link class="mobile-menu-item-link" :href="item.path">
+            <div class="mobile-menu-item-text">
+              {{ item.label }}
+              <Squiggle class="squiggle" />
+            </div>
+          </Link>
+        </MainMenuItem>
+        <MainMenuItem>
+          <BasicButton theme="menu">
+            Log out
+          </BasicButton>
+        </MainMenuItem>
       </div>
       <div class="content">
         <slot></slot>
@@ -100,23 +122,26 @@ a {
 }
 
 .main-layout-wrap {
-  width: calc(1 * var(--layout-grid-size));
+  width: calc(7 * var(--layout-grid-size));
   margin: 0 auto;
   padding: var(--layout-grid-size) 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: calc(var(--layout-grid-size) * 2);
+  gap: var(--layout-grid-size);
+  overflow: hidden;
 }
 
 .header {
   height: calc(var(--layout-grid-size) * 2);
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  justify-content: space-between;
   gap: 32px;
+  padding: 0 24px;
 }
 .logo {
-  flex: 0 0 calc(var(--layout-grid-size) * 6);
+  flex: 0 0 calc(var(--layout-grid-size) * 4);
   margin: -16px 0 -17px;
   padding-left: 2px;
   position: relative;
@@ -141,7 +166,7 @@ a {
   transform-origin: 50% 50%;
 }
 .menu {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   justify-content: flex-end;
   align-items: center;
   gap: 48px;
@@ -150,19 +175,53 @@ a {
 
   display: none;
 }
-@media (min-width: 832px) {
-  .menu {
-    display: flex;
-  }
-}
 .menu-item {
   padding: 0 16px;
 }
-.profile {
-  flex: 0 0 calc(64px * 3);
+.account {
+  display: none;
+}
+.mobile-menu-toggle {
+  flex: 0 0 auto;
+}
+.mobile-menu {
+  display: none;
+  background: url(../../assets/charcoal-noise.webp) repeat top left / 50% 50%, #222;
+  padding: 24px;
+  box-shadow: 5px 5px 16px -2px rgba(0, 0, 0, 0.75);
+  margin-top: -48px;
+
+  flex-direction: column;
+  gap: 8px;
+}
+.mobile-menu.expanded {
   display: flex;
-  align-items: center;
-  gap: 48px;
+}
+.mobile-menu-item-link {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+@media (min-width: 960px) {
+  .header {
+    padding: 0;
+  }
+  .logo {
+    flex-basis: calc(var(--layout-grid-size) * 6);
+  }
+  .menu {
+    display: flex;
+  }
+  .account {
+    display: flex;
+  }
+  .mobile-menu-toggle {
+    display: none;
+  }
+  .mobile-menu {
+    display: none;
+  }
 }
 
 .content {
@@ -185,12 +244,19 @@ a {
 </style>
 
 <script setup lang="ts">
+import { MenuItem } from "#backend/features/menu/types";
+import BasicButton from "#frontend/components/BasicButton.vue";
 import BasicLink from "#frontend/components/BasicLink.vue";
 import MainMenuItem from "#frontend/components/MainMenuItem.vue";
+import Squiggle from "#frontend/components/Squiggle.vue";
 import { LAYOUT_GRID_SIZE_PX } from "#frontend/features/layout/measurements.js";
+import { menuItemIsActive } from "#frontend/features/menu/menuItemIsActive.js";
 import FlashToasts from "#frontend/features/toasts/FlashToasts.vue";
+import { useCurrentPath } from "#frontend/features/utils/useCurrentPath.js";
 import { Link } from "@adonisjs/inertia/vue";
 import { computed, onMounted, ref } from "vue";
+
+const currentPath = useCurrentPath();
 
 const props = defineProps({
   maxWidthStep: {
@@ -214,7 +280,7 @@ const rootCss = computed(() => `
   }
 `);
 
-const breakpointSteps = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
+const breakpointSteps = [8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
 const wrapCss = computed(() => {
   return breakpointSteps
     .map((step) => `
@@ -226,4 +292,25 @@ const wrapCss = computed(() => {
     `)
     .join("\n");
 });
+
+const mainMenuItems: MenuItem[] = [
+  {
+    label: "Home",
+    path: "/",
+  },
+  {
+    label: "Documentation",
+    path: "/docs",
+  },
+  {
+    label: "Dashboard",
+    path: "/dashboard",
+  },
+  {
+    label: "Account",
+    path: "/account",
+  },
+];
+
+const mobileMenuIsOpen = ref(false);
 </script>

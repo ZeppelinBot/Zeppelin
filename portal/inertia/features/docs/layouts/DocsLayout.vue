@@ -2,8 +2,8 @@
   <MainLayout>
     <WithSidebar>
       <template #sidebar>
-        <nav>
-          <SidebarMenu :categories="page.props.docsLayoutData.menu" :current-path="path" />
+        <nav aria-label="Documentation menu">
+          <SidebarMenu :categories="page.props.docsLayoutData.menu" :current-path="currentPath" />
         </nav>
       </template>
       <template #content>
@@ -21,14 +21,11 @@ import { DocsLayoutData } from '#backend/features/docs/utils/docsLayoutData';
 import WithSidebar from '#frontend/features/layout/WithSidebar.vue';
 import MainLayout from '#frontend/features/layout/MainLayout.vue';
 import { usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
-import { Link } from '@adonisjs/inertia/vue';
-import Squiggle from '#frontend/components/Squiggle.vue';
 import SidebarMenu from '#frontend/features/layout/SidebarMenu.vue';
+import { useCurrentPath } from '#frontend/features/utils/useCurrentPath.js';
 
 const page = usePage<{
   docsLayoutData: DocsLayoutData,
 }>();
-
-const path = computed(() => page.url.split("?")[0].replace(/\/$/, ""));
+const currentPath = useCurrentPath();
 </script>

@@ -1,7 +1,6 @@
 <template>
   <div class="main-menu-item" :class="{ active: props.active }" :aria-current="props.active" role="menuitem">
     <div class="link"><slot /></div>
-    <Squiggle class="squiggle" />
   </div>
 </template>
 
@@ -13,17 +12,15 @@
 .link > :deep(*:visited) {
   color: inherit;
 }
-.squiggle {
+.link :deep(.squiggle) {
   visibility: hidden;
 }
-.active .squiggle {
+.active :deep(.squiggle) {
   visibility: visible;
 }
 </style>
 
 <script setup lang="ts">
-import Squiggle from "./Squiggle.vue";
-
 const props = defineProps({
   active: {
     type: Boolean,

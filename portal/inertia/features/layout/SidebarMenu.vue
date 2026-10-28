@@ -4,7 +4,7 @@
       <div class="title">{{ menuCategory.title }}</div>
       <ul class="submenu">
         <li v-for="item of menuCategory.items">
-          <Link class="menu-link" :class="{ active: isActive(item) }" :href="item.path">
+          <Link class="menu-link" :class="{ active: menuItemIsActive(item, props.currentPath) }" :href="item.path">
             {{ item.label }}
             <Squiggle class="squiggle" />
           </Link>
@@ -57,8 +57,9 @@
 </style>
 
 <script setup lang="ts">
-import { MenuCategory, MenuItem } from '#backend/features/menu/types';
+import { MenuCategory } from '#backend/features/menu/types';
 import Squiggle from '#frontend/components/Squiggle.vue';
+import { menuItemIsActive } from '#frontend/features/menu/menuItemIsActive.js';
 import { Link } from '@adonisjs/inertia/vue';
 import { PropType } from 'vue';
 
@@ -72,8 +73,4 @@ const props = defineProps({
     default: "",
   },
 });
-
-const isActive = (item: MenuItem) => {
-  return item.activeStartsWith ? props.currentPath.startsWith(item.path) : props.currentPath === item.path;
-};
 </script>

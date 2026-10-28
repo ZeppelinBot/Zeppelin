@@ -40,7 +40,7 @@
   box-shadow: 5px 5px 16px -2px rgba(0, 0, 0, 0.75);
   z-index: 2;
 
-  padding: 32px 32px 24px 32px;
+  padding: 12px;
 
   font: 16px/1.4 var(--font-stack-recursive);
 }
@@ -91,6 +91,12 @@
   .background-paper {
     background-image: url(../../assets/charcoal-noise.webp);
     border: 1px solid #3b4141;
+  }
+}
+
+@media (min-width: 960px) {
+  .foreground-paper {
+    padding: 32px;
   }
 }
 

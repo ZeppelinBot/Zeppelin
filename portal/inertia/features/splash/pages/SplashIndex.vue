@@ -22,14 +22,10 @@
 <style scoped>
 .splash-content {
   text-align: center;
-  padding-top: 32px;
 }
 .splash-content h1 {
-  font-size: 90px;
+  font-size: 48px;
   line-height: 128px;
-  border: none;
-  margin: 0;
-  font-weight: 600;
 }
 .blurb {
   margin-top: 16px;
@@ -37,16 +33,34 @@
 }
 
 .actions {
-  margin-top: 64px;
   display: flex;
-  gap: 64px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 48px;
+  align-items: center;
 }
 .action {
   flex: 0 0 auto;
 }
 .action-btn {
   font-size: 20px;
+}
+
+@media (min-width: 960px) {
+  .splash-content {
+    padding-top: 32px;
+  }
+  .splash-content h1 {
+    font-size: 90px;
+    line-height: 128px;
+  }
+  .actions {
+    flex-direction: row;
+    margin-top: 72px;
+    display: flex;
+    gap: 72px;
+    justify-content: center;
+  }
 }
 </style>
 

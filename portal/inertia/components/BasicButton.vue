@@ -50,6 +50,9 @@ button:active {
 .theme-dark {
   --fg-color: rgb(200, 200, 200);
 }
+.theme-menu {
+  --fg-color: rgb(232, 232, 232);
+}
 @media (prefers-color-scheme: dark) {
   button.theme-auto {
     --fg-color: rgb(200, 200, 200);
