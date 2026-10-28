@@ -1,10 +1,10 @@
-export interface MenuItem {
+export type MenuItem = {
   label: string;
   path: string;
   activeStartsWith?: boolean;
-}
+};
 
-export interface MenuCategory {
+export type MenuCategory = {
   title: string;
   items: MenuItem[];
-}
+};

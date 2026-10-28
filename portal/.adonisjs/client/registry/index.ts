@@ -18,6 +18,42 @@ const routes = {
     tokens: [{"old":"/docs","type":0,"val":"docs","end":""}],
     types: placeholder as Registry['docs.get_index']['types'],
   },
+  'auth.get_discord_login': {
+    methods: ["GET","HEAD"],
+    pattern: '/oauth/discord/login',
+    tokens: [{"old":"/oauth/discord/login","type":0,"val":"oauth","end":""},{"old":"/oauth/discord/login","type":0,"val":"discord","end":""},{"old":"/oauth/discord/login","type":0,"val":"login","end":""}],
+    types: placeholder as Registry['auth.get_discord_login']['types'],
+  },
+  'auth.get_discord_callback': {
+    methods: ["GET","HEAD"],
+    pattern: '/oauth/discord/callback',
+    tokens: [{"old":"/oauth/discord/callback","type":0,"val":"oauth","end":""},{"old":"/oauth/discord/callback","type":0,"val":"discord","end":""},{"old":"/oauth/discord/callback","type":0,"val":"callback","end":""}],
+    types: placeholder as Registry['auth.get_discord_callback']['types'],
+  },
+  'auth.post_logout': {
+    methods: ["POST"],
+    pattern: '/logout',
+    tokens: [{"old":"/logout","type":0,"val":"logout","end":""}],
+    types: placeholder as Registry['auth.post_logout']['types'],
+  },
+  'account.get_account_page': {
+    methods: ["GET","HEAD"],
+    pattern: '/account',
+    tokens: [{"old":"/account","type":0,"val":"account","end":""}],
+    types: placeholder as Registry['account.get_account_page']['types'],
+  },
+  'account.post_download_account_data': {
+    methods: ["POST"],
+    pattern: '/account/download-data',
+    tokens: [{"old":"/account/download-data","type":0,"val":"account","end":""},{"old":"/account/download-data","type":0,"val":"download-data","end":""}],
+    types: placeholder as Registry['account.post_download_account_data']['types'],
+  },
+  'account.post_delete_account_data': {
+    methods: ["POST"],
+    pattern: '/account/delete-data',
+    tokens: [{"old":"/account/delete-data","type":0,"val":"account","end":""},{"old":"/account/delete-data","type":0,"val":"delete-data","end":""}],
+    types: placeholder as Registry['account.post_delete_account_data']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

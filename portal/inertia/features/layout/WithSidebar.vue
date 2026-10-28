@@ -1,7 +1,9 @@
 <template>
   <div class="sidebar-mobile-trigger">
-    <BasicButton theme="menu" role="button" :aria-controls="sidebarId" :aria-expanded="sidebarExpanded" @click="sidebarExpanded = !sidebarExpanded">
-      <slot name="mobile-trigger">Toggle sidebar</slot>
+    <BasicButton theme="menu">
+      <button role="button" :aria-controls="sidebarId" :aria-expanded="sidebarExpanded" @click="sidebarExpanded = !sidebarExpanded">
+        <slot name="mobile-trigger">Toggle sidebar</slot>
+      </button>
     </BasicButton>
   </div>
   <div class="with-sidebar">

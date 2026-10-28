@@ -8,10 +8,14 @@
         </div>
         <div class="actions">
           <div class="action">
-            <BasicButton class="action-btn">Dashboard</BasicButton>
+            <BasicButton>
+              <Link class="action-btn" href="/dashboard">Dashboard</Link>
+            </BasicButton>
           </div>
           <div class="action">
-            <BasicButton class="action-btn">Documentation</BasicButton>
+            <BasicButton>
+              <Link class="action-btn" href="/docs">Documentation</Link>
+            </BasicButton>
           </div>
         </div>
       </div>
@@ -68,4 +72,5 @@
 import BasicButton from "#frontend/components/BasicButton.vue";
 import ContentPaper from "#frontend/features/layout/ContentPaper.vue";
 import MainLayout from "#frontend/features/layout/MainLayout.vue";
+import { Link } from "@adonisjs/inertia/vue";
 </script>

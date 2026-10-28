@@ -19,7 +19,7 @@ const authConfig = defineConfig({
       useRememberMeTokens: false,
 
       provider: sessionUserProvider({
-        model: () => import("#backend/features/portalUsers/models/PortalUser"),
+        model: () => import("#backend/features/auth/models/PortalUser"),
       }),
     }),
   },

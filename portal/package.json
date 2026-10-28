@@ -43,6 +43,7 @@
     "youch": "^4.1.1"
   },
   "dependencies": {
+    "@adonisjs/ally": "^6.3.2",
     "@adonisjs/auth": "^10.1.0",
     "@adonisjs/core": "^7.5.2",
     "@adonisjs/cors": "^3.0.0",
@@ -66,6 +67,7 @@
     "luxon": "^3.7.2",
     "mysql2": "^3.23.0",
     "reflect-metadata": "^0.2.2",
+    "reka-ui": "^2.11.0",
     "vue": "^3.5.43",
     "vue-sonner": "^2.0.9",
     "zod": "^4.4.3"

@@ -1,19 +1,34 @@
 <template>
-  <button :class="`theme-${props.theme}`">
+  <Slot class="button" :class="`theme-${props.theme}`">
     <slot />
-  </button>
+  </Slot>
 </template>
 
 <style scoped>
-button {
+/* Reset target element styles */
+@layer reset {
+  button.button {
+    appearance: none;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+  }
+
+  a.button {
+    color: inherit;
+    font: inherit;
+    text-decoration: none;
+  }
+}
+
+/* Actual button styles */
+.button {
   --bg-color: rgba(0, 0, 0, 0.02);
   --fg-color: var(--color-ink-dark);
   --stripe-color: color-mix(in lab, var(--fg-color), transparent 95%);
 
   display: inline-block;
-  font: inherit;
-  display: block;
-  appearance: none;
   color: var(--fg-color);
   border: 0.1em solid var(--fg-color);
   border-radius: 8px;
@@ -34,16 +49,13 @@ button {
     );
   position: relative;
 
-  /* box-shadow: 2px 5px 0px var(--color-steelblue-800); */
   box-shadow: 0 0.15em 0px var(--fg-color);
 }
-button:hover {
-  /* --bg-color: rgba(255, 255, 255, 0.1); */
-  /* --fg-color: color-mix(in lab, currentColor, white 10%); */
+.button:hover {
   box-shadow: 0 0.075em 0px var(--fg-color);
   transform: translateY(0.075em);
 }
-button:active {
+.button:active {
   box-shadow: none;
   transform: translateY(0.15em);
 }
@@ -53,14 +65,22 @@ button:active {
 .theme-menu {
   --fg-color: rgb(232, 232, 232);
 }
+.theme-danger {
+  --fg-color: rgb(170, 21, 21);
+}
 @media (prefers-color-scheme: dark) {
-  button.theme-auto {
+  .button.theme-auto {
     --fg-color: rgb(200, 200, 200);
+  }
+  .theme-danger {
+    --fg-color: rgb(255, 96, 96);
   }
 }
 </style>
 
 <script setup lang="ts">
+import { Slot } from "reka-ui";
+
 const props = defineProps({
   theme: {
     type: String,

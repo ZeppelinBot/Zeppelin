@@ -117,7 +117,7 @@ body {
   font-weight: 400;
 }
 
-@layer base {
+@layer rootBase {
   body {
     background-color: white;
     color: black;
@@ -129,3 +129,7 @@ body {
     }
   }
 }
+
+@layer base {}
+
+@layer reset {}

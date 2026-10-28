@@ -32,4 +32,5 @@ router.use([
 export const middleware = router.named({
   guest: () => import("#backend/middleware/guestMiddleware"),
   auth: () => import("#backend/middleware/authMiddleware"),
+  authPage: () => import("#backend/features/auth/middleware/authPageMiddleware"),
 });

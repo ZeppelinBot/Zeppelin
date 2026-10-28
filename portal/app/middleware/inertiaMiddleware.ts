@@ -1,7 +1,7 @@
 import type { HttpContext } from "@adonisjs/core/http";
 import type { NextFn } from "@adonisjs/core/types/http";
 import BaseInertiaMiddleware from "@adonisjs/inertia/inertia_middleware";
-import { PortalUserTransformer } from "#backend/features/portalUsers/transformers/PortalUserTransformer";
+import { PortalUserTransformer } from "#backend/features/auth/transformers/PortalUserTransformer";
 
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
   share(ctx: HttpContext) {

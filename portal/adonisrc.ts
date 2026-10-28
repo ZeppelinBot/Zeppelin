@@ -1,6 +1,6 @@
-import { indexEntities } from "@adonisjs/core/generators";
-import { defineConfig } from "@adonisjs/core/app";
-import { generateRegistry } from "@tuyau/core/hooks";
+import { indexEntities } from "@adonisjs/core/generators"
+import { defineConfig } from "@adonisjs/core/app"
+import { generateRegistry } from "@tuyau/core/hooks"
 
 export default defineConfig({
   /*
@@ -59,6 +59,7 @@ export default defineConfig({
     () => import("@adonisjs/auth/auth_provider"),
     () => import("@adonisjs/redis/redis_provider"),
     () => import("#providers/apiProvider"),
+    () => import('@adonisjs/ally/ally_provider')
   ],
 
   /*
@@ -163,4 +164,4 @@ export default defineConfig({
     buildStarting: [() => import("@adonisjs/vite/build_hook")],
     devServerStarting: [() => import("./hooks/devHmrPort.ts")],
   },
-});
+})

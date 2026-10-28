@@ -101,22 +101,23 @@
 }
 
 /* Content styles */
-
-.content-paper :deep(h1) {
-  margin: 0 0 32px;
-  font-size: 32px;
-  font-weight: 700;
-}
-.content-paper :deep(h2) {
-  margin: 0 0 12px;
-  font-size: 24px;
-  font-weight: 700;
-}
-.content-paper :deep(p) {
-  margin: 0 0 48px;
-}
-.content-paper :deep(a) {
-  color: currentColor;
+@layer base {
+  .content-paper :deep(h1) {
+    margin: 0 0 32px;
+    font-size: 32px;
+    font-weight: 700;
+  }
+  .content-paper :deep(h2) {
+    margin: 0 0 12px;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .content-paper :deep(p) {
+    margin: 0 0 48px;
+  }
+  .content-paper :deep(a) {
+    color: currentColor;
+  }
 }
 </style>
 

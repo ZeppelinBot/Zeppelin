@@ -6,14 +6,14 @@
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type { InferSharedProps, InferFlashData } from '@adonisjs/inertia/types'
-import type PortalUsersPortalUserTransformer from '#backend/features/portalUsers/transformers/PortalUserTransformer'
+import type AuthPortalUserTransformer from '#backend/features/auth/transformers/PortalUserTransformer'
 import type InertiaMiddleware from '#backend/middleware/inertiaMiddleware'
 
 export namespace Data {
-  export namespace PortalUsers {
-    export type PortalUser = InferData<PortalUsersPortalUserTransformer>
+  export namespace Auth {
+    export type PortalUser = InferData<AuthPortalUserTransformer>
     export namespace PortalUser {
-      export type Variants = InferVariants<PortalUsersPortalUserTransformer>
+      export type Variants = InferVariants<AuthPortalUserTransformer>
     }
   }
   export type SharedProps = InferSharedProps<InertiaMiddleware>

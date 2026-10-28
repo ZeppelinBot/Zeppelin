@@ -7,9 +7,9 @@
 |
 */
 
-// import { middleware } from '#start/kernel'
 import { docsLayoutData } from "#backend/features/docs/utils/docsLayoutData";
 import { controllers } from "#generated/controllers";
+import { middleware } from "#start/kernel";
 import router from "@adonisjs/core/services/router";
 
 router.get("/", [controllers.splash.Splash, "getIndex"]);
@@ -23,21 +23,15 @@ router.group(() => {
   return next();
 });
 
-// router.on('/').renderInertia('home', {}).as('home')
+router.group(() => {
+  router.get("/oauth/discord/login", [controllers.auth.Auth, "getDiscordLogin"]);
+  router.get("/oauth/discord/callback", [controllers.auth.Auth, "getDiscordCallback"]);
+}).middleware(middleware.guest());
 
-// router
-//   .group(() => {
-//     router.get('signup', [controllers.NewAccount, 'create'])
-//     router.post('signup', [controllers.NewAccount, 'store'])
+router.post("/logout", [controllers.auth.Auth, "postLogout"]);
 
-//     router.get('login', [controllers.Session, 'create'])
-//     router.post('login', [controllers.Session, 'store'])
-//   })
-//   .use(middleware.guest())
-
-// router
-//   .group(() => {
-//     router.on('/dashboard').renderInertia('dashboard', {}).as('dashboard')
-//     router.post('logout', [controllers.Session, 'destroy'])
-//   })
-//   .use(middleware.auth())
+router.group(() => {
+  router.get("/account", [controllers.account.Account, "getAccountPage"]);
+  router.post("/account/download-data", [controllers.account.Account, "postDownloadAccountData"]);
+  router.post("/account/delete-data", [controllers.account.Account, "postDeleteAccountData"]);
+}).middleware(middleware.authPage());

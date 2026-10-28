@@ -4,6 +4,12 @@
  */
 
 export const controllers = {
+  account: {
+    Account: () => import('#backend/features/account/controllers/AccountController'),
+  },
+  auth: {
+    Auth: () => import('#backend/features/auth/controllers/AuthController'),
+  },
   docs: {
     Docs: () => import('#backend/features/docs/controllers/DocsController'),
   },

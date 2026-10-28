@@ -18,15 +18,22 @@
             </Link>
             <Squiggle class="squiggle" />
           </MainMenuItem>
-          <MainMenuItem>
+          <MainMenuItem v-if="page.props.user">
             <BasicButton theme="menu">
-              Log out
+              <button @click="logout">Log out</button>
+            </BasicButton>
+          </MainMenuItem>
+          <MainMenuItem v-else>
+            <BasicButton theme="menu">
+              <Link href="/oauth/discord/login">Log in</Link>
             </BasicButton>
           </MainMenuItem>
         </div>
         <div class="mobile-menu-toggle">
-          <BasicButton theme="menu" role="button" aria-controls="mobile-menu" :aria-expanded="mobileMenuIsOpen" @click="mobileMenuIsOpen = !mobileMenuIsOpen">
-            Menu
+          <BasicButton theme="menu">
+            <button role="button" aria-controls="mobile-menu" :aria-expanded="mobileMenuIsOpen" @click="mobileMenuIsOpen = !mobileMenuIsOpen">
+              Menu
+            </button>
           </BasicButton>
         </div>
       </div>
@@ -39,9 +46,9 @@
             </div>
           </Link>
         </MainMenuItem>
-        <MainMenuItem>
+        <MainMenuItem v-if="page.props.user">
           <BasicButton theme="menu">
-            Log out
+            <button @click="logout">Log out</button>
           </BasicButton>
         </MainMenuItem>
       </div>
@@ -93,9 +100,12 @@ body {
   min-height: 100vh;
   font: 14px/1.4 var(--font-stack-playpen-sans);
 }
-a {
-  color: #fff;
-  text-decoration: underline;
+
+@layer base {
+  a {
+    color: #fff;
+    text-decoration: underline;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -204,6 +214,9 @@ a {
 }
 
 @media (min-width: 960px) {
+  .main-layout-wrap {
+    gap: calc(var(--layout-grid-size) * 2);
+  }
   .header {
     padding: 0;
   }
@@ -253,10 +266,13 @@ import { LAYOUT_GRID_SIZE_PX } from "#frontend/features/layout/measurements.js";
 import { menuItemIsActive } from "#frontend/features/menu/menuItemIsActive.js";
 import FlashToasts from "#frontend/features/toasts/FlashToasts.vue";
 import { useCurrentPath } from "#frontend/features/utils/useCurrentPath.js";
-import { Link } from "@adonisjs/inertia/vue";
+import { Link, useRouter } from "@adonisjs/inertia/vue";
+import { usePage } from "@inertiajs/vue3";
 import { computed, onMounted, ref } from "vue";
 
+const page = usePage();
 const currentPath = useCurrentPath();
+const router = useRouter();
 
 const props = defineProps({
   maxWidthStep: {
@@ -293,24 +309,33 @@ const wrapCss = computed(() => {
     .join("\n");
 });
 
-const mainMenuItems: MenuItem[] = [
-  {
-    label: "Home",
-    path: "/",
-  },
-  {
-    label: "Documentation",
-    path: "/docs",
-  },
-  {
-    label: "Dashboard",
-    path: "/dashboard",
-  },
-  {
-    label: "Account",
-    path: "/account",
-  },
-];
+const mainMenuItems = computed(() => {
+  const items: MenuItem[] = [
+    {
+      label: "Home",
+      path: "/",
+    },
+    {
+      label: "Documentation",
+      path: "/docs",
+    },
+    {
+      label: "Dashboard",
+      path: "/dashboard",
+    },
+  ];
+  if (page.props.user) {
+    items.push({
+      label: "Account",
+      path: "/account",
+    });
+  }
+  return items;
+});
 
 const mobileMenuIsOpen = ref(false);
+
+const logout = () => {
+  router.post({ route: "auth.post_logout" }, {});
+};
 </script>

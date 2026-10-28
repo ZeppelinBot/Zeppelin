@@ -31,4 +31,76 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/docs/controllers/DocsController').default['getIndex']>>>
     }
   }
+  'auth.get_discord_login': {
+    methods: ["GET","HEAD"]
+    pattern: '/oauth/discord/login'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/auth/controllers/AuthController').default['getDiscordLogin']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/auth/controllers/AuthController').default['getDiscordLogin']>>>
+    }
+  }
+  'auth.get_discord_callback': {
+    methods: ["GET","HEAD"]
+    pattern: '/oauth/discord/callback'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/auth/controllers/AuthController').default['getDiscordCallback']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/auth/controllers/AuthController').default['getDiscordCallback']>>>
+    }
+  }
+  'auth.post_logout': {
+    methods: ["POST"]
+    pattern: '/logout'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/auth/controllers/AuthController').default['postLogout']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/auth/controllers/AuthController').default['postLogout']>>>
+    }
+  }
+  'account.get_account_page': {
+    methods: ["GET","HEAD"]
+    pattern: '/account'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['getAccountPage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['getAccountPage']>>>
+    }
+  }
+  'account.post_download_account_data': {
+    methods: ["POST"]
+    pattern: '/account/download-data'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDownloadAccountData']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDownloadAccountData']>>>
+    }
+  }
+  'account.post_delete_account_data': {
+    methods: ["POST"]
+    pattern: '/account/delete-data'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDeleteAccountData']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDeleteAccountData']>>>
+    }
+  }
 }
