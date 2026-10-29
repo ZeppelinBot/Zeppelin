@@ -31,7 +31,12 @@
         </div>
         <div class="mobile-menu-toggle">
           <BasicButton theme="menu">
-            <button role="button" aria-controls="mobile-menu" :aria-expanded="mobileMenuIsOpen" @click="mobileMenuIsOpen = !mobileMenuIsOpen">
+            <button
+              role="button"
+              aria-controls="mobile-menu"
+              :aria-expanded="mobileMenuIsOpen"
+              @click="mobileMenuIsOpen = !mobileMenuIsOpen"
+            >
               Menu
             </button>
           </BasicButton>
@@ -83,20 +88,17 @@ body {
 
   background:
     /* Grid 1 */
-    linear-gradient(var(--grid1-color) 1px, transparent 1px) repeat calc(50% - var(--grid1-size) / 2) top / var(--grid1-size) var(--grid1-size),
-    linear-gradient(90deg, var(--grid1-color) 1px, transparent 1px) repeat calc(50% - var(--grid1-size) / 2) top / var(--grid1-size) var(--grid1-size),
+    linear-gradient(var(--grid1-color) 1px, transparent 1px) repeat calc(50% - var(--grid1-size) / 2) top /
+      var(--grid1-size) var(--grid1-size),
+    linear-gradient(90deg, var(--grid1-color) 1px, transparent 1px) repeat calc(50% - var(--grid1-size) / 2) top /
+      var(--grid1-size) var(--grid1-size),
+    /* Grid 2 */ linear-gradient(var(--grid2-color) 1px, transparent 1px) repeat calc(50% - var(--grid2-size) / 2) top /
+      var(--grid2-size) var(--grid2-size),
+    linear-gradient(90deg, var(--grid2-color) 1px, transparent 1px) repeat calc(50% - var(--grid2-size) / 2) top /
+      var(--grid2-size) var(--grid2-size),
+    /* "Light" / vignette */ radial-gradient(circle at 50% 160px, var(--bg-color1) 0, var(--bg-color2) 1200px) no-repeat
+      center / 100% 100%;
 
-    /* Grid 2 */
-    linear-gradient(var(--grid2-color) 1px, transparent 1px) repeat calc(50% - var(--grid2-size) / 2) top / var(--grid2-size) var(--grid2-size),
-    linear-gradient(90deg, var(--grid2-color) 1px, transparent 1px) repeat calc(50% - var(--grid2-size) / 2) top / var(--grid2-size) var(--grid2-size),
-
-    /* "Light" / vignette */
-    radial-gradient(
-      circle at 50% 160px,
-      var(--bg-color1) 0,
-      var(--bg-color2) 1200px
-    ) no-repeat center / 100% 100%;
-  
   min-height: 100vh;
   font: 14px/1.4 var(--font-stack-playpen-sans);
 }
@@ -196,7 +198,9 @@ body {
 }
 .mobile-menu {
   display: none;
-  background: url(../../assets/charcoal-noise.webp) repeat top left / 50% 50%, #222;
+  background:
+    url(../../assets/charcoal-noise.webp) repeat top left / 50% 50%,
+    #222;
   padding: 24px;
   box-shadow: 5px 5px 16px -2px rgba(0, 0, 0, 0.75);
   margin-top: -48px;
@@ -290,22 +294,26 @@ onMounted(() => {
   mounted.value = true;
 });
 
-const rootCss = computed(() => `
+const rootCss = computed(
+  () => `
   :root {
     --layout-grid-size: ${LAYOUT_GRID_SIZE_PX}px;
   }
-`);
+`,
+);
 
 const breakpointSteps = [8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
 const wrapCss = computed(() => {
   return breakpointSteps
-    .map((step) => `
+    .map(
+      (step) => `
       @media (min-width: ${step * LAYOUT_GRID_SIZE_PX}px) {
         .main-layout-wrap {
           width: ${step * LAYOUT_GRID_SIZE_PX}px !important;
         }
       }
-    `)
+    `,
+    )
     .join("\n");
 });
 

@@ -87,20 +87,8 @@
   --text-xl3: 48px;
 
   --font-stack-system-sans:
-    -apple-system,
-    BlinkMacSystemFont,
-    avenir next,
-    avenir,
-    segoe ui,
-    helvetica neue,
-    Adwaita Sans,
-    Cantarell,
-    Ubuntu,
-    roboto,
-    noto,
-    helvetica,
-    arial,
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, Adwaita Sans, Cantarell, Ubuntu,
+    roboto, noto, helvetica, arial, sans-serif;
   --font-stack-recursive: "Recursive Variable", var(--font-stack-system-sans);
   --font-stack-playpen-sans: "Playpen Sans Variable", var(--font-stack-system-sans);
 }
@@ -130,6 +118,8 @@ body {
   }
 }
 
-@layer base {}
+@layer base {
+}
 
-@layer reset {}
+@layer reset {
+}

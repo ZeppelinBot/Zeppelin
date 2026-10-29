@@ -7,7 +7,7 @@
   background-image: url(../assets/squiggle.svg);
   background-repeat: repeat-x;
   background-size: auto 100%;
-  
+
   width: 100%;
   height: 4px;
 }

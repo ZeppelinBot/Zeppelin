@@ -38,15 +38,14 @@
   padding: 0.5em 1em;
 
   background-color: var(--bg-color);
-  background-image:
-    repeating-linear-gradient(
-      32deg,
-      var(--stripe-color) 0px,
-      var(--stripe-color) 1px,
-      transparent 3px,
-      transparent 5px,
-      var(--stripe-color) 6px
-    );
+  background-image: repeating-linear-gradient(
+    32deg,
+    var(--stripe-color) 0px,
+    var(--stripe-color) 1px,
+    transparent 3px,
+    transparent 5px,
+    var(--stripe-color) 6px
+  );
   position: relative;
 
   box-shadow: 0 0.15em 0px var(--fg-color);

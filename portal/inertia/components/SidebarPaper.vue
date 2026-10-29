@@ -16,7 +16,7 @@
   --stripe-color: rgba(0, 0, 0, 0.005);
   color: var(--color-ink-dark);
   position: relative;
-  
+
   background-image:
     radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.1) 0%, transparent 100%),
     repeating-linear-gradient(
@@ -40,12 +40,12 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  
+
   background-image: radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
   background-color: #ece8dd;
 
   transform: rotateZ(-1deg) translateX(5px) translateY(5px);
-  
+
   box-shadow: 5px 5px 12px -2px rgba(0, 0, 0, 0.25);
 }
 @media (prefers-color-scheme: dark) {
@@ -75,5 +75,4 @@
 }
 </style>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>

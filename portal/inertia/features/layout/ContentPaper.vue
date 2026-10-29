@@ -22,7 +22,7 @@
   --stripe-color: rgba(0, 0, 0, 0.005);
   color: var(--color-ink-dark);
   position: relative;
-  
+
   background-image:
     radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.1) 0%, transparent 100%),
     repeating-linear-gradient(
@@ -59,12 +59,12 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  
+
   background-image: radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
   background-color: #ece8dd;
 
   transform: rotateZ(1deg) translateX(5px);
-  
+
   box-shadow: 5px 5px 12px -2px rgba(0, 0, 0, 0.25);
 }
 @media (prefers-color-scheme: dark) {
@@ -73,13 +73,14 @@
     background:
       /* radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.1) 0%, transparent 100%) 100% 100%, */
       repeating-linear-gradient(
-        1deg,
-        var(--stripe-color) 0px,
-        var(--stripe-color) 1px,
-        transparent 3px,
-        transparent 5px,
-        var(--stripe-color) 6px
-      ) 100% 100%,
+          1deg,
+          var(--stripe-color) 0px,
+          var(--stripe-color) 1px,
+          transparent 3px,
+          transparent 5px,
+          var(--stripe-color) 6px
+        )
+        100% 100%,
       url(../../assets/charcoal-noise.webp) repeat top left / 50% 50%,
       #222;
     color: rgb(213, 213, 213);

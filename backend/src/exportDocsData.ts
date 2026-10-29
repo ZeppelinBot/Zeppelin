@@ -12,7 +12,10 @@ if (!outputPath) {
   process.exit(1);
 }
 
-function pluginToDocsData(plugin: GuildPluginBlueprint<any, any> | GlobalPluginBlueprint<any, any>, docs: ZeppelinPluginDocs): ZeppelinPluginDocsData {
+function pluginToDocsData(
+  plugin: GuildPluginBlueprint<any, any> | GlobalPluginBlueprint<any, any>,
+  docs: ZeppelinPluginDocs,
+): ZeppelinPluginDocsData {
   return {
     name: plugin.name,
     prettyName: docs.prettyName ?? plugin.name,

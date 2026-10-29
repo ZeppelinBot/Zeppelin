@@ -118,7 +118,12 @@ function getCasesPlugin(): Promise<any> {
 export const LogsPlugin = guildPlugin<LogsPluginType>()({
   name: "logs",
 
-  dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getCasesPlugin()).CasesPlugin, MessageSaverPlugin],
+  dependencies: async () => [
+    TimeAndDatePlugin,
+    InternalPosterPlugin,
+    (await getCasesPlugin()).CasesPlugin,
+    MessageSaverPlugin,
+  ],
   configSchema: zLogsConfig,
   defaultOverrides: [
     {

@@ -57,11 +57,11 @@
 </style>
 
 <script setup lang="ts">
-import { MenuCategory } from '#backend/features/menu/types';
-import Squiggle from '#frontend/components/Squiggle.vue';
-import { menuItemIsActive } from '#frontend/features/menu/menuItemIsActive.js';
-import { Link } from '@adonisjs/inertia/vue';
-import { PropType } from 'vue';
+import { MenuCategory } from "#backend/features/menu/types";
+import Squiggle from "#frontend/components/Squiggle.vue";
+import { menuItemIsActive } from "#frontend/features/menu/menuItemIsActive.js";
+import { Link } from "@adonisjs/inertia/vue";
+import { PropType } from "vue";
 
 const props = defineProps({
   categories: {

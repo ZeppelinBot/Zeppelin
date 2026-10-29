@@ -1,7 +1,12 @@
 <template>
   <div class="sidebar-mobile-trigger">
     <BasicButton theme="menu">
-      <button role="button" :aria-controls="sidebarId" :aria-expanded="sidebarExpanded" @click="sidebarExpanded = !sidebarExpanded">
+      <button
+        role="button"
+        :aria-controls="sidebarId"
+        :aria-expanded="sidebarExpanded"
+        @click="sidebarExpanded = !sidebarExpanded"
+      >
         <slot name="mobile-trigger">Toggle sidebar</slot>
       </button>
     </BasicButton>
@@ -58,8 +63,8 @@
 </style>
 
 <script setup lang="ts">
-import BasicButton from '#frontend/components/BasicButton.vue';
-import { ref } from 'vue';
+import BasicButton from "#frontend/components/BasicButton.vue";
+import { ref } from "vue";
 
 const sidebarId = ref(`sidebar-${Math.ceil(Math.random() * 10_000_000 + 1_000_000)}`);
 const sidebarExpanded = ref(false);

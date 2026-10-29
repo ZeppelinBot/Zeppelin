@@ -19,17 +19,21 @@ const menu: MenuCategory[] = [
   },
   {
     title: "Plugins",
-    items: sortedGuildPlugins.filter((p) => p.type === "stable").map((p) => ({
-      label: p.prettyName,
-      path: `/docs/plugins/${p.name}`
-    })),
+    items: sortedGuildPlugins
+      .filter((p) => p.type === "stable")
+      .map((p) => ({
+        label: p.prettyName,
+        path: `/docs/plugins/${p.name}`,
+      })),
   },
   {
     title: "Legacy plugins",
-    items: sortedGuildPlugins.filter((p) => p.type === "legacy").map((p) => ({
-      label: p.prettyName,
-      path: `/docs/plugins/${p.name}`
-    })),
+    items: sortedGuildPlugins
+      .filter((p) => p.type === "legacy")
+      .map((p) => ({
+        label: p.prettyName,
+        path: `/docs/plugins/${p.name}`,
+      })),
   },
 ];
 
