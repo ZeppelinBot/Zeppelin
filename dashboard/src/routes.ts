@@ -14,6 +14,12 @@ export const router = createRouter({
     {
       path: "/privacy-policy",
       component: () => import("./components/PrivacyPolicy.vue"),
+      beforeEnter: () => {
+        if (window.USE_PORTAL_PRIVACY_POLICY) {
+          window.location.replace(`${window.PORTAL_URL}/privacy-policy`);
+          return false;
+        }
+      },
     },
 
     // Docs
