@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import BasicTab from "./BasicTab.vue";
-</script>
-
 <template>
   <div class="page-header">
     <div class="heading">
