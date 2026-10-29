@@ -9,13 +9,13 @@ export class AuthPageMiddleware {
 
     if (request.method() !== "GET") {
       return response.unauthorized({
-        message: "Authentication required"
+        message: "Authentication required",
       });
     }
 
     session.setIntendedUrl(request.url());
 
-    return inertia.render("features/auth/pages/LoginRequiredPage", {});
+    return response.send(await inertia.render("features/auth/pages/LoginRequiredPage", {}));
   }
 }
 
