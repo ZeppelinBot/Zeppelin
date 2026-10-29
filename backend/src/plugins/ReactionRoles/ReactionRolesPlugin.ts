@@ -10,11 +10,12 @@ import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd.js";
 import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt.js";
 import { MessageDeletedEvt } from "./events/MessageDeletedEvt.js";
 import { ReactionRolesPluginType, zReactionRolesConfig } from "./types.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 export const ReactionRolesPlugin = guildPlugin<ReactionRolesPluginType>()({
   name: "reaction_roles",
 
-  dependencies: () => [LogsPlugin],
+  dependencies: () => [LogsPlugin, MessageSaverPlugin],
   configSchema: zReactionRolesConfig,
   defaultOverrides: [
     {

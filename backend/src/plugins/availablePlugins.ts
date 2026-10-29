@@ -148,7 +148,6 @@ export const availableGuildPlugins: ZeppelinGuildPluginInfo[] = [
   {
     plugin: MessageSaverPlugin,
     docs: messageSaverPluginDocs,
-    autoload: true,
   },
   {
     plugin: ModActionsPlugin,

@@ -7,6 +7,7 @@ import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd.js";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd.js";
 import { AddReactionsEvt } from "./events/AddReactionsEvt.js";
 import { AutoReactionsPluginType, zAutoReactionsConfig } from "./types.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 const defaultOverrides: Array<PluginOverride<AutoReactionsPluginType>> = [
   {
@@ -23,6 +24,7 @@ export const AutoReactionsPlugin = guildPlugin<AutoReactionsPluginType>()({
   // prettier-ignore
   dependencies: () => [
     LogsPlugin,
+    MessageSaverPlugin,
   ],
 
   configSchema: zAutoReactionsConfig,

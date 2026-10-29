@@ -6,6 +6,7 @@ import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { CensorPluginType, zCensorConfig } from "./types.js";
 import { onMessageCreate } from "./util/onMessageCreate.js";
 import { onMessageUpdate } from "./util/onMessageUpdate.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 const defaultOverrides: Array<PluginOverride<CensorPluginType>> = [
   {
@@ -24,7 +25,7 @@ const defaultOverrides: Array<PluginOverride<CensorPluginType>> = [
 export const CensorPlugin = guildPlugin<CensorPluginType>()({
   name: "censor",
 
-  dependencies: () => [LogsPlugin],
+  dependencies: () => [LogsPlugin, MessageSaverPlugin],
   configSchema: zCensorConfig,
   defaultOverrides,
 
