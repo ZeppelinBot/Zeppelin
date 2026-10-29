@@ -19,6 +19,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/splash/controllers/SplashController').default['getIndex']>>>
     }
   }
+  'privacy_policy.get_privacy_policy_page': {
+    methods: ["GET","HEAD"]
+    pattern: '/privacy-policy'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/legal/controllers/PrivacyPolicyController').default['getPrivacyPolicyPage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/legal/controllers/PrivacyPolicyController').default['getPrivacyPolicyPage']>>>
+    }
+  }
   'docs.get_index': {
     methods: ["GET","HEAD"]
     pattern: '/docs'

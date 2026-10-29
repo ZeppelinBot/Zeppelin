@@ -5,6 +5,7 @@ type ParamValue = string | number | bigint | boolean
 export type ScannedRoutes = {
   ALL: {
     'splash.get_index': { paramsTuple?: []; params?: {} }
+    'privacy_policy.get_privacy_policy_page': { paramsTuple?: []; params?: {} }
     'docs.get_index': { paramsTuple?: []; params?: {} }
     'auth.get_discord_login': { paramsTuple?: []; params?: {} }
     'auth.get_discord_callback': { paramsTuple?: []; params?: {} }
@@ -18,6 +19,7 @@ export type ScannedRoutes = {
   }
   GET: {
     'splash.get_index': { paramsTuple?: []; params?: {} }
+    'privacy_policy.get_privacy_policy_page': { paramsTuple?: []; params?: {} }
     'docs.get_index': { paramsTuple?: []; params?: {} }
     'auth.get_discord_login': { paramsTuple?: []; params?: {} }
     'auth.get_discord_callback': { paramsTuple?: []; params?: {} }
@@ -26,6 +28,7 @@ export type ScannedRoutes = {
   }
   HEAD: {
     'splash.get_index': { paramsTuple?: []; params?: {} }
+    'privacy_policy.get_privacy_policy_page': { paramsTuple?: []; params?: {} }
     'docs.get_index': { paramsTuple?: []; params?: {} }
     'auth.get_discord_login': { paramsTuple?: []; params?: {} }
     'auth.get_discord_callback': { paramsTuple?: []; params?: {} }

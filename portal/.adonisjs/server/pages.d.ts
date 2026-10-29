@@ -31,6 +31,8 @@ declare module '@adonisjs/inertia/types' {
 
     'features/splash/pages/SplashIndex': ExtractProps<(typeof import('../../inertia/features/splash/pages/SplashIndex.vue'))['default']>
 
+    'features/legal/pages/PrivacyPolicyPage': ExtractProps<(typeof import('../../inertia/features/legal/pages/PrivacyPolicyPage.vue'))['default']>
+
   }
 
 }

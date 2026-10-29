@@ -12,6 +12,12 @@ const routes = {
     tokens: [{"old":"/","type":0,"val":"/","end":""}],
     types: placeholder as Registry['splash.get_index']['types'],
   },
+  'privacy_policy.get_privacy_policy_page': {
+    methods: ["GET","HEAD"],
+    pattern: '/privacy-policy',
+    tokens: [{"old":"/privacy-policy","type":0,"val":"privacy-policy","end":""}],
+    types: placeholder as Registry['privacy_policy.get_privacy_policy_page']['types'],
+  },
   'docs.get_index': {
     methods: ["GET","HEAD"],
     pattern: '/docs',

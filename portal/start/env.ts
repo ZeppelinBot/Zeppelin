@@ -34,4 +34,5 @@ export const portalEnv = await Env.create(new URL("../", import.meta.url), {
   SESSION_DRIVER: Env.schema.enum.optional(["redis", "memory"] as const),
   LOG_LEVEL: Env.schema.string.optional(),
   LIMITER_STORE: Env.schema.enum.optional(["redis", "memory"] as const),
+  PORTAL_PRIVACY_POLICY_PATH: Env.schema.string.optional(),
 });

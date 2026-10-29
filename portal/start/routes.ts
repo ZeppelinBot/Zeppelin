@@ -15,6 +15,8 @@ import router from "@adonisjs/core/services/router";
 
 router.get("/", [controllers.splash.Splash, "getIndex"]);
 
+router.get("/privacy-policy", [controllers.legal.PrivacyPolicy, "getPrivacyPolicyPage"]);
+
 router
   .group(() => {
     router.get("/", [controllers.docs.Docs, "getIndex"]);

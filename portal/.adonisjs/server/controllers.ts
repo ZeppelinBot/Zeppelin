@@ -16,4 +16,7 @@ export const controllers = {
   splash: {
     Splash: () => import('#backend/features/splash/controllers/SplashController'),
   },
+  legal: {
+    PrivacyPolicy: () => import('#backend/features/legal/controllers/PrivacyPolicyController'),
+  },
 }

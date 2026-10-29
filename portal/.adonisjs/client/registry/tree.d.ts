@@ -5,6 +5,9 @@ export interface ApiDefinition {
   splash: {
     getIndex: typeof routes['splash.get_index']
   }
+  privacyPolicy: {
+    getPrivacyPolicyPage: typeof routes['privacy_policy.get_privacy_policy_page']
+  }
   docs: {
     getIndex: typeof routes['docs.get_index']
   }

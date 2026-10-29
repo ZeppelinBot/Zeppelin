@@ -68,6 +68,7 @@
     "jszip": "^3.10.2",
     "lucide-vue-next": "^1.0.0",
     "luxon": "^3.7.2",
+    "markdown-it": "^15.0.2",
     "mysql2": "^3.23.0",
     "reflect-metadata": "^0.2.2",
     "reka-ui": "^2.11.0",
