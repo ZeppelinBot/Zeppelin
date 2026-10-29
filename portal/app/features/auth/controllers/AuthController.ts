@@ -1,6 +1,10 @@
 import PortalUser from "#backend/features/auth/models/PortalUser";
 import type { HttpContext } from "@adonisjs/core/http";
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
+
+function normalizeUsername(username: string) {
+  return username.match(/^(.+)(#.*)?$/)![1];
+}
 
 export default class AuthController {
   async getDiscordLogin({ ally, session }: HttpContext) {
@@ -13,28 +17,26 @@ export default class AuthController {
     const discordUser = await ally.use("discord").user();
 
     const user = await navigator.locks.request(`login-callback-${discordUser.id}`, async () => {
-      const existingUser = await PortalUser.query()
-        .where("userId", discordUser.id)
-        .first();
-      
+      const existingUser = await PortalUser.query().where("discord_user_id", discordUser.id).first();
+
       if (existingUser) {
-        existingUser.username = discordUser.name;
-        existingUser.avatar = discordUser.avatarUrl;
+        existingUser.discordUsername = normalizeUsername(discordUser.name);
+        existingUser.discordAvatarUrl = discordUser.avatarUrl;
         existingUser.lastLoginAt = DateTime.now();
         return existingUser.save();
       }
 
       const newUser = new PortalUser();
-      newUser.userId = discordUser.id;
-      newUser.username = discordUser.name;
-      newUser.avatar = discordUser.avatarUrl;
+      newUser.discordUserId = discordUser.id;
+      newUser.discordUsername = normalizeUsername(discordUser.name);
+      newUser.discordAvatarUrl = discordUser.avatarUrl;
       newUser.lastLoginAt = DateTime.now();
       return newUser.save();
     });
 
     await auth.use("web").login(user);
 
-    return response.redirect().toIntended("/account");
+    return response.redirect().withQs(false).toIntended("/account");
   }
 
   async postLogout({ auth, session, inertia, response }: HttpContext) {

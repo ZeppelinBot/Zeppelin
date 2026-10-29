@@ -14,16 +14,16 @@ export class CreatePortalUsersTable1792935256055 implements MigrationInterface {
             generationStrategy: "increment",
           },
           {
-            name: "user_id",
+            name: "discord_user_id",
             type: "bigint",
           },
           {
-            name: "username",
+            name: "discord_username",
             type: "varchar",
             length: "255",
           },
           {
-            name: "avatar",
+            name: "discord_avatar_url",
             type: "varchar",
             length: "255",
             isNullable: true,
@@ -40,7 +40,7 @@ export class CreatePortalUsersTable1792935256055 implements MigrationInterface {
         ],
         indices: [
           {
-            columnNames: ["user_id"],
+            columnNames: ["discord_user_id"],
             isUnique: true,
           },
         ],
