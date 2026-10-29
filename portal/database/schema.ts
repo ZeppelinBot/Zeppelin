@@ -455,20 +455,20 @@ export class PingableRoleSchema extends BaseModel {
 }
 
 export class PortalUserSchema extends BaseModel {
-  static $columns = ["avatar", "createdAt", "id", "lastLoginAt", "userId", "username"] as const;
+  static $columns = ["createdAt", "discordAvatarUrl", "discordUserId", "discordUsername", "id", "lastLoginAt"] as const;
   $columns = PortalUserSchema.$columns;
-  @column()
-  declare avatar: string | null;
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime;
+  @column()
+  declare discordAvatarUrl: string | null;
+  @column()
+  declare discordUserId: string;
+  @column()
+  declare discordUsername: string;
   @column({ isPrimary: true })
   declare id: number;
   @column.dateTime()
   declare lastLoginAt: DateTime;
-  @column()
-  declare userId: string;
-  @column()
-  declare username: string;
 }
 
 export class ReactionRoleSchema extends BaseModel {
