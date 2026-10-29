@@ -1,4 +1,4 @@
-import { ColumnInfo, DatabaseColumn, type SchemaRules } from "@adonisjs/lucid/types/schema_generator";
+import { DatabaseColumn, type SchemaRules } from "@adonisjs/lucid/types/schema_generator";
 
 export default {
   types: {

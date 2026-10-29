@@ -15,7 +15,7 @@ class ApiSerializer extends BaseSerializer<{
    * Wraps all serialized data under this key in the response object.
    * Example: { data: [...] } instead of returning raw arrays/objects
    */
-  wrap: "data" = "data";
+  wrap = "data" as const;
 
   /**
    * Validates and defines pagination metadata structure for paginated responses.
