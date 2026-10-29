@@ -48,7 +48,7 @@
 </style>
 
 <script setup lang="ts">
-import { watch } from "vue";
+import { nextTick, watch } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { toast, Toaster } from "vue-sonner";
 import { CircleAlert, CircleCheck } from "lucide-vue-next";
@@ -62,7 +62,9 @@ watch(
 
 watch(
   () => page.flash,
-  (flash) => {
+  async (flash) => {
+    await nextTick();
+
     if (flash.error) toast.error(flash.error, { id: "flash" });
     if (flash.success) toast.success(flash.success, { id: "flash" });
   },
