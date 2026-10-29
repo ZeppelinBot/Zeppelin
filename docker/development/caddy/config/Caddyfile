@@ -6,11 +6,11 @@ https://:443 {
 
     @api path /api /api/*
     handle @api {
-        reverse_proxy devenv:3002
+        reverse_proxy devenv:3001
     }
 
     handle {
-        reverse_proxy devenv:3001
+        reverse_proxy devenv:3002
     }
 }
 
