@@ -67,7 +67,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/auth/controllers/AuthController').default['postLogout']>>>
     }
   }
-  'account.get_account_page': {
+  'account.get_my_account_page': {
     methods: ["GET","HEAD"]
     pattern: '/account'
     types: {
@@ -75,11 +75,11 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['getAccountPage']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['getAccountPage']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['getMyAccountPage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['getMyAccountPage']>>>
     }
   }
-  'account.post_download_account_data': {
+  'account.post_download_my_account_data': {
     methods: ["POST"]
     pattern: '/account/download-data'
     types: {
@@ -87,11 +87,11 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDownloadAccountData']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDownloadAccountData']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDownloadMyAccountData']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDownloadMyAccountData']>>>
     }
   }
-  'account.post_delete_account_data': {
+  'account.post_delete_my_account_data': {
     methods: ["POST"]
     pattern: '/account/delete-data'
     types: {
@@ -99,8 +99,44 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDeleteAccountData']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDeleteAccountData']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDeleteMyAccountData']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDeleteMyAccountData']>>>
+    }
+  }
+  'account.get_specific_account_page': {
+    methods: ["GET","HEAD"]
+    pattern: '/specific-account/:userId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { userId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['getSpecificAccountPage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['getSpecificAccountPage']>>>
+    }
+  }
+  'account.post_download_specific_account_data': {
+    methods: ["POST"]
+    pattern: '/specific-account/:userId/download-data'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { userId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDownloadSpecificAccountData']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDownloadSpecificAccountData']>>>
+    }
+  }
+  'account.post_delete_specific_account_data': {
+    methods: ["POST"]
+    pattern: '/specific-account/:userId/delete-data'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { userId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDeleteSpecificAccountData']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/account/controllers/AccountController').default['postDeleteSpecificAccountData']>>>
     }
   }
 }

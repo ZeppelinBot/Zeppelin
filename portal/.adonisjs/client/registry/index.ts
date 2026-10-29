@@ -36,23 +36,41 @@ const routes = {
     tokens: [{"old":"/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['auth.post_logout']['types'],
   },
-  'account.get_account_page': {
+  'account.get_my_account_page': {
     methods: ["GET","HEAD"],
     pattern: '/account',
     tokens: [{"old":"/account","type":0,"val":"account","end":""}],
-    types: placeholder as Registry['account.get_account_page']['types'],
+    types: placeholder as Registry['account.get_my_account_page']['types'],
   },
-  'account.post_download_account_data': {
+  'account.post_download_my_account_data': {
     methods: ["POST"],
     pattern: '/account/download-data',
     tokens: [{"old":"/account/download-data","type":0,"val":"account","end":""},{"old":"/account/download-data","type":0,"val":"download-data","end":""}],
-    types: placeholder as Registry['account.post_download_account_data']['types'],
+    types: placeholder as Registry['account.post_download_my_account_data']['types'],
   },
-  'account.post_delete_account_data': {
+  'account.post_delete_my_account_data': {
     methods: ["POST"],
     pattern: '/account/delete-data',
     tokens: [{"old":"/account/delete-data","type":0,"val":"account","end":""},{"old":"/account/delete-data","type":0,"val":"delete-data","end":""}],
-    types: placeholder as Registry['account.post_delete_account_data']['types'],
+    types: placeholder as Registry['account.post_delete_my_account_data']['types'],
+  },
+  'account.get_specific_account_page': {
+    methods: ["GET","HEAD"],
+    pattern: '/specific-account/:userId',
+    tokens: [{"old":"/specific-account/:userId","type":0,"val":"specific-account","end":""},{"old":"/specific-account/:userId","type":1,"val":"userId","end":""}],
+    types: placeholder as Registry['account.get_specific_account_page']['types'],
+  },
+  'account.post_download_specific_account_data': {
+    methods: ["POST"],
+    pattern: '/specific-account/:userId/download-data',
+    tokens: [{"old":"/specific-account/:userId/download-data","type":0,"val":"specific-account","end":""},{"old":"/specific-account/:userId/download-data","type":1,"val":"userId","end":""},{"old":"/specific-account/:userId/download-data","type":0,"val":"download-data","end":""}],
+    types: placeholder as Registry['account.post_download_specific_account_data']['types'],
+  },
+  'account.post_delete_specific_account_data': {
+    methods: ["POST"],
+    pattern: '/specific-account/:userId/delete-data',
+    tokens: [{"old":"/specific-account/:userId/delete-data","type":0,"val":"specific-account","end":""},{"old":"/specific-account/:userId/delete-data","type":1,"val":"userId","end":""},{"old":"/specific-account/:userId/delete-data","type":0,"val":"delete-data","end":""}],
+    types: placeholder as Registry['account.post_delete_specific_account_data']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

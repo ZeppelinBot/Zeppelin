@@ -14,8 +14,11 @@ export interface ApiDefinition {
     postLogout: typeof routes['auth.post_logout']
   }
   account: {
-    getAccountPage: typeof routes['account.get_account_page']
-    postDownloadAccountData: typeof routes['account.post_download_account_data']
-    postDeleteAccountData: typeof routes['account.post_delete_account_data']
+    getMyAccountPage: typeof routes['account.get_my_account_page']
+    postDownloadMyAccountData: typeof routes['account.post_download_my_account_data']
+    postDeleteMyAccountData: typeof routes['account.post_delete_my_account_data']
+    getSpecificAccountPage: typeof routes['account.get_specific_account_page']
+    postDownloadSpecificAccountData: typeof routes['account.post_download_specific_account_data']
+    postDeleteSpecificAccountData: typeof routes['account.post_delete_specific_account_data']
   }
 }

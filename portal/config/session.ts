@@ -47,7 +47,8 @@ const sessionConfig = defineConfig({
     /**
      * Cross-site policy for cookie sending.
      */
-    sameSite: "strict",
+    // Allow the session cookie on the top-level OAuth callback from Discord.
+    sameSite: "lax",
   },
 
   /**

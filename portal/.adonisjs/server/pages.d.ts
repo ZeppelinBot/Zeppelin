@@ -17,7 +17,9 @@ declare module '@adonisjs/inertia/types' {
 
   export interface InertiaPages {
 
-    'features/account/pages/AccountPage': ExtractProps<(typeof import('../../inertia/features/account/pages/AccountPage.vue'))['default']>
+    'features/account/pages/MyAccountPage': ExtractProps<(typeof import('../../inertia/features/account/pages/MyAccountPage.vue'))['default']>
+
+    'features/account/pages/SpecificAccountPage': ExtractProps<(typeof import('../../inertia/features/account/pages/SpecificAccountPage.vue'))['default']>
 
     'features/auth/pages/LoginRequiredPage': ExtractProps<(typeof import('../../inertia/features/auth/pages/LoginRequiredPage.vue'))['default']>
 

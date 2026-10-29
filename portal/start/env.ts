@@ -9,7 +9,7 @@
 |
 */
 
-import { Env } from "@adonisjs/core/env"
+import { Env } from "@adonisjs/core/env";
 
 export const rootEnv = await Env.create(new URL("../../", import.meta.url), {
   PORTAL_URL: Env.schema.string.optional(),
@@ -23,13 +23,15 @@ export const rootEnv = await Env.create(new URL("../../", import.meta.url), {
   DEVELOPMENT_MYSQL_PASSWORD: Env.schema.string.optional(),
   DEVELOPMENT_VITE_ALLOWED_HOSTS: Env.schema.string.optional(),
   DEVELOPMENT_PORTAL_PORT: Env.schema.number.optional(),
+  STAFF: Env.schema.string.optional(),
 
   // Discord client id/secret
   CLIENT_ID: Env.schema.string(),
   CLIENT_SECRET: Env.schema.string(),
-})
+});
 
 export const portalEnv = await Env.create(new URL("../", import.meta.url), {
   SESSION_DRIVER: Env.schema.enum.optional(["redis", "memory"] as const),
   LOG_LEVEL: Env.schema.string.optional(),
-})
+  LIMITER_STORE: Env.schema.enum.optional(["redis", "memory"] as const),
+});

@@ -3,13 +3,11 @@
     <ContentPaper>
       <div class="login-required">
         <h1>Login required</h1>
-        <div class="blurb">
-          To access this page, please log in first.
-        </div>
+        <div class="blurb">To access this page, please log in first.</div>
         <div class="actions">
           <div class="action">
             <BasicButton>
-              <button class="action-btn">Dashboard</button>
+              <Link href="/oauth/discord/login">Log in</Link>
             </BasicButton>
           </div>
         </div>
@@ -19,10 +17,10 @@
 </template>
 
 <style scoped>
-.splash-content {
+.login-required {
   text-align: center;
 }
-.splash-content h1 {
+.login-required h1 {
   font-size: 48px;
   line-height: 128px;
 }
@@ -67,4 +65,5 @@
 import BasicButton from "#frontend/components/BasicButton.vue";
 import ContentPaper from "#frontend/features/layout/ContentPaper.vue";
 import MainLayout from "#frontend/features/layout/MainLayout.vue";
+import { Link } from "@adonisjs/inertia/vue";
 </script>
