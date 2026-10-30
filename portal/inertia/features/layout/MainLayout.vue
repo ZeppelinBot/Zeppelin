@@ -13,7 +13,10 @@
         </div>
         <div class="menu" role="menubar" aria-label="Main menu">
           <MainMenuItem v-for="item in mainMenuItems" :active="menuItemIsActive(item, currentPath)">
-            <Link :href="item.path">
+            <a v-if="item.external" :href="item.path">
+              {{ item.label }}
+            </a>
+            <Link v-else :href="item.path">
               {{ item.label }}
             </Link>
             <Squiggle class="squiggle" />
@@ -44,14 +47,20 @@
       </div>
       <div id="mobile-menu" class="mobile-menu" :class="{ expanded: mobileMenuIsOpen }">
         <MainMenuItem v-for="item in mainMenuItems" :active="menuItemIsActive(item, currentPath)">
-          <Link class="mobile-menu-item-link" :href="item.path">
+          <a v-if="item.external" class="mobile-menu-item-link" :href="item.path">
+            <div class="mobile-menu-item-text">
+              {{ item.label }}
+              <Squiggle class="squiggle" />
+            </div>
+          </a>
+          <Link v-else class="mobile-menu-item-link" :href="item.path">
             <div class="mobile-menu-item-text">
               {{ item.label }}
               <Squiggle class="squiggle" />
             </div>
           </Link>
         </MainMenuItem>
-        <MainMenuItem v-if="page.props.user">
+        <MainMenuItem v-if="page.props.user" class="mobile-menu-logout">
           <BasicButton theme="menu">
             <button @click="logout">Log out</button>
           </BasicButton>
@@ -62,9 +71,8 @@
       </div>
       <div class="footer">
         <div class="footer-links">
-          <BasicLink href="#">GitHub</BasicLink>
-          <BasicLink href="#">Privacy policy</BasicLink>
-          <BasicLink href="#">Contact us</BasicLink>
+          <BasicLink href="https://github.com/ZeppelinBot/Zeppelin">GitHub</BasicLink>
+          <Link href="/privacy-policy">Privacy policy</Link>
         </div>
       </div>
     </div>
@@ -216,6 +224,31 @@ body {
   width: 100%;
   justify-content: flex-start;
 }
+.mobile-menu-logout {
+  margin-top: 24px;
+}
+
+.content {
+  flex: 1 1 100%;
+}
+
+.footer {
+  flex: 0 0 auto;
+}
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 64px;
+  height: 48px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  font-size: 14px;
+}
+.footer-links a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+}
 
 @media (min-width: 960px) {
   .main-layout-wrap {
@@ -239,24 +272,9 @@ body {
   .mobile-menu {
     display: none;
   }
-}
-
-.content {
-  flex: 1 1 100%;
-}
-
-.footer {
-  flex: 0 0 auto;
-}
-.footer-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 64px;
-  height: 64px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-  font-size: 14px;
+  .footer {
+    margin-top: -48px;
+  }
 }
 </style>
 
@@ -317,19 +335,25 @@ const wrapCss = computed(() => {
     .join("\n");
 });
 
+type MainMenuItem = MenuItem & {
+  external?: boolean;
+};
+
 const mainMenuItems = computed(() => {
-  const items: MenuItem[] = [
+  const items: MainMenuItem[] = [
     {
       label: "Home",
       path: "/",
     },
     {
       label: "Documentation",
-      path: "/docs",
+      path: "https://zeppelin.gg/docs",
+      external: true,
     },
     {
       label: "Dashboard",
-      path: "/dashboard",
+      path: "https://zeppelin.gg/dashboard",
+      external: true,
     },
   ];
   if (page.props.user) {
