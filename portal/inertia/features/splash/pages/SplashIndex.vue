@@ -9,12 +9,12 @@
         <div class="actions">
           <div class="action">
             <BasicButton>
-              <Link class="action-btn" href="https://zeppelin.gg/dashboard">Dashboard</Link>
+              <a class="action-btn" href="https://zeppelin.gg/dashboard">Dashboard</a>
             </BasicButton>
           </div>
           <div class="action">
             <BasicButton>
-              <Link class="action-btn" href="https://zeppelin.gg/docs">Documentation</Link>
+              <a class="action-btn" href="https://zeppelin.gg/docs">Documentation</a>
             </BasicButton>
           </div>
         </div>
