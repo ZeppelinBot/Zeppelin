@@ -9,6 +9,7 @@ const fastify = Fastify({
 
 fastify.addHook("preHandler", (req, reply, done) => {
   if (req.url === "/env.js") {
+    reply.header("Cache-Control", "no-store");
     reply.header("Content-Type", "application/javascript; charset=utf8");
     const vars = [`window.API_URL = ${JSON.stringify(process.env.API_URL)};`];
     if (process.env.PORTAL_URL) {
