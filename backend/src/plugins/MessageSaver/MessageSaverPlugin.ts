@@ -1,8 +1,6 @@
 import { guildPlugin } from "vety";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { CommonPlugin } from "../Common/CommonPlugin.js";
-import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB.js";
-import { SavePinsToDBCmd } from "./commands/SavePinsToDB.js";
 import {
   MessageCreateEvt,
   MessageDeleteBulkEvt,
