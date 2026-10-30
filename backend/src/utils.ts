@@ -221,6 +221,7 @@ export const zEmbedInput = z
     image: z.optional(
       z.object({
         url: z.string().optional(),
+        icon_url: z.string().optional(),
         width: z.number().optional(),
         height: z.number().optional(),
       }),
