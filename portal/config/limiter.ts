@@ -2,7 +2,7 @@ import { portalEnv } from "#start/env";
 import { defineConfig, stores } from "@adonisjs/limiter";
 
 const limiterConfig = defineConfig({
-  default: portalEnv.get("LIMITER_STORE") ?? "redis",
+  default: portalEnv.get("LIMITER_STORE", "redis"),
   stores: {
     redis: stores.redis({
       keyPrefix: "portal:limiter:",
