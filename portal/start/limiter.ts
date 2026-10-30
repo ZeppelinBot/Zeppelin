@@ -34,7 +34,7 @@ export async function dataDownloadThrottle(ctx: HttpContext, next: NextFn) {
 
 export const dataDeleteThrottle = limiter.define("dataDelete", (ctx) => {
   return limiter
-    .allowRequests(1)
+    .allowRequests(5)
     .every("5 minutes")
     .usingKey(`user_${ctx.auth.user?.discordUserId ?? "anonymous"}`);
 });
