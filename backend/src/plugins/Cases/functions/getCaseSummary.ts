@@ -39,8 +39,28 @@ export async function getCaseSummary(
     const match = reason.slice(CASE_SUMMARY_REASON_MAX_LENGTH, 100).match(/(?:[.,!?\s]|$)/);
     const nextWhitespaceIndex = match ? CASE_SUMMARY_REASON_MAX_LENGTH + match.index! : CASE_SUMMARY_REASON_MAX_LENGTH;
     const reasonChunks = splitMessageIntoChunks(reason, nextWhitespaceIndex);
-    reason = reasonChunks[0] + "...";
-  }
+    reason = reasonChunks[0]
+
+    // Sanitise case reasons to ensure codeblocks are properly closed in truncated case reasons
+    const tripleBacktickMatches = reason.match(/```/g);
+    const tripleBacktickCount = tripleBacktickMatches ? tripleBacktickMatches.length : 0;
+    
+    // If odd number of triple backticks, we have an unclosed codeblock
+    if (tripleBacktickCount % 2 !== 0) {
+      reason += "```";
+    }
+    
+    // Also check for single backticks (inline code)
+    const singleBacktickMatches = reason.match(/(?<!`)`(?!`)/g);
+    const singleBacktickCount = singleBacktickMatches ? singleBacktickMatches.length : 0;
+    
+    // If odd number of single backticks (not part of triple), close it
+    if (singleBacktickCount % 2 !== 0) {
+      reason += "`";
+    }
+
+    reason += "...";
+  } 
 
   const timestamp = moment.utc(theCase.created_at, DBDateFormat);
   const relativeTimeCutoff = convertDelayStringToMS(config.relative_time_cutoff)!;
