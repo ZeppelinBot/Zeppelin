@@ -21,8 +21,6 @@ export const rootEnv = await Env.create(new URL("../../", import.meta.url), {
   DB_DATABASE: Env.schema.string.optional(),
   REDIS_URL: Env.schema.string.optional(),
   DEVELOPMENT_MYSQL_PASSWORD: Env.schema.string.optional(),
-  DEVELOPMENT_VITE_ALLOWED_HOSTS: Env.schema.string.optional(),
-  DEVELOPMENT_PORTAL_PORT: Env.schema.number.optional(),
   STAFF: Env.schema.string.optional(),
 
   // Discord client id/secret
