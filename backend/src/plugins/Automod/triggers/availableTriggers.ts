@@ -1,4 +1,6 @@
 import { AutomodTriggerBlueprint } from "../helpers.js";
+import { createAndTrigger } from "./and.js";
+import { createNotTrigger } from "./not.js";
 import { AntiraidLevelTrigger } from "./antiraidLevel.js";
 import { AnyMessageTrigger } from "./anyMessage.js";
 import { AttachmentSpamTrigger } from "./attachmentSpam.js";
@@ -78,3 +80,11 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   thread_archive: ThreadArchiveTrigger,
   thread_unarchive: ThreadUnarchiveTrigger,
 };
+
+availableTriggers.and = createAndTrigger({
+  getAvailableTriggers: () => availableTriggers,
+});
+
+availableTriggers.not = createNotTrigger({
+  getAvailableTriggers: () => availableTriggers,
+});
