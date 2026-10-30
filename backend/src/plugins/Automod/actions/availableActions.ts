@@ -1,4 +1,5 @@
 import { AutomodActionBlueprint } from "../helpers.js";
+import { AddReactionsAction } from "./addReactions.js";
 import { AddRolesAction } from "./addRoles.js";
 import { AddToCounterAction } from "./addToCounter.js";
 import { AlertAction } from "./alert.js";
@@ -29,6 +30,7 @@ export const availableActions = {
   change_nickname: ChangeNicknameAction,
   log: LogAction,
   add_roles: AddRolesAction,
+  add_reactions: AddReactionsAction,
   remove_roles: RemoveRolesAction,
   set_antiraid_level: SetAntiraidLevelAction,
   reply: ReplyAction,
