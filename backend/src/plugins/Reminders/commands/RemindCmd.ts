@@ -3,6 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { registerUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop.js";
 import { humanizeDuration } from "../../../humanizeDuration.js";
 import { convertDelayStringToMS, messageLink } from "../../../utils.js";
+import { parseDiscordTimestampToMS } from "../../../utils/parseDiscordTimestampToMS.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 import { remindersCmd } from "../types.js";
 
@@ -34,14 +35,19 @@ export const RemindCmd = remindersCmd({
       // Date and time in YYYY-MM-DD[T]HH:mm format
       reminderTime = moment.tz(args.time, "YYYY-M-D[T]HH:mm", tz).second(0);
     } else {
-      // "Delay string" i.e. e.g. "2h30m"
-      const ms = convertDelayStringToMS(args.time);
-      if (ms === null) {
-        void pluginData.state.common.sendErrorMessage(msg, "Invalid reminder time");
-        return;
-      }
+      const timestampMs = parseDiscordTimestampToMS(args.time);
+      if (timestampMs !== null) {
+        reminderTime = moment.utc(timestampMs);
+      } else {
+        // "Delay string" i.e. e.g. "2h30m"
+        const ms = convertDelayStringToMS(args.time);
+        if (ms === null) {
+          void pluginData.state.common.sendErrorMessage(msg, "Invalid reminder time");
+          return;
+        }
 
-      reminderTime = moment.utc().add(ms, "millisecond");
+        reminderTime = moment.utc().add(ms, "millisecond");
+      }
     }
 
     if (!reminderTime.isValid() || reminderTime.isBefore(now)) {
