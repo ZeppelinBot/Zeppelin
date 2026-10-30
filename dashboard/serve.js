@@ -10,12 +10,12 @@ const fastify = Fastify({
 fastify.addHook("preHandler", (req, reply, done) => {
   if (req.url === "/env.js") {
     reply.header("Content-Type", "application/javascript; charset=utf8");
-    const vars = [
-      `window.API_URL = ${JSON.stringify(process.env.API_URL)};`,
-    ];
+    const vars = [`window.API_URL = ${JSON.stringify(process.env.API_URL)};`];
     if (process.env.PORTAL_URL) {
       vars.push(`window.PORTAL_URL = ${JSON.stringify(process.env.PORTAL_URL)};`);
-      vars.push(`window.USE_PORTAL_PRIVACY_POLICY = ${process.env.USE_PORTAL_PRIVACY_POLICY === "1" ? "true" : "false"};`);
+      vars.push(
+        `window.USE_PORTAL_PRIVACY_POLICY = ${process.env.USE_PORTAL_PRIVACY_POLICY === "1" ? "true" : "false"};`,
+      );
     }
     reply.send(vars.join("\n"));
   }
