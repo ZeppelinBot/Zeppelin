@@ -20,7 +20,7 @@ export default class AccountController {
 
   async postDownloadMyAccountData({ response, auth }: HttpContext) {
     const userId = auth.user!.discordUserId;
-    const job = await startDataExport(`user-${userId}`, () => buildAccountDataZip(userId));
+    const job = await startDataExport(`user-${userId}`, auth.user!.id, () => buildAccountDataZip(userId));
     response.header("Cache-Control", "no-store");
     return response.accepted({ code: job.code });
   }
@@ -43,9 +43,9 @@ export default class AccountController {
     return inertia.render("features/account/pages/SpecificAccountPage", { userId });
   }
 
-  async postDownloadSpecificAccountData({ params, response }: HttpContext) {
+  async postDownloadSpecificAccountData({ params, response, auth }: HttpContext) {
     const userId = String(params.userId);
-    const job = await startDataExport(`user-${userId}`, () => buildAccountDataZip(userId));
+    const job = await startDataExport(`user-${userId}`, auth.user!.id, () => buildAccountDataZip(userId));
     response.header("Cache-Control", "no-store");
     return response.accepted({ code: job.code });
   }
@@ -135,8 +135,8 @@ async function deleteAccountData(userId: string): Promise<void> {
     await trx.rollback();
     throw err;
   }
-  const dataExport = await PortalDataExport.findBy("ref", `user-${userId}`);
-  if (dataExport) {
+  const dataExports = await PortalDataExport.query().where("ref", `user-${userId}`).exec();
+  for (const dataExport of dataExports) {
     await deleteDataExport(dataExport);
   }
 }

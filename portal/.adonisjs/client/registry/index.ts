@@ -54,12 +54,6 @@ const routes = {
     tokens: [{"old":"/data-exports/:code/download","type":0,"val":"data-exports","end":""},{"old":"/data-exports/:code/download","type":1,"val":"code","end":""},{"old":"/data-exports/:code/download","type":0,"val":"download","end":""}],
     types: placeholder as Registry['data_export.get_download']['types'],
   },
-  'data_export.delete_export': {
-    methods: ["DELETE"],
-    pattern: '/data-exports/:code',
-    tokens: [{"old":"/data-exports/:code","type":0,"val":"data-exports","end":""},{"old":"/data-exports/:code","type":1,"val":"code","end":""}],
-    types: placeholder as Registry['data_export.delete_export']['types'],
-  },
   'account.get_my_account_page': {
     methods: ["GET","HEAD"],
     pattern: '/account',

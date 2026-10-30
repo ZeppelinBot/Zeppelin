@@ -22,7 +22,10 @@ const newDataDownloadThrottle = limiter.define("dataDownload", (ctx) => {
 });
 
 export async function dataDownloadThrottle(ctx: HttpContext, next: NextFn) {
-  const existing = await PortalDataExport.findBy("ref", `user-${ctx.auth.user!.discordUserId}`);
+  const existing = await PortalDataExport.query()
+    .where("ref", `user-${ctx.auth.user!.discordUserId}`)
+    .where("requesterId", ctx.auth.user!.id)
+    .first();
   if (existing && existing.status !== "failed") {
     return next();
   }

@@ -455,7 +455,7 @@ export class PingableRoleSchema extends BaseModel {
 }
 
 export class PortalDataExportSchema extends BaseModel {
-  static $columns = ["code", "completedAt", "createdAt", "filePath", "id", "ref", "status"] as const;
+  static $columns = ["code", "completedAt", "createdAt", "filePath", "id", "ref", "requesterId", "status"] as const;
   $columns = PortalDataExportSchema.$columns;
   @column()
   declare code: string;
@@ -469,6 +469,8 @@ export class PortalDataExportSchema extends BaseModel {
   declare id: number;
   @column()
   declare ref: string;
+  @column()
+  declare requesterId: number;
   @column()
   declare status: string;
 }

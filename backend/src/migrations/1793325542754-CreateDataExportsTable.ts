@@ -24,6 +24,11 @@ export class CreateDataExportsTable1793325542754 implements MigrationInterface {
             length: "255",
           },
           {
+            // Retain the requester ID even after their portal user is deleted. No foreign key.
+            name: "requester_id",
+            type: "int",
+          },
+          {
             name: "status",
             type: "varchar",
             length: "255",
@@ -48,11 +53,14 @@ export class CreateDataExportsTable1793325542754 implements MigrationInterface {
         ],
         indices: [
           {
+            columnNames: ["status", "completed_at"],
+          },
+          {
             columnNames: ["code"],
             isUnique: true,
           },
           {
-            columnNames: ["ref"],
+            columnNames: ["ref", "requester_id"],
             isUnique: true,
           },
         ],

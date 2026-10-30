@@ -61,6 +61,10 @@ export default defineConfig({
     () => import("#providers/apiProvider"),
     () => import("@adonisjs/ally/ally_provider"),
     () => import("@adonisjs/limiter/limiter_provider"),
+    {
+      file: () => import("#providers/dataExportCleanupProvider"),
+      environment: ["web"],
+    },
   ],
 
   /*

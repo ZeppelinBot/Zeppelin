@@ -2,6 +2,8 @@ import { accountDataCategories } from "#backend/features/account/accountDataDefi
 import AccountController from "#backend/features/account/controllers/AccountController";
 import AuthPageMiddleware from "#backend/features/auth/middleware/authPageMiddleware";
 import DataExportController from "#backend/features/dataExport/controllers/DataExportController";
+import * as dataExports from "#backend/features/dataExport/dataExports";
+import { dataDownloadThrottle } from "#start/limiter";
 import PortalDataExport from "#backend/features/dataExport/models/PortalDataExport";
 import logger from "@adonisjs/core/services/logger";
 import type { HttpContext } from "@adonisjs/core/http";
@@ -16,9 +18,9 @@ import { dirname, join } from "node:path";
 import { mock } from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
 
-function context(userId = "1234") {
+function context(userId = "1234", portalUserId = 1) {
   const ctx = new HttpContextFactory().create();
-  Object.defineProperty(ctx, "auth", { value: { user: { discordUserId: userId } } });
+  Object.defineProperty(ctx, "auth", { value: { user: { id: portalUserId, discordUserId: userId } } });
   return ctx;
 }
 
@@ -47,19 +49,36 @@ test.group("Account data exports", (group) => {
       return row;
     });
     mock.method(PortalDataExport, "query", () => {
-      const filters: Array<[keyof PortalDataExport, unknown]> = [];
+      const filters: Array<(row: PortalDataExport) => boolean> = [];
+      const matches = () => rows.filter((row) => filters.every((filter) => filter(row)));
       const query = {
-        where(key: keyof PortalDataExport, value: unknown) {
-          filters.push([key, value]);
+        where(key: keyof PortalDataExport, operator: unknown, value?: unknown) {
+          if (value === undefined) {
+            filters.push((row) => row[key] === operator);
+          } else if (operator === "<=") {
+            filters.push((row) => row[key] != null && Number(row[key]) <= Number(value));
+          } else {
+            throw new Error(`Unsupported query operator: ${operator}`);
+          }
           return query;
+        },
+        whereIn(key: keyof PortalDataExport, values: unknown[]) {
+          filters.push((row) => values.includes(row[key]));
+          return query;
+        },
+        async first() {
+          return matches()[0] ?? null;
+        },
+        async exec() {
+          return matches();
         },
         async update(values: Record<string, unknown>) {
           beforeUpdate?.(values);
-          const matches = rows.filter((row) => filters.every(([key, value]) => row[key] === value));
-          for (const row of matches) {
+          const selected = matches();
+          for (const row of selected) {
             row.merge({ ...values, completedAt: DateTime.fromJSDate(values.completedAt as Date) });
           }
-          return [matches.length];
+          return [selected.length];
         },
       };
       return query;
@@ -104,6 +123,7 @@ test.group("Account data exports", (group) => {
     const payload = ctx.response.content?.[0];
     assert.match(payload.code, /^[a-f0-9]{64}$/);
     assert.equal(rows[0].ref, "user-1234");
+    assert.equal(rows[0].requesterId, 1);
     assert.equal(rows[0].completedAt, null);
     await waitForExport(rows[0]);
     assert.equal(rows[0].status, "completed");
@@ -113,7 +133,7 @@ test.group("Account data exports", (group) => {
     assert.equal(await zip.file("test_data.csv")!.async("string"), "value\nhello\n");
   });
 
-  test("reuses an existing export for the same Discord user", async ({ assert }) => {
+  test("reuses an existing export for the same subject and requester", async ({ assert }) => {
     const data = Promise.withResolvers<{ columns: string[]; rows: Record<string, string>[] }>();
     addCategory(() => data.promise);
     const controller = new AccountController();
@@ -128,6 +148,205 @@ test.group("Account data exports", (group) => {
     assert.lengthOf(rows, 1);
     assert.equal(first.response.content?.[0].code, second.response.content?.[0].code);
     await waitForExport(rows[0]);
+  });
+
+  test("builds separate archives for each requesting portal user", async ({ assert }) => {
+    addCategory(async () => ({ columns: ["value"], rows: [] }));
+    const controller = new AccountController();
+    const first = context("5678", 7);
+    first.params = { userId: "1234" };
+    await controller.postDownloadSpecificAccountData(first);
+    await waitForExport(rows[0]);
+    const second = context("5678", 8);
+    second.params = { userId: "1234" };
+    await controller.postDownloadSpecificAccountData(second);
+    await waitForExport(rows.at(-1)!);
+    assert.lengthOf(rows, 2);
+    assert.notEqual(first.response.content?.[0].code, second.response.content?.[0].code);
+    assert.deepEqual(
+      rows.map((row) => ({ ref: row.ref, requesterId: row.requesterId })),
+      [
+        { ref: "user-1234", requesterId: 7 },
+        { ref: "user-1234", requesterId: 8 },
+      ],
+    );
+    const repeated = context("5678", 7);
+    repeated.params = { userId: "1234" };
+    await controller.postDownloadSpecificAccountData(repeated);
+    assert.equal(repeated.response.content?.[0].code, first.response.content?.[0].code);
+    const otherSubject = context("5678", 7);
+    otherSubject.params = { userId: "12345" };
+    await controller.postDownloadSpecificAccountData(otherSubject);
+    await waitForExport(rows.at(-1)!);
+    assert.lengthOf(rows, 3);
+    assert.notEqual(otherSubject.response.content?.[0].code, first.response.content?.[0].code);
+    assert.equal(rows.at(-1)!.ref, "user-12345");
+    assert.equal(rows.at(-1)!.requesterId, 7);
+  });
+
+  test("duplicate insert recovery returns the concurrent job belonging to this requester", async ({ assert }) => {
+    await PortalDataExport.create({
+      ref: "user-1234",
+      requesterId: 1,
+      code: "other-requester",
+      status: "processing",
+      filePath: null,
+      completedAt: null,
+    });
+    const create = PortalDataExport.create;
+    mock.method(PortalDataExport, "create", async () => {
+      await create.call(PortalDataExport, {
+        ref: "user-1234",
+        requesterId: 2,
+        code: "concurrent-requester",
+        status: "processing",
+        filePath: null,
+        completedAt: null,
+      });
+      throw Object.assign(new Error("Duplicate export"), { code: "ER_DUP_ENTRY" });
+    });
+    const build = async () => {
+      assert.fail("The concurrent job must be reused");
+      return Buffer.alloc(0);
+    };
+    const job = await dataExports.startDataExport("user-1234", 2, build);
+    assert.equal(job.code, "concurrent-requester");
+    assert.equal(job.requesterId, 2);
+  });
+
+  test("does not expose an old portal user's archive after the account is recreated", async ({ assert }) => {
+    addCategory(async () => ({ columns: ["value"], rows: [] }));
+    await new AccountController().postDownloadMyAccountData(context());
+    const row = rows[0];
+    await waitForExport(row);
+    for (const action of ["getStatus", "getDownload"] as const) {
+      const ctx = context("1234", 2);
+      ctx.params = { code: row.code };
+      await new DataExportController()[action](ctx);
+      assert.equal(ctx.response.response.statusCode, 404);
+    }
+  });
+
+  test("allows retained archives to be requested again without spending the build throttle", async ({ assert }) => {
+    addCategory(async () => ({ columns: ["value"], rows: [] }));
+    await PortalDataExport.create({
+      ref: "user-1234",
+      requesterId: 1,
+      code: "retained",
+      status: "processing",
+      filePath: null,
+      completedAt: null,
+    });
+    const ctx = context();
+    await dataDownloadThrottle(ctx, async () => new AccountController().postDownloadMyAccountData(ctx));
+    const second = context();
+    await dataDownloadThrottle(second, async () => new AccountController().postDownloadMyAccountData(second));
+    assert.equal(second.response.response.statusCode, 202);
+    assert.equal(second.response.content?.[0].code, ctx.response.content?.[0].code);
+  });
+
+  test("cleanup expires archives ten minutes after completion and preserves recent and processing jobs", async ({
+    assert,
+  }) => {
+    addCategory(async () => ({ columns: ["value"], rows: [] }));
+    for (let id = 1; id <= 4; id++) {
+      await new AccountController().postDownloadMyAccountData(context(String(id), id));
+      await waitForExport(rows.at(-1)!);
+    }
+    const [expired, recent, processing, failed] = rows;
+    const now = Date.now();
+    mock.method(Date, "now", () => now);
+    expired.completedAt = DateTime.fromMillis(now - 10 * 60_000);
+    recent.createdAt = DateTime.fromMillis(now - 2 * 60 * 60_000);
+    recent.completedAt = DateTime.fromMillis(now - 10 * 60_000 + 1);
+    processing.status = "processing";
+    processing.completedAt = null;
+    failed.status = "failed";
+    failed.completedAt = DateTime.fromMillis(now - 11 * 60_000);
+    const expiredPath = expired.filePath!;
+    const failedPath = failed.filePath!;
+    await dataExports.cleanupExpiredDataExports();
+    assert.deepEqual(rows, [recent, processing]);
+    await assert.rejects(() => access(expiredPath));
+    await assert.rejects(() => access(failedPath));
+    await access(recent.filePath!);
+    await access(processing.filePath!);
+  });
+
+  test("cleanup continues after one archive cannot be removed", async ({ assert }) => {
+    addCategory(async () => ({ columns: ["value"], rows: [] }));
+    await new AccountController().postDownloadMyAccountData(context("1234", 1));
+    await waitForExport(rows[0]);
+    await new AccountController().postDownloadMyAccountData(context("5678", 2));
+    await waitForExport(rows[1]);
+    const [blocked, expired] = rows;
+    blocked.completedAt = expired.completedAt = DateTime.utc().minus({ minutes: 11 });
+    mock.method(blocked, "lockForUpdate", async () => {
+      throw new Error("File cannot be removed");
+    });
+    const expiredPath = expired.filePath!;
+    await dataExports.cleanupExpiredDataExports();
+    assert.deepEqual(rows, [blocked]);
+    await assert.rejects(() => access(expiredPath));
+  });
+
+  test("cleanup task sweeps at startup and every minute, then stops on shutdown", async ({ assert, cleanup }) => {
+    addCategory(async () => ({ columns: ["value"], rows: [] }));
+    await new AccountController().postDownloadMyAccountData(context("1234", 1));
+    await waitForExport(rows[0]);
+    await new AccountController().postDownloadMyAccountData(context("5678", 2));
+    await waitForExport(rows[1]);
+    const [expired, recent] = rows;
+    expired.completedAt = DateTime.utc().minus({ minutes: 11 });
+    const expiredPath = expired.filePath!;
+    const recentPath = recent.filePath!;
+    mock.timers.enable({ apis: ["setInterval"] });
+    cleanup(() => mock.timers.reset());
+    const { default: Provider } = await import("#providers/dataExportCleanupProvider");
+    const provider = new Provider();
+    cleanup(() => provider.shutdown());
+    await provider.ready();
+    assert.deepEqual(rows, [recent]);
+    await assert.rejects(() => access(expiredPath));
+
+    recent.completedAt = DateTime.utc().minus({ minutes: 11 });
+    mock.timers.tick(60_000);
+    // Shutdown waits for an in-flight sweep to finish.
+    await provider.shutdown();
+    assert.lengthOf(rows, 0);
+    await assert.rejects(() => access(recentPath));
+
+    await new AccountController().postDownloadMyAccountData(context("9012", 3));
+    const afterShutdown = rows[0];
+    await waitForExport(afterShutdown);
+    afterShutdown.completedAt = DateTime.utc().minus({ minutes: 11 });
+    mock.timers.tick(60_000);
+    await delay(5);
+    assert.deepEqual(rows, [afterShutdown]);
+    await access(afterShutdown.filePath!);
+  });
+
+  test("cleanup task recovers when its startup query fails", async ({ assert, cleanup }) => {
+    addCategory(async () => ({ columns: ["value"], rows: [] }));
+    await new AccountController().postDownloadMyAccountData(context());
+    const row = rows[0];
+    await waitForExport(row);
+    row.completedAt = DateTime.utc().minus({ minutes: 11 });
+    const query = PortalDataExport.query;
+    mock.method(PortalDataExport, "query", () => {
+      throw new Error("Database temporarily unavailable");
+    });
+    mock.timers.enable({ apis: ["setInterval"] });
+    cleanup(() => mock.timers.reset());
+    const { default: Provider } = await import("#providers/dataExportCleanupProvider");
+    const provider = new Provider();
+    cleanup(() => provider.shutdown());
+    await provider.ready();
+    assert.lengthOf(rows, 1);
+    mock.method(PortalDataExport, "query", query);
+    mock.timers.tick(60_000);
+    await provider.shutdown();
+    assert.lengthOf(rows, 0);
   });
 
   test("records a failed job so polling can stop", async ({ assert }) => {
@@ -146,6 +365,7 @@ test.group("Account data exports", (group) => {
   test("polls by code without exposing the temporary path", async ({ assert }) => {
     const row = await PortalDataExport.create({
       ref: "user-1234",
+      requesterId: 1,
       code: "poll-code",
       status: "processing",
       filePath: null,
@@ -158,17 +378,18 @@ test.group("Account data exports", (group) => {
     assert.equal(ctx.response.getHeader("Cache-Control"), "no-store");
   });
 
-  test("denies other users access to status, files, and cleanup", async ({ assert }) => {
+  test("denies other users access to status and files", async ({ assert }) => {
     await PortalDataExport.create({
       ref: "user-1234",
+      requesterId: 1,
       code: "private-code",
       status: "completed",
       filePath: null,
       completedAt: DateTime.utc(),
     });
     const controller = new DataExportController();
-    for (const action of ["getStatus", "getDownload", "deleteExport"] as const) {
-      const ctx = context("5678");
+    for (const action of ["getStatus", "getDownload"] as const) {
+      const ctx = context("5678", 2);
       ctx.params = { code: "private-code" };
       await controller[action](ctx);
       assert.equal(ctx.response.response.statusCode, 404);
@@ -176,7 +397,7 @@ test.group("Account data exports", (group) => {
     assert.lengthOf(rows, 1);
   });
 
-  test("keeps the ZIP until the browser acknowledges receipt, then removes the file and row", async ({ assert }) => {
+  test("keeps the same archive available for repeated downloads during retention", async ({ assert }) => {
     addCategory(async () => ({ columns: ["value"], rows: [] }));
     await new AccountController().postDownloadMyAccountData(context());
     const row = rows[0];
@@ -191,35 +412,37 @@ test.group("Account data exports", (group) => {
     assert.lengthOf(rows, 1);
     await access(path);
 
-    const acknowledge = context();
-    acknowledge.params = { code: row.code };
-    await controller.deleteExport(acknowledge);
-    assert.equal(acknowledge.response.response.statusCode, 204);
-    assert.lengthOf(rows, 0);
-    await assert.rejects(() => access(path));
+    const again = context();
+    await new AccountController().postDownloadMyAccountData(again);
+    assert.equal(again.response.content?.[0].code, row.code);
+    const redownload = context();
+    redownload.params = { code: row.code };
+    await controller.getDownload(redownload);
+    assert.equal(redownload.response.fileToStream?.path, path);
+    assert.lengthOf(rows, 1);
+    await access(path);
   });
 
-  test("rejects download and cleanup while an export is processing", async ({ assert }) => {
+  test("rejects downloading an export that is still processing", async ({ assert }) => {
     await PortalDataExport.create({
       ref: "user-1234",
+      requesterId: 1,
       code: "pending-code",
       status: "processing",
       filePath: null,
       completedAt: null,
     });
-    const controller = new DataExportController();
-    for (const action of ["getDownload", "deleteExport"] as const) {
-      const ctx = context();
-      ctx.params = { code: "pending-code" };
-      await controller[action](ctx);
-      assert.equal(ctx.response.response.statusCode, 409);
-    }
+    const ctx = context();
+    ctx.params = { code: "pending-code" };
+    await new DataExportController().getDownload(ctx);
+    assert.equal(ctx.response.response.statusCode, 409);
     assert.lengthOf(rows, 1);
   });
 
   test("marks a stalled job failed and allows a new export", async ({ assert }) => {
     const row = await PortalDataExport.create({
       ref: "user-1234",
+      requesterId: 1,
       code: "stalled-code",
       status: "processing",
       filePath: null,
@@ -265,19 +488,29 @@ test.group("Account data exports", (group) => {
     cleanup(() => rm(directory, { recursive: true, force: true }));
     const sibling = join(directory, "unrelated.txt");
     await writeFile(sibling, "keep me");
-    const ctx = context();
-    ctx.params = { code: row.code };
-    await new DataExportController().deleteExport(ctx);
+    row.completedAt = DateTime.utc().minus({ minutes: 11 });
+    await dataExports.cleanupExpiredDataExports();
     assert.equal(await readFile(sibling, "utf8"), "keep me");
     assert.lengthOf(rows, 0);
   });
 
-  test("deleting account data removes a retained export", async ({ assert }) => {
+  test("deleting account data removes every requester archive for that subject", async ({ assert }) => {
     addCategory(async () => ({ columns: ["value"], rows: [{ value: "personal data" }] }));
     await new AccountController().postDownloadMyAccountData(context());
     const row = rows[0];
     await waitForExport(row);
     const path = row.filePath!;
+    const staff = context("5678", 2);
+    staff.params = { userId: "1234" };
+    await new AccountController().postDownloadSpecificAccountData(staff);
+    assert.lengthOf(rows, 2);
+    const staffExport = rows[1];
+    await waitForExport(staffExport);
+    const staffPath = staffExport.filePath!;
+    const unrelated = context("12345", 3);
+    await new AccountController().postDownloadMyAccountData(unrelated);
+    const unrelatedExport = rows.at(-1)!;
+    await waitForExport(unrelatedExport);
     mock.method(
       db,
       "transaction",
@@ -291,8 +524,10 @@ test.group("Account data exports", (group) => {
     ctx.params = { userId: "1234" };
     ctx.session = { flash: () => {} } as unknown as HttpContext["session"];
     await new AccountController().postDeleteSpecificAccountData(ctx);
-    assert.lengthOf(rows, 0);
+    assert.deepEqual(rows, [unrelatedExport]);
     await assert.rejects(() => access(path));
+    await assert.rejects(() => access(staffPath));
+    await access(unrelatedExport.filePath!);
   });
 
   test("removes the ZIP when its job is invalidated just before publication", async ({ assert }) => {

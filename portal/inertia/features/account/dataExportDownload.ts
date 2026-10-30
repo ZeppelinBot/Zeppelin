@@ -68,7 +68,5 @@ export async function downloadDataExport(startUrl: string, options: DownloadOpti
   const blob = await response.blob();
   signal.throwIfAborted();
   await onDownload(blob);
-  // Acknowledge only after the browser has received the complete file.
-  await checkedFetch(exportUrl, { method: "DELETE", headers, signal });
   onStatus("downloaded");
 }

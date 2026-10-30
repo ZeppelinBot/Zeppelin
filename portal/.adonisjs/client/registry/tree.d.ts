@@ -19,7 +19,6 @@ export interface ApiDefinition {
   dataExport: {
     getStatus: typeof routes['data_export.get_status']
     getDownload: typeof routes['data_export.get_download']
-    deleteExport: typeof routes['data_export.delete_export']
   }
   account: {
     getMyAccountPage: typeof routes['account.get_my_account_page']

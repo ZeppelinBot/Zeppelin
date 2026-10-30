@@ -42,7 +42,6 @@ router
   .group(() => {
     router.get("/data-exports/:code", [controllers.dataExport.DataExport, "getStatus"]);
     router.get("/data-exports/:code/download", [controllers.dataExport.DataExport, "getDownload"]);
-    router.delete("/data-exports/:code", [controllers.dataExport.DataExport, "deleteExport"]);
 
     router.get("/account", [controllers.account.Account, "getMyAccountPage"]);
     router

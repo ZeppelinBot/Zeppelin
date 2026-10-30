@@ -8,6 +8,20 @@ import { basename, dirname, join } from "node:path";
 
 const processingTimeoutMs = 60 * 60 * 1000;
 
+export async function cleanupExpiredDataExports() {
+  const exports = await PortalDataExport.query()
+    .whereIn("status", ["completed", "failed"])
+    .where("completedAt", "<=", DateTime.utc().minus({ minutes: 10 }).toJSDate())
+    .exec();
+  for (const job of exports) {
+    try {
+      await deleteDataExport(job);
+    } catch (error) {
+      logger.error({ err: error, dataExportId: job.id }, "Failed to clean up data export");
+    }
+  }
+}
+
 type ExportUpdate = { status: "completed" | "failed"; completedAt: DateTime; filePath?: string | null };
 
 async function updateDataExport(job: PortalDataExport, expectedStatus: string, values: ExportUpdate) {
@@ -22,7 +36,7 @@ async function updateDataExport(job: PortalDataExport, expectedStatus: string, v
 }
 
 export async function refreshDataExportStatus(job: PortalDataExport) {
-  // A portal restart can interrupt an in-process job. Let the user retry it.
+  // A portal restart can interrupt an in-process job. Unless it's timed out, we can retry it.
   let failed = job.status === "processing" && Date.now() - job.createdAt.toMillis() > processingTimeoutMs;
   if (job.status === "completed") {
     if (!job.filePath) {
@@ -80,8 +94,12 @@ export async function deleteDataExport(job: PortalDataExport) {
   }
 }
 
-export async function startDataExport(ref: string, build: () => Promise<Buffer>): Promise<PortalDataExport> {
-  const existing = await PortalDataExport.findBy("ref", ref);
+export async function startDataExport(
+  ref: string,
+  requesterId: number,
+  build: () => Promise<Buffer>,
+): Promise<PortalDataExport> {
+  const existing = await PortalDataExport.query().where("ref", ref).where("requesterId", requesterId).first();
   if (existing) {
     await refreshDataExportStatus(existing);
     if (existing.status !== "failed") {
@@ -94,15 +112,16 @@ export async function startDataExport(ref: string, build: () => Promise<Buffer>)
   try {
     job = await PortalDataExport.create({
       ref,
+      requesterId,
       code: randomBytes(32).toString("hex"),
       status: "processing",
       filePath: null,
       completedAt: null,
     });
   } catch (error) {
-    // The unique ref also prevents duplicate work from concurrent requests.
+    // The unique (ref, requester_id) pair prevents duplicate work from concurrent requests.
     if ((error as { code?: string }).code === "ER_DUP_ENTRY") {
-      const concurrent = await PortalDataExport.findBy("ref", ref);
+      const concurrent = await PortalDataExport.query().where("ref", ref).where("requesterId", requesterId).first();
       if (concurrent) {
         return concurrent;
       }

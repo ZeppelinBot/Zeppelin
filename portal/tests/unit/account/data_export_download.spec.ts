@@ -8,21 +8,15 @@ const { downloadDataExport } = await import(clientUrl);
 test.group("Data export download client", (group) => {
   group.each.teardown(() => mock.restoreAll());
 
-  test("polls until ready and acknowledges only after delivering the complete file", async ({ assert }) => {
+  test("polls until ready and downloads without deleting the retained export", async ({ assert }) => {
     const requests: Array<{ url: string; method: string }> = [];
     const received = Promise.withResolvers<void>();
-    let delivered = false;
     let polls = 0;
     mock.method(globalThis, "fetch", async (url: string, options: RequestInit = {}) => {
       requests.push({ url, method: options.method ?? "GET" });
       if (url === "/account/download-data") {
         assert.equal(new Headers(options.headers).get("X-CSRF-TOKEN"), "csrf-token");
         return Response.json({ code: "test-code" }, { status: 202 });
-      }
-      if (options.method === "DELETE") {
-        assert.isTrue(delivered);
-        assert.equal(new Headers(options.headers).get("X-CSRF-TOKEN"), "csrf-token");
-        return new Response(null, { status: 204 });
       }
       if (url.endsWith("/download")) {
         return new Response("ZIP contents", { headers: { "Content-Type": "application/zip" } });
@@ -38,7 +32,6 @@ test.group("Data export download client", (group) => {
       onDownload: async (blob: Blob) => {
         assert.equal(await blob.text(), "ZIP contents");
         assert.isFalse(requests.some((request) => request.method === "DELETE"));
-        delivered = true;
         received.resolve();
       },
     });
@@ -48,7 +41,6 @@ test.group("Data export download client", (group) => {
       { url: "/data-exports/test-code", method: "GET" },
       { url: "/data-exports/test-code", method: "GET" },
       { url: "/data-exports/test-code/download", method: "GET" },
-      { url: "/data-exports/test-code", method: "DELETE" },
     ]);
   }).timeout(5000);
 

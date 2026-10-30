@@ -103,18 +103,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['getDownload']>>>
     }
   }
-  'data_export.delete_export': {
-    methods: ["DELETE"]
-    pattern: '/data-exports/:code'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { code: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['deleteExport']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['deleteExport']>>>
-    }
-  }
   'account.get_my_account_page': {
     methods: ["GET","HEAD"]
     pattern: '/account'
