@@ -15,12 +15,12 @@ export const dataDownloadThrottle = limiter.define("dataDownload", (ctx) => {
   return limiter
     .allowRequests(1)
     .every("5 minutes")
-    .usingKey(`user_${ctx.auth.user?.id ?? "anonymous"}`);
+    .usingKey(`user_${ctx.auth.user?.discordUserId ?? "anonymous"}`);
 });
 
 export const dataDeleteThrottle = limiter.define("dataDelete", (ctx) => {
   return limiter
     .allowRequests(1)
     .every("5 minutes")
-    .usingKey(`user_${ctx.auth.user?.id ?? "anonymous"}`);
+    .usingKey(`user_${ctx.auth.user?.discordUserId ?? "anonymous"}`);
 });
