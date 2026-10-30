@@ -76,7 +76,7 @@ async function buildAccountDataZip(userId: string) {
         return collectedData.data.columns.map((column) => row[column] ?? "");
       }),
     ];
-    zip.file(`${collectedData.name}.csv`, toCsv(rows));
+    zip.file(`${collectedData.name}.csv`, toCsv(rows, { escape_formulas: true }));
   }
   return zip.generateAsync({
     type: "nodebuffer",
