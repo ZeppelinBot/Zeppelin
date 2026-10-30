@@ -10,13 +10,16 @@ export const controllers = {
   auth: {
     Auth: () => import('#backend/features/auth/controllers/AuthController'),
   },
+  dataExport: {
+    DataExport: () => import('#backend/features/dataExport/controllers/DataExportController'),
+  },
   docs: {
     Docs: () => import('#backend/features/docs/controllers/DocsController'),
   },
-  splash: {
-    Splash: () => import('#backend/features/splash/controllers/SplashController'),
-  },
   legal: {
     PrivacyPolicy: () => import('#backend/features/legal/controllers/PrivacyPolicyController'),
+  },
+  splash: {
+    Splash: () => import('#backend/features/splash/controllers/SplashController'),
   },
 }

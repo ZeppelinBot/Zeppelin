@@ -7,7 +7,7 @@ export class AuthPageMiddleware {
       return next();
     }
 
-    if (request.method() !== "GET") {
+    if (request.method() !== "GET" || request.accepts(["html", "json"]) === "json") {
       return response.unauthorized({
         message: "Authentication required",
       });

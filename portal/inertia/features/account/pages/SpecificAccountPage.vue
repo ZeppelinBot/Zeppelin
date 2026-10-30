@@ -4,14 +4,10 @@
       <h1>Account</h1>
       <p>Managing account data for user ID {{ props.userId }}</p>
       <h2>Account data</h2>
-      <form method="POST" :action="`/specific-account/${props.userId}/download-data`" target="_blank">
-        <input type="hidden" name="_csrf" :value="csrfToken" />
-        <p>
-          <BasicButton>
-            <button type="submit">Download account data</button>
-          </BasicButton>
-        </p>
-      </form>
+      <DataExportDownload
+        :start-url="`/specific-account/${props.userId}/download-data`"
+        :filename="`export-${props.userId}.zip`"
+      />
       <h3>Delete account data</h3>
       <Form
         route="account.post_delete_specific_account_data"
@@ -30,6 +26,7 @@
 
 <script setup lang="ts">
 import BasicButton from "#frontend/components/BasicButton.vue";
+import DataExportDownload from "#frontend/features/account/components/DataExportDownload.vue";
 import ContentPaper from "#frontend/features/layout/ContentPaper.vue";
 import MainLayout from "#frontend/features/layout/MainLayout.vue";
 import { Form } from "@adonisjs/inertia/vue";
@@ -40,8 +37,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const csrfToken = document.querySelector<HTMLMetaElement>("meta[name='csrf-token']")?.content ?? "";
 
 function confirmDataDeletion() {
   return window.confirm(

@@ -1,10 +1,11 @@
 import { accountDataCategories, DataContainer } from "#backend/features/account/accountDataDefinitions";
 import AllowedGuild from "#backend/features/guilds/models/AllowedGuild";
+import { deleteDataExport, startDataExport } from "#backend/features/dataExport/dataExports";
+import PortalDataExport from "#backend/features/dataExport/models/PortalDataExport";
 import type { HttpContext } from "@adonisjs/core/http";
 import db from "@adonisjs/lucid/services/db";
 import { stringify as toCsv } from "csv-stringify/sync";
 import JSZip from "jszip";
-import { Readable } from "node:stream";
 
 interface CollectedData {
   name: string;
@@ -19,13 +20,9 @@ export default class AccountController {
 
   async postDownloadMyAccountData({ response, auth }: HttpContext) {
     const userId = auth.user!.discordUserId;
-    const zipBuffer = await buildAccountDataZip(userId);
-
-    response.header("Content-Type", "application/zip");
-    response.header("Content-Disposition", `attachment; filename="export-${userId}.zip"`);
-    response.header("Content-Length", String(zipBuffer.length));
+    const job = await startDataExport(`user-${userId}`, () => buildAccountDataZip(userId));
     response.header("Cache-Control", "no-store");
-    response.stream(Readable.from([zipBuffer]));
+    return response.accepted({ code: job.code });
   }
 
   async postDeleteMyAccountData({ response, auth, session, inertia }: HttpContext) {
@@ -48,13 +45,9 @@ export default class AccountController {
 
   async postDownloadSpecificAccountData({ params, response }: HttpContext) {
     const userId = String(params.userId);
-    const zipBuffer = await buildAccountDataZip(userId);
-
-    response.header("Content-Type", "application/zip");
-    response.header("Content-Disposition", `attachment; filename="export-${userId}.zip"`);
-    response.header("Content-Length", String(zipBuffer.length));
+    const job = await startDataExport(`user-${userId}`, () => buildAccountDataZip(userId));
     response.header("Cache-Control", "no-store");
-    response.stream(Readable.from([zipBuffer]));
+    return response.accepted({ code: job.code });
   }
 
   async postDeleteSpecificAccountData({ params, response, session }: HttpContext) {
@@ -141,5 +134,9 @@ async function deleteAccountData(userId: string): Promise<void> {
   } catch (err) {
     await trx.rollback();
     throw err;
+  }
+  const dataExport = await PortalDataExport.findBy("ref", `user-${userId}`);
+  if (dataExport) {
+    await deleteDataExport(dataExport);
   }
 }

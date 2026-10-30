@@ -454,6 +454,25 @@ export class PingableRoleSchema extends BaseModel {
   declare roleId: string;
 }
 
+export class PortalDataExportSchema extends BaseModel {
+  static $columns = ["code", "completedAt", "createdAt", "filePath", "id", "ref", "status"] as const;
+  $columns = PortalDataExportSchema.$columns;
+  @column()
+  declare code: string;
+  @column.dateTime()
+  declare completedAt: DateTime | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare filePath: string | null;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare ref: string;
+  @column()
+  declare status: string;
+}
+
 export class PortalUserSchema extends BaseModel {
   static $columns = ["createdAt", "discordAvatarUrl", "discordUserId", "discordUsername", "id", "lastLoginAt"] as const;
   $columns = PortalUserSchema.$columns;

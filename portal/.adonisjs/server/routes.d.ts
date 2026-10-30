@@ -10,6 +10,9 @@ export type ScannedRoutes = {
     'auth.get_discord_login': { paramsTuple?: []; params?: {} }
     'auth.get_discord_callback': { paramsTuple?: []; params?: {} }
     'auth.post_logout': { paramsTuple?: []; params?: {} }
+    'data_export.get_status': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'data_export.get_download': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'data_export.delete_export': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'account.get_my_account_page': { paramsTuple?: []; params?: {} }
     'account.post_download_my_account_data': { paramsTuple?: []; params?: {} }
     'account.post_delete_my_account_data': { paramsTuple?: []; params?: {} }
@@ -23,6 +26,8 @@ export type ScannedRoutes = {
     'docs.get_index': { paramsTuple?: []; params?: {} }
     'auth.get_discord_login': { paramsTuple?: []; params?: {} }
     'auth.get_discord_callback': { paramsTuple?: []; params?: {} }
+    'data_export.get_status': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'data_export.get_download': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'account.get_my_account_page': { paramsTuple?: []; params?: {} }
     'account.get_specific_account_page': { paramsTuple: [ParamValue]; params: {'userId': ParamValue} }
   }
@@ -32,6 +37,8 @@ export type ScannedRoutes = {
     'docs.get_index': { paramsTuple?: []; params?: {} }
     'auth.get_discord_login': { paramsTuple?: []; params?: {} }
     'auth.get_discord_callback': { paramsTuple?: []; params?: {} }
+    'data_export.get_status': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'data_export.get_download': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'account.get_my_account_page': { paramsTuple?: []; params?: {} }
     'account.get_specific_account_page': { paramsTuple: [ParamValue]; params: {'userId': ParamValue} }
   }
@@ -41,6 +48,9 @@ export type ScannedRoutes = {
     'account.post_delete_my_account_data': { paramsTuple?: []; params?: {} }
     'account.post_download_specific_account_data': { paramsTuple: [ParamValue]; params: {'userId': ParamValue} }
     'account.post_delete_specific_account_data': { paramsTuple: [ParamValue]; params: {'userId': ParamValue} }
+  }
+  DELETE: {
+    'data_export.delete_export': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

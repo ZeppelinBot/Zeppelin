@@ -79,6 +79,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/auth/controllers/AuthController').default['postLogout']>>>
     }
   }
+  'data_export.get_status': {
+    methods: ["GET","HEAD"]
+    pattern: '/data-exports/:code'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { code: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['getStatus']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['getStatus']>>>
+    }
+  }
+  'data_export.get_download': {
+    methods: ["GET","HEAD"]
+    pattern: '/data-exports/:code/download'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { code: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['getDownload']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['getDownload']>>>
+    }
+  }
+  'data_export.delete_export': {
+    methods: ["DELETE"]
+    pattern: '/data-exports/:code'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { code: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['deleteExport']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#backend/features/dataExport/controllers/DataExportController').default['deleteExport']>>>
+    }
+  }
   'account.get_my_account_page': {
     methods: ["GET","HEAD"]
     pattern: '/account'

@@ -16,16 +16,10 @@
         case history, please contact the relevant servers. The data archive includes a list of servers that are
         processing data about you.
       </p>
-      <form method="POST" action="/account/download-data" target="_blank">
-        <input type="hidden" name="_csrf" :value="csrfToken" />
-        <p>
-          <BasicButton>
-            <button type="submit">Download account data</button>
-          </BasicButton>
-          <br /><br />
-          Please note that it can take up to a minute to build your data archive after clicking the button.
-        </p>
-      </form>
+      <DataExportDownload
+        start-url="/account/download-data"
+        :filename="`export-${page.props.user?.discordUserId}.zip`"
+      />
       <h3>Delete your data</h3>
       <p>
         Press the button below to delete data stored against your Discord user in Zeppelin.
@@ -49,14 +43,13 @@
 
 <script setup lang="ts">
 import BasicButton from "#frontend/components/BasicButton.vue";
+import DataExportDownload from "#frontend/features/account/components/DataExportDownload.vue";
 import ContentPaper from "#frontend/features/layout/ContentPaper.vue";
 import MainLayout from "#frontend/features/layout/MainLayout.vue";
 import { Form } from "@adonisjs/inertia/vue";
 import { usePage } from "@inertiajs/vue3";
 
 const page = usePage();
-
-const csrfToken = document.querySelector<HTMLMetaElement>("meta[name='csrf-token']")?.content ?? "";
 
 function confirmDataDeletion() {
   return window.confirm(
