@@ -60,11 +60,16 @@
             </div>
           </Link>
         </MainMenuItem>
-        <MainMenuItem v-if="page.props.user" class="mobile-menu-logout">
+        <MainMenuItem v-if="page.props.user" class="mobile-menu-button">
           <BasicButton theme="menu">
             <button @click="logout">Log out</button>
           </BasicButton>
         </MainMenuItem>
+          <MainMenuItem v-else class="mobile-menu-button">
+            <BasicButton theme="menu">
+              <Link href="/oauth/discord/login">Log in</Link>
+            </BasicButton>
+          </MainMenuItem>
       </div>
       <div class="content">
         <slot></slot>
@@ -224,7 +229,7 @@ body {
   width: 100%;
   justify-content: flex-start;
 }
-.mobile-menu-logout {
+.mobile-menu-button {
   margin-top: 24px;
 }
 
