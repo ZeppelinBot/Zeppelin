@@ -48,6 +48,7 @@ services:
 
   devenv:
     build: &devenv-build
+      pull: true
       context: ./docker/development/devenv
     init: true
     environment:
@@ -75,6 +76,7 @@ services:
   cftunnel:
     profiles: [cftunnel]
     image: cloudflare/cloudflared:latest
+    pull_policy: daily
     command: tunnel run
     environment:
       TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN:-}
