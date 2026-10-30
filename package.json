@@ -14,7 +14,8 @@
     "run:migrate": "cd backend && pnpm run migrate",
     "run:bot": "cd backend && pnpm run start-bot-prod",
     "run:api": "cd backend && pnpm run start-api-prod",
-    "run:dashboard": "cd dashboard && node serve.js"
+    "run:dashboard": "cd dashboard && node serve.js",
+    "run:portal": "cd portal/build && NODE_ENV=production node bin/server.js"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
