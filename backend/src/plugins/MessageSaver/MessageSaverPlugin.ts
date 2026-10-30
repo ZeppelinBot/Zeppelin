@@ -30,14 +30,6 @@ export const MessageSaverPlugin = guildPlugin<MessageSaverPluginType>()({
     SavePinsToDBCmd,
   ],
 
-  // prettier-ignore
-  events: [
-    MessageCreateEvt,
-    MessageUpdateEvt,
-    MessageDeleteEvt,
-    MessageDeleteBulkEvt,
-  ],
-
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
@@ -45,5 +37,11 @@ export const MessageSaverPlugin = guildPlugin<MessageSaverPluginType>()({
 
   beforeStart(pluginData) {
     pluginData.state.common = pluginData.getPlugin(CommonPlugin);
+
+    // Register manually so message saving also runs when loaded only as a dependency.
+    pluginData.events.registerEventListener(MessageCreateEvt);
+    pluginData.events.registerEventListener(MessageUpdateEvt);
+    pluginData.events.registerEventListener(MessageDeleteEvt);
+    pluginData.events.registerEventListener(MessageDeleteBulkEvt);
   },
 });
