@@ -45,11 +45,12 @@ import { hasPermission } from "./functions/hasPermission.js";
 import { activeReloads } from "./guildReloads.js";
 import { refreshMembersIfNeeded } from "./refreshMembers.js";
 import { UtilityPluginType, zUtilityConfig } from "./types.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 export const UtilityPlugin = guildPlugin<UtilityPluginType>()({
   name: "utility",
 
-  dependencies: () => [TimeAndDatePlugin, ModActionsPlugin, LogsPlugin],
+  dependencies: () => [TimeAndDatePlugin, ModActionsPlugin, LogsPlugin, MessageSaverPlugin],
 
   configSchema: zUtilityConfig,
   defaultOverrides: [

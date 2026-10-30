@@ -7,11 +7,12 @@ import { AutoDeletePluginType, zAutoDeleteConfig } from "./types.js";
 import { onMessageCreate } from "./util/onMessageCreate.js";
 import { onMessageDelete } from "./util/onMessageDelete.js";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 export const AutoDeletePlugin = guildPlugin<AutoDeletePluginType>()({
   name: "auto_delete",
 
-  dependencies: () => [TimeAndDatePlugin, LogsPlugin],
+  dependencies: () => [TimeAndDatePlugin, LogsPlugin, MessageSaverPlugin],
   configSchema: zAutoDeleteConfig,
 
   beforeLoad(pluginData) {

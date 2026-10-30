@@ -1,0 +1,8 @@
+{
+  "extends": "./inertia/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./inertia",
+    "composite": true
+  },
+  "include": ["./inertia/**/*.ts", "./inertia/**/*.vue"]
+}

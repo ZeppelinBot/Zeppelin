@@ -8,9 +8,12 @@ import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt.js";
 import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./events/StarboardReactionRemoveEvts.js";
 import { StarboardPluginType, zStarboardConfig } from "./types.js";
 import { onMessageDelete } from "./util/onMessageDelete.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 export const StarboardPlugin = guildPlugin<StarboardPluginType>()({
   name: "starboard",
+
+  dependencies: () => [MessageSaverPlugin],
 
   configSchema: zStarboardConfig,
   defaultOverrides: [

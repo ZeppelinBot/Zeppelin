@@ -3,25 +3,7 @@ import { z } from "zod";
 import { availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { zZeppelinGuildConfig } from "./types.js";
 import { JSONSchema } from "zod/v4/core";
-
-function makeJsonSchemaDeepPartial(schema: Record<string, any>) {
-  if (schema.type === "object") {
-    delete schema.required;
-  }
-  for (const value of Object.values(schema)) {
-    if (value && typeof value === "object") {
-      if (Array.isArray(value)) {
-        for (const item of value) {
-          if (item && typeof item === "object") {
-            makeJsonSchemaDeepPartial(item);
-          }
-        }
-      } else {
-        makeJsonSchemaDeepPartial(value);
-      }
-    }
-  }
-}
+import { makeJsonSchemaDeepPartial } from "./utils/makeJsonSchemaDeepPartial.js";
 
 const basePluginOverrideCriteriaSchema = z.strictObject({
   channel: z

@@ -108,6 +108,7 @@ import { logVoiceChannelForceMove } from "./logFunctions/logVoiceChannelForceMov
 import { logVoiceChannelJoin } from "./logFunctions/logVoiceChannelJoin.js";
 import { logVoiceChannelLeave } from "./logFunctions/logVoiceChannelLeave.js";
 import { logVoiceChannelMove } from "./logFunctions/logVoiceChannelMove.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 // The `any` cast here is to prevent TypeScript from locking up from the circular dependency
 function getCasesPlugin(): Promise<any> {
@@ -117,7 +118,12 @@ function getCasesPlugin(): Promise<any> {
 export const LogsPlugin = guildPlugin<LogsPluginType>()({
   name: "logs",
 
-  dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getCasesPlugin()).CasesPlugin],
+  dependencies: async () => [
+    TimeAndDatePlugin,
+    InternalPosterPlugin,
+    (await getCasesPlugin()).CasesPlugin,
+    MessageSaverPlugin,
+  ],
   configSchema: zLogsConfig,
   defaultOverrides: [
     {

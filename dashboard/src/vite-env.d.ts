@@ -7,4 +7,6 @@ declare module "*.html" {
 
 interface Window {
   API_URL: string;
+  PORTAL_URL: string;
+  USE_PORTAL_PRIVACY_POLICY?: boolean;
 }

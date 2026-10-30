@@ -6,13 +6,16 @@ packages:
   - 'shared'
   - 'dashboard'
   - 'config-checker'
+  - 'portal'
 
 allowBuilds:
+  '@swc/core': true
   bufferutil: true
   esbuild: true
   utf-8-validate: true
 
 minimumReleaseAge: 20160 # in minutes (2 weeks)
+minimumReleaseAgeIgnoreMissingTime: false
 minimumReleaseAgeExclude:
   - 'vety'
   - 'knub-command-manager'

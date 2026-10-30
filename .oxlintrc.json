@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "ignorePatterns": ["dist/**", "*.min.js", "dashboard/src/**"],
+  "ignorePatterns": ["**/dist/**", "*.min.js", "dashboard/src/**", "**/.adonisjs/**", "public/assets/**"],
   "plugins": [
     "typescript",
     "unicorn",

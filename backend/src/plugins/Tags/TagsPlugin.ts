@@ -21,11 +21,12 @@ import { findTagByName } from "./util/findTagByName.js";
 import { onMessageCreate } from "./util/onMessageCreate.js";
 import { onMessageDelete } from "./util/onMessageDelete.js";
 import { renderTagBody } from "./util/renderTagBody.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 export const TagsPlugin = guildPlugin<TagsPluginType>()({
   name: "tags",
 
-  dependencies: () => [LogsPlugin],
+  dependencies: () => [LogsPlugin, MessageSaverPlugin],
   configSchema: zTagsConfig,
   defaultOverrides: [
     {

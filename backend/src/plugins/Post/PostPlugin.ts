@@ -15,11 +15,12 @@ import { ScheduledPostsListCmd } from "./commands/ScheduledPostsListCmd.js";
 import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd.js";
 import { PostPluginType, zPostConfig } from "./types.js";
 import { postScheduledPost } from "./util/postScheduledPost.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 export const PostPlugin = guildPlugin<PostPluginType>()({
   name: "post",
 
-  dependencies: () => [TimeAndDatePlugin, LogsPlugin],
+  dependencies: () => [TimeAndDatePlugin, LogsPlugin, MessageSaverPlugin],
   configSchema: zPostConfig,
   defaultOverrides: [
     {

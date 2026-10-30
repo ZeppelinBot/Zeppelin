@@ -21,10 +21,12 @@ COPY --from=prod-deps /zeppelin/node_modules /zeppelin/node_modules
 COPY --from=prod-deps /zeppelin/backend/node_modules /zeppelin/backend/node_modules
 #COPY --from=prod-deps /zeppelin/shared/node_modules /zeppelin/shared/node_modules # No prod deps in shared
 COPY --from=prod-deps /zeppelin/dashboard/node_modules /zeppelin/dashboard/node_modules
+COPY --from=prod-deps /zeppelin/portal/node_modules /zeppelin/portal/node_modules
 
 COPY --from=build /zeppelin/backend/dist /zeppelin/backend/dist
 COPY --from=build /zeppelin/shared/dist /zeppelin/shared/dist
 COPY --from=build /zeppelin/dashboard/dist /zeppelin/dashboard/dist
+COPY --from=build /zeppelin/portal/build /zeppelin/portal/build
 
 # Add version info
 RUN echo "${COMMIT_HASH}" > /zeppelin/.commit-hash

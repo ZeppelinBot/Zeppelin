@@ -13,6 +13,7 @@ import { SlowmodeSetCmd } from "./commands/SlowmodeSetCmd.js";
 import { SlowmodePluginType, zSlowmodeConfig } from "./types.js";
 import { clearExpiredSlowmodes } from "./util/clearExpiredSlowmodes.js";
 import { onMessageCreate } from "./util/onMessageCreate.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * SECONDS;
 
@@ -22,6 +23,7 @@ export const SlowmodePlugin = guildPlugin<SlowmodePluginType>()({
   // prettier-ignore
   dependencies: () => [
     LogsPlugin,
+    MessageSaverPlugin,
   ],
 
   configSchema: zSlowmodeConfig,

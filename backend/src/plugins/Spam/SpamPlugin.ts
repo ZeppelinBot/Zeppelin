@@ -8,11 +8,12 @@ import { SpamVoiceStateUpdateEvt } from "./events/SpamVoiceEvt.js";
 import { SpamPluginType, zSpamConfig } from "./types.js";
 import { clearOldRecentActions } from "./util/clearOldRecentActions.js";
 import { onMessageCreate } from "./util/onMessageCreate.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 export const SpamPlugin = guildPlugin<SpamPluginType>()({
   name: "spam",
 
-  dependencies: () => [LogsPlugin],
+  dependencies: () => [LogsPlugin, MessageSaverPlugin],
   configSchema: zSpamConfig,
   defaultOverrides: [
     {

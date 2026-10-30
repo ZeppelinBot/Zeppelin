@@ -1,5 +1,5 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["dist/**", "*.min.js", "*.yml", "*.yaml", "*.json", "LICENSE.md"],
+  "ignorePatterns": ["**/dist/**", "**/*.min.js", "**/*.yml", "**/*.yaml", "**/*.json", "**/LICENSE.md", "**/.adonisjs/**", "public/assets/**", "**/*.md"],
   "printWidth": 120
 }

@@ -34,6 +34,7 @@ import { clearOldRecentActions } from "./functions/clearOldRecentActions.js";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam.js";
 import { AutomodPluginType, zAutomodConfig } from "./types.js";
 import { DebugAutomodCmd } from "./commands/DebugAutomodCmd.js";
+import { MessageSaverPlugin } from "../MessageSaver/MessageSaverPlugin.js";
 
 export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
   name: "automod",
@@ -47,6 +48,7 @@ export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
     PhishermanPlugin,
     InternalPosterPlugin,
     RoleManagerPlugin,
+    MessageSaverPlugin,
   ],
 
   configSchema: zAutomodConfig,

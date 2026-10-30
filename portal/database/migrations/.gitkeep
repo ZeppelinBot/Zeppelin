@@ -1,0 +1,3 @@
+# We don't currently use Adonis's migrations at all.
+# All migrations are handled by the /backend project instead.
+# schema.ts is generated based on database inspection.

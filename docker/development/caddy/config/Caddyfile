@@ -1,0 +1,30 @@
+# Dashboard + API
+https://:443 {
+    tls internal {
+        on_demand
+    }
+
+    @api path /api /api/*
+    handle @api {
+        reverse_proxy devenv:3001
+    }
+
+    handle {
+        reverse_proxy devenv:3002
+    }
+}
+
+# Portal
+https://:444 {
+    tls internal {
+        on_demand
+    }
+
+    @vite_hmr {
+        path /
+        header Upgrade websocket
+    }
+
+    reverse_proxy @vite_hmr devenv:3004
+    reverse_proxy devenv:3003
+}
