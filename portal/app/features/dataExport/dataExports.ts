@@ -6,7 +6,7 @@ import { access, mkdtemp, rm, rmdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
 
-const processingTimeoutMs = 60 * 60 * 1000;
+const processingTimeoutMs = 15 * 60 * 1000;
 
 export async function cleanupExpiredDataExports() {
   const exports = await PortalDataExport.query()
