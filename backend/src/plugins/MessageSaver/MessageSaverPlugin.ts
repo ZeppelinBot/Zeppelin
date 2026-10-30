@@ -24,12 +24,6 @@ export const MessageSaverPlugin = guildPlugin<MessageSaverPluginType>()({
     },
   ],
 
-  // prettier-ignore
-  messageCommands: [
-    SaveMessagesToDBCmd,
-    SavePinsToDBCmd,
-  ],
-
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
