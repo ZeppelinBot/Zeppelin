@@ -1,4 +1,4 @@
-import { GuildChannel, Message } from "discord.js";
+import { GuildChannel, Message, MessageReferenceType } from "discord.js";
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
 import { QueuedEventEmitter } from "../QueuedEventEmitter.js";
@@ -25,6 +25,16 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
   }
 
   protected msgToSavedMessageData(msg: Message): ISavedMessageData {
+    if (msg.reference?.type === MessageReferenceType.Forward && msg.reference.messageId) {
+      const realMsg = msg.messageSnapshots.get(msg.reference.messageId)
+      if (realMsg) {
+        msg.content = realMsg.content;
+        msg.attachments = realMsg.attachments;
+        msg.embeds = realMsg.embeds;
+        msg.stickers = realMsg.stickers;
+      }
+    }
+
     const data: ISavedMessageData = {
       author: {
         username: msg.author.username,
