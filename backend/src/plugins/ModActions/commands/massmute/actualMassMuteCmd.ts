@@ -3,7 +3,7 @@ import { GuildPluginData } from "vety";
 import { LogType } from "../../../../data/LogType.js";
 import { logger } from "../../../../logger.js";
 import { canActOn, deleteContextResponse, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
-import { noop } from "../../../../utils.js";
+import { noop, resolveMember } from "../../../../utils.js";
 import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
@@ -35,8 +35,15 @@ export async function actualMassMuteCmd(
   const muteReasonWithAttachments = formatReasonWithAttachments(reason, attachments);
 
   // Verify we can act upon all users
+  let fetchedMembers: Map<string, GuildMember> | null = null;
+  try {
+    fetchedMembers = await pluginData.guild.members.fetch({ user: userIds as Snowflake[] });
+  } catch {
+    // If bulk fetch fails, fall back to cache-only checks
+  }
+
   for (const userId of userIds) {
-    const member = pluginData.guild.members.cache.get(userId as Snowflake);
+    const member = fetchedMembers?.get(userId) ?? pluginData.guild.members.cache.get(userId as Snowflake);
     if (member && !canActOn(pluginData, author, member)) {
       pluginData.state.common.sendErrorMessage(context, "Cannot massmute one or more users: insufficient permissions");
       return;
