@@ -158,11 +158,11 @@ export default defineConfig({
         },
       }),
 
-      () => import("./hooks/indexInertiaPages.ts"),
+      () => import("./hooks/indexInertiaPages.js"),
 
       generateRegistry(),
     ],
     buildStarting: [() => import("@adonisjs/vite/build_hook")],
-    devServerStarting: [() => import("./hooks/devHmrPort.ts")],
+    devServerStarting: [() => import("./hooks/devHmrPort.js")],
   },
 });
