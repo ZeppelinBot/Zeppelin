@@ -65,11 +65,11 @@
             <button @click="logout">Log out</button>
           </BasicButton>
         </MainMenuItem>
-          <MainMenuItem v-else class="mobile-menu-button">
-            <BasicButton theme="menu">
-              <Link href="/oauth/discord/login">Log in</Link>
-            </BasicButton>
-          </MainMenuItem>
+        <MainMenuItem v-else class="mobile-menu-button">
+          <BasicButton theme="menu">
+            <Link href="/oauth/discord/login">Log in</Link>
+          </BasicButton>
+        </MainMenuItem>
       </div>
       <div class="content">
         <slot></slot>
